@@ -22,4 +22,6 @@ k8s_administrators  = []    # add any AWS users here who should also have access
 #       username = "<username>"
 #   }
 
-nomad_count = 1
+nomad_count       = 1
+nomad_ssh_enabled = false    # Set to true to enable SSH access to Nomad clients
+nomad_ssh_key     = ""       # SSH Public key for Nomad SSH authentication
