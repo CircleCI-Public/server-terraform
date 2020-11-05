@@ -1,0 +1,28 @@
+basename          = ""        # Prefix added to cluster resources
+project_id        = ""        # Name of the google cloud project
+project_loc       = ""        # Region to create cluster IE us-east1 
+# The filename of the service_account auth token
+service_account   = "<HOME>/.config/gcloud/service_accounts/terraform.json"
+
+node_spec         = "n1-standard-8"
+node_min          = 1
+node_max          = 9
+node_pool_cpu_max = 128
+node_pool_ram_max = 1024
+node_auto_repair  = true
+node_auto_upgrade = true
+initial_nodes     = 1
+
+enable_nat                     = true
+enable_bastion                 = false
+enable_istio                   = false
+enable_intranode_communication = false
+enable_dashboard               = false
+
+# The CIDR ranges that are allowed to access the Kubernetes cluster.
+# Developers, this is typically the public IP address of your home/office network
+# IE ["1.2.3.4/32"]
+# The default is ["0.0.0.0/0"], which implements no IP restrictions
+# allowed_cidr_blocks = []
+
+nomad_count = 1
