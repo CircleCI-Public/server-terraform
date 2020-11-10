@@ -1,2 +1,11 @@
 # Vim
 *.swp
+
+# Terraform
+.terraform
+terraform.tfvars
+remote-state.tf
+terraform.tfstate
+
+# Mac
+.DS_Store
