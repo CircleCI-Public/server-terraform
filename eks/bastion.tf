@@ -41,12 +41,22 @@ resource "aws_security_group" "bastion_ssh" {
 }
 
 resource "aws_iam_role" "bastion_role" {
-  count       = var.enable_bastion ? 1 : 0
   name        = "${var.basename}-circleci-cluster-bastion_role"
   description = "IAM role for the EKS bastion host"
 
-  assume_role_policy = <<EOF
-{"Version": "2012-10-17","Statement": [{"Effect": "Allow","Principal": {"Service": ["ec2.amazonaws.com"]},"Action": ["sts:AssumeRole"]}]}
+  assume_role_policy = <<-EOF
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Service": ["ec2.amazonaws.com"]
+          },
+          "Action": ["sts:AssumeRole"]
+        }
+      ]
+    }
   EOF
 
   tags = {
@@ -58,44 +68,37 @@ resource "aws_iam_role" "bastion_role" {
 }
 
 resource "aws_iam_policy" "bastion_policy" {
-  count       = var.enable_bastion ? 1 : 0
   name        = "${var.basename}-circleci-cluster-bastion_policy"
   path        = "/"
   description = "IAM policy for the CircleCI Server EKS bastion host"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
+  policy = <<-EOF
     {
-      "Action": [
-        "eks:*",
-        "sts:*",
-        "iam:PassPolicy",
-        "ec2:DescribeTags",
-        "logs:*"
-      ],
-      "Resource": [
-        "*"
-      ],
-      "Effect": "Allow",
-      "Sid": ""
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "eks:ListClusters",
+            "eks:DescribeCluster"
+          ],
+          "Resource": [
+            "${module.eks-cluster.cluster_arn}"
+          ]
+        }
+      ]
     }
-  ]
-}
   EOF
 }
 
 resource "aws_iam_role_policy_attachment" "bastion_policy_attachment" {
-  count      = var.enable_bastion ? 1 : 0
-  role       = aws_iam_role.bastion_role[0.0].name
-  policy_arn = aws_iam_policy.bastion_policy[0.0].arn
+  role       = aws_iam_role.bastion_role.name
+  policy_arn = aws_iam_policy.bastion_policy.arn
 }
 
 resource "aws_iam_instance_profile" "bastion_iam_profile" {
-  count = var.enable_bastion ? 1 : 0
   name  = "${var.basename}-circleci-bastion_iam_profile"
-  role  = aws_iam_role.bastion_role[0.0].name
+  role  = aws_iam_role.bastion_role.name
 }
 
 resource "aws_instance" "bastion" {
@@ -104,22 +107,21 @@ resource "aws_instance" "bastion" {
   instance_type               = "t3.micro"
   associate_public_ip_address = true
   user_data                   = <<-EOF
-          #! /bin/bash
+    #!/bin/bash
+    sudo apt update -y
+    sudo apt install -y awscli
+    aws eks update-kubeconfig --name ${module.eks-cluster.cluster_id} --region ${var.aws_region} --kubeconfig /home/ubuntu/.kube/config
 
-          curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.17.9/2020-08-04/bin/linux/amd64/aws-iam-authenticator
-          chmod +x ./aws-iam-authenticator
-          sudo mv ./aws-iam-authenticator /usr/bin/.
-          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.14.10/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/bin/
-          echo "${module.eks-cluster.kubeconfig}" > /etc/kube.config
-          echo export KUBECONFIG=/etc/kube.config >> /etc/profile
-          curl -LO https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv3.5.4/kustomize_v3.5.4_linux_amd64.tar.gz && tar xzf ./kustomize_v3.5.4_linux_amd64.tar.gz && sudo mv ./kustomize /usr/bin/
-          curl -LO https://github.com/replicatedhq/kots/releases/download/v1.19.5/kots_linux_amd64.tar.gz && tar xzf kots_linux_amd64.tar.gz && sudo mv ./kots /usr/bin/kubectl-kots
-          EOF
+    # Kubernetes Tooling
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.14.10/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/bin/
+    curl -LO https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv3.5.4/kustomize_v3.5.4_linux_amd64.tar.gz && tar xzf ./kustomize_v3.5.4_linux_amd64.tar.gz && sudo mv ./kustomize /usr/bin/
+    curl -LO https://github.com/replicatedhq/kots/releases/download/v1.19.5/kots_linux_amd64.tar.gz && tar xzf kots_linux_amd64.tar.gz && sudo mv ./kots /usr/bin/kubectl-kots
+  EOF
 
   key_name               = aws_key_pair.bastion_key[0.0].key_name
   vpc_security_group_ids = [module.vpc.default_security_group_id, aws_security_group.bastion_ssh[0.0].id]
   subnet_id              = module.vpc.public_subnets[0]
-  iam_instance_profile   = aws_iam_instance_profile.bastion_iam_profile[0.0].name
+  iam_instance_profile   = aws_iam_instance_profile.bastion_iam_profile.name
 
   tags = {
     Terraform   = "true"
