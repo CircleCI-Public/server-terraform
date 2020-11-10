@@ -2,7 +2,7 @@ basename         = ""        # Prefix added to cluster resources
 aws_region       = ""        # Region to create cluster IE us-east-1
 
 enable_bastion   = true      # Enable a bastion host for the eks cluster
-bastion_key      = ""        # The public ssh key to use for the bastion host.
+bastion_key      = ""        # cat the public ssh key to use for the bastion host.
 
 # The CIDR ranges that are allowed to access the Kubernetes cluster.
 allowed_cidr_blocks = [""]
