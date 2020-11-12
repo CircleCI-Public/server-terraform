@@ -21,12 +21,12 @@ module "asg" {
   # Launch configuration
   lc_name = "${var.basename}-circleci-nomad_lc"
 
-  image_id      = var.ami_id
-  instance_type = var.nomad_instance_type
-  key_name      = local.ssh_enabled ? aws_key_pair.ssh_key[0].id : null
+  image_id        = var.ami_id
+  instance_type   = var.nomad_instance_type
+  key_name        = local.ssh_enabled ? aws_key_pair.ssh_key[0].id : null
   security_groups = compact([
     aws_security_group.nomad_sg[0].id,
-    local.ssh_enabled  ? aws_security_group.ssh_sg.id : "",
+    local.ssh_enabled  ? aws_security_group.ssh_sg[0].id : "",
   ])
 
   root_block_device = [
@@ -111,6 +111,7 @@ resource "aws_security_group" "nomad_sg" {
 # We are allowing port 22 for operators
 # to debug nomad clients
 resource "aws_security_group" "ssh_sg" {
+  count       = local.ssh_enabled ? 1 : 0
   name        = "${var.basename}-circleci-nomad_ssh"
   description = "SG for CircleCI Server nomad SSH access"
   vpc_id      = var.vpc_id
