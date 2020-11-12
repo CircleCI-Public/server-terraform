@@ -25,4 +25,5 @@ enable_dashboard               = false
 # The default is ["0.0.0.0/0"], which implements no IP restrictions
 # allowed_cidr_blocks = []
 
-nomad_count = 1
+nomad_count   = 1
+nomad_ssh_key = null # Set to valid SSH public key to enable SSH access to nomad clients
