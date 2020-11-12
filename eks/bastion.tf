@@ -97,8 +97,8 @@ resource "aws_iam_role_policy_attachment" "bastion_policy_attachment" {
 }
 
 resource "aws_iam_instance_profile" "bastion_iam_profile" {
-  name  = "${var.basename}-circleci-bastion_iam_profile"
-  role  = aws_iam_role.bastion_role.name
+  name = "${var.basename}-circleci-bastion_iam_profile"
+  role = aws_iam_role.bastion_role.name
 }
 
 resource "aws_instance" "bastion" {
