@@ -1,0 +1,56 @@
+version: 2.1
+
+orbs:
+  shellcheck: circleci/shellcheck@2.2.0
+
+workflows:
+  version: 2
+  terraform-validate:
+    jobs:
+      - shellcheck/check
+      - format
+      - validate:
+          name: EKS
+          tf_path: eks
+          requires:
+            - format
+            - shellcheck/check
+      - validate:
+          name: GKE
+          tf_path: gke
+          requires:
+            - format
+            - shellcheck/check
+
+executors:
+  default:
+    resource_class: small
+    docker:
+      - image: hashicorp/terraform:0.13.5
+jobs:
+  validate:
+    executor: default
+    parameters:
+      tf_path:
+        type: string
+    steps:
+      - checkout
+
+      - run:
+          name: terraform init
+          working_directory: << parameters.tf_path >>
+          command: terraform init
+
+      - run:
+          name: terraform validate
+          working_directory: << parameters.tf_path >>
+          command: terraform validate
+
+  format:
+    executor: default
+    steps:
+      - checkout
+
+      - run:
+          name: terraform fmt
+          command: terraform fmt -check -diff -recursive
