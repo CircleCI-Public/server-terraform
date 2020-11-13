@@ -115,7 +115,7 @@ resource "google_compute_firewall" "nomad_ssh" {
   count       = local.ssh_enabled ? 1 : 0
   name        = "${local.basename}-nomad-ssh"
   description = "${local.basename} firewall rule for CircleCI Server Nomand component"
-  
+
   allow {
     protocol = "tcp"
     ports    = ["22"]
