@@ -57,7 +57,8 @@ module "nomad" {
   basename        = var.basename
   service_account = var.service_account
   nomad_count     = var.nomad_count
-  network_name    = google_compute_network.test_net.self_link
+  network_name    = google_compute_network.test_net.name
+  cluster_name    = module.kube_private_cluster.cluster_name
 }
 
 resource "google_storage_bucket" "data_bucket" {

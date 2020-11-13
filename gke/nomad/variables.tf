@@ -30,3 +30,12 @@ variable "nomad_count" {
   type    = number
   default = 1
 }
+
+variable "network_name" {
+  type = string
+}
+
+variable "cluster_name" {
+  type = string
+}
+
