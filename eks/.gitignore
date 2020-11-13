@@ -1,5 +1,6 @@
 kubeconfig*
-.terraform
 terraform.tfvars
+remote-state.tf
+.terraform
 terraform.tfstate
 terraform.tfstate.backup
