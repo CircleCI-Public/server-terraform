@@ -2,10 +2,7 @@
 
 ## Assumptions and Requirements
 
-There are several requirements in order to follow this document to deploy a
-CircleCI Server instance on EKS.
-
-Initial assumption is that a AWS account exists and that the deployer has
+It is assumed that an AWS account exists and that the deployer has
 permissions to create, modify, and delete resources and IAM accounts. 
 
 To deploy the infrastructure and application you will need to have the

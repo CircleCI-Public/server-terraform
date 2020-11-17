@@ -20,11 +20,10 @@ You may contribute to server-terraform by:
 Creating a Branch
 - Start by branching off main. Branches should be named with the issue number they resolve or a description of the work being done.
 - Once your work is complete, you may create a PR for your branch
-- each commit is tested for formatting and syntax errors in terraform and shell scripts
+- each commit is tested for formatting and syntax errors
 - we then test PRs in our own test enfironments
 - PRs are reviewed and approved by members of CircleCI's Server team
 
 ### Reporting Issues
 - Feature requests or problems found may be reported by createing an issue within this repository
 - CircleCI's Server team will review and respond to issues.
-- Guides on creating issues will be added soon

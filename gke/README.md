@@ -2,9 +2,6 @@
 
 ## Assumptions and Requirements
 
-There are several requirements in order to follow this document to deploy a
-CircleCI Server instance on GKE.
-
 Initial assumption is that a Google Cloud project exists and that the deployer
 has permissions to create, modify, and delete resources and IAM accounts. 
 
