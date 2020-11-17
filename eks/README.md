@@ -31,7 +31,7 @@ configure the CircleCI Server application:
 
 ## Setup
 
-1. Install any missing cli tools listed above. Ensure access to listed
+1. Install any missing CLI tools listed above. Ensure access to listed
    services.
 2. Clone `server-helm-chart` repository to your machine. `git clone
    git@github.com:circleci/server-helm-chart.git`

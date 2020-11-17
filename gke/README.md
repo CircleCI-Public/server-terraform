@@ -46,7 +46,7 @@ curl https://kots.io/install | bash
 
 ## Setup
 
-1. Install any missing cli tools listed above. Ensure access to listed
+1. Install any missing CLI tools listed above. Ensure access to listed
    services.
 2. Clone `server-helm-chart` repository to your machine.  
 	`git clone git@github.com:circleci/server-helm-chart.git`
@@ -133,7 +133,7 @@ forward creds to the next machine for you so that you don't have to copy a key
 around.
 
 <!-- Links -->
-[terraform]: https://releases.hashicorp.com/terraform/0.12.24/
+[terraform]: https://releases.hashicorp.com/terraform/0.13.5/
 [kubectl]: https://storage.googleapis.com/kubernetes-release/release/v1.14.6/bin/darwin/amd64/kubectl
 [kustomize]: https://github.com/kubernetes-sigs/kustomize/releases/tag/kustomize%2Fv3.6.1
 [helm]: https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
