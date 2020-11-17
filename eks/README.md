@@ -12,7 +12,7 @@ To deploy the infrastructure and application you will need to have the
 following CLIs installed:
 
 
-* [terraform] (tested with 0.12.24)
+* [terraform] (tested with 0.13.5)
 * [kubectl] (tested with 1.14.6)
 * [kustomize] (tested with 3.6.1)
 * [helm] (tested with 3.0.1)
@@ -25,7 +25,7 @@ following CLIs installed:
 Additionally you will require the following permissions and access in order to
 configure the CircleCI Server application:
 
-* ID and secret for a Github OAuth application, configured to CircleCI specifications.
+* ID and secret for a Github OAuth application.
 * An AWS [keypair][aws-keypair-docs]
 * optional - certbot with Route53 `pip install certbot_dns_route53`
 
@@ -86,7 +86,7 @@ connecting to the bastion host you can run the kubectl command above.
 
 If you already have a Certificate please skip to the next step.
 
-A TLS certificate is require for proper operation of CircleCI Enterprise.  A
+A TLS certificate is required for proper operation of CircleCI Server.  A
 free option is to use LetsEncrypt via certbot.
 
 ```shell
@@ -132,7 +132,7 @@ after terraform has run so that subsequent runs always show removal of that as
 a change
 
 <!-- Links -->
-[terraform]: https://releases.hashicorp.com/terraform/0.12.24/
+[terraform]: https://releases.hashicorp.com/terraform/0.13.5/
 [kubectl]: https://storage.googleapis.com/kubernetes-release/release/v1.14.6/bin/darwin/amd64/kubectl
 [kustomize]: https://github.com/kubernetes-sigs/kustomize/releases/tag/kustomize%2Fv3.6.1
 [helm]: https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz

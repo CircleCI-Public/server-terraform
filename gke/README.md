@@ -1,9 +1,5 @@
 # CircleCI Server on GKE
 
-## CircleCI Engineers
-
-There is a companion doc to this one in the [engineering repo](https://github.com/circleci/engineering/blob/master/server/server-gke-kots-testing-guide.md), it includes details for our org GKE account and testing domain.
-
 ## Assumptions and Requirements
 
 There are several requirements in order to follow this document to deploy a
@@ -30,9 +26,8 @@ following CLIs installed:
 Additionally you will require the following permissions and access in order to
 configure the CircleCI Server application:
 
-* You use google DNS to manage the circleci enterprise subdomain
-* ID and secret for a Github OAuth application, configured to CircleCI
-  specifications.
+* You use google DNS to manage the CircleCI Server subdomain
+* ID and secret for a Github OAuth application.
 * A GCP Service Account with [keys][gcloud-service-account-keys]
 
 ### macOS dependency installation (Homebrew)
@@ -99,7 +94,7 @@ asterix beside the active context.
 
 If you already have a Certificate please skip to the next step.
 
-A TLS certificate is require for proper operation of CircleCI Enterprise.  A
+A TLS certificate is required for proper operation of CircleCI Server.  A
 free option is to use LetsEncrypt via certbot.
 
 ```shell
