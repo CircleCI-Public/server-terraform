@@ -38,7 +38,7 @@ configure the CircleCI Server application:
 ### Optional
 The following steps are optional if the IAM secret key needs to be encrypted in the terraform state file
 1. Generate a PGP key: `gpg --full-generate-key`
-2. Get a copy of the base64 encoded public key gpg --export <keyname> | base64 | pbcopy
+2. Get a copy of the base64 encoded public key: `gpg --export <keyname> | base64 | pbcopy`
 3. Use the base64 encoded public key to populate the `pgp_key` terraform variable
 
 ## Deploy EKS Infrastructure with Terraform
