@@ -67,7 +67,8 @@ resource "google_project_iam_member" "nomad_member_service_management" {
 }
 
 resource "google_compute_instance_template" "nomad_template" {
-  depends_on = [null_resource.dependency]
+  # We've add this wait to ensure that 
+  depends_on = [time_sleep.wait_120_seconds]
 
   name_prefix  = "${local.basename}-nomad-template"
   machine_type = "n1-standard-8"
@@ -136,9 +137,7 @@ resource "google_compute_instance_group_manager" "nomad_manager" {
   }
 }
 
-resource "null_resource" "dependency" {
-  triggers = {
-    dependency_id = var.cluster_name
-  }
 
+resource "time_sleep" "wait_120_seconds" {
+  create_duration = "120s"
 }

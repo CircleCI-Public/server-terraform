@@ -27,15 +27,13 @@ variable "service_account" {
 }
 
 variable "nomad_count" {
-  type    = number
-  default = 1
+  type        = number
+  default     = 1
+  description = "The number of nomad clients to create"
 }
 
 variable "network_name" {
-  type = string
-}
-
-variable "cluster_name" {
-  type = string
+  type        = string
+  description = "Name of the GCP network to attach to nomad"
 }
 
