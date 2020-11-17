@@ -1,0 +1,8 @@
+namespace=""          # (Optional) The namespace of your CircleCI deployment in an existing cluster
+nomad_count=""        # The number of nomad clients to create
+project_loc=""        # The GCP zone
+project_id=""         # GCP project
+basename=""           # A basename to identify your nomad resources
+service_account=""    # Path to filename of the service_account auth token. eg: "<HOME>/.config/gcloud/service_accounts/terraform.json"
+network_name=""       # Name of the GCP network to attach to nomad
+cluster_name=""       # The name of an existing K8s cluster hosting CircleCI

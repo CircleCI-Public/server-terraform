@@ -17,7 +17,7 @@ variable "basename" {
 variable "namespace" {
   default     = ""
   type        = string
-  description = "Name of deployment to be used as a base for naming resources."
+  description = "(Optional) The namespace of your CircleCI deployment in an existing cluster"
 }
 
 variable "service_account" {
@@ -27,6 +27,13 @@ variable "service_account" {
 }
 
 variable "nomad_count" {
-  type    = number
-  default = 1
+  type        = number
+  default     = 1
+  description = "The number of nomad clients to create"
 }
+
+variable "network_name" {
+  type        = string
+  description = "Name of the GCP network to attach to nomad"
+}
+

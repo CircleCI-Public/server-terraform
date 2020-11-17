@@ -67,6 +67,9 @@ resource "google_project_iam_member" "nomad_member_service_management" {
 }
 
 resource "google_compute_instance_template" "nomad_template" {
+  # We've add this wait to ensure that 
+  depends_on = [time_sleep.wait_120_seconds]
+
   name_prefix  = "${local.basename}-nomad-template"
   machine_type = "n1-standard-8"
 
@@ -94,7 +97,7 @@ resource "google_compute_instance_template" "nomad_template" {
 
   network_interface {
 
-    network = "${var.basename}-net"
+    network = var.network_name
 
     access_config {}
 
@@ -118,7 +121,7 @@ resource "google_compute_firewall" "nomad_ssh" {
     ports    = ["80"]
   }
   target_tags = ["ssh", "nomad"]
-  network     = "${var.basename}-net"
+  network     = var.network_name
 }
 
 resource "google_compute_instance_group_manager" "nomad_manager" {
@@ -132,4 +135,9 @@ resource "google_compute_instance_group_manager" "nomad_manager" {
   version {
     instance_template = google_compute_instance_template.nomad_template.self_link
   }
+}
+
+
+resource "time_sleep" "wait_120_seconds" {
+  create_duration = "120s"
 }
