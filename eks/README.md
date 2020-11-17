@@ -112,7 +112,7 @@ record for `dev.example.com` for this step to succeed.
 These must be deleted manually.
   - Start by deleting all the Load Balancers.  Identify them based on tag.
   - Then Delete the VPC
-  - then run `terraform destroy` again and it will probably show 0 to destroy.
+  - Run `terraform destroy` again and it will should show 0 entities to destroy.
     Problem solved!
 - Network Interfaces don't get any tags.  This is probably something in the
   module implementation
