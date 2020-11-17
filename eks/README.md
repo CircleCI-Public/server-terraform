@@ -108,19 +108,16 @@ record for `dev.example.com` for this step to succeed.
 
 ### Known Problems: ###
 
-- Running `terraform destroy` fails on subnet and internet gateway sometimes.  The VPC
-  also will have still be there but the terraform output does not show that.
-These must be deleted manually.
+- Running `terraform destroy` fails on subnet and internet gateway sometimes. The VPC
+  also will have still be there but the terraform output does not show that. These must be deleted manually.
   - Start by deleting all the Load Balancers.  Identify them based on tag.
   - Then Delete the VPC
-  - then run `terraform destroy` again and it will probably show 0 to destroy.
-    Problem solved!
+  - then run `terraform destroy` again and it will probably show 0 to destroy. Problem solved!
 - Network Interfaces don't get any tags.  This is probably something in the
   module implementation
-- Something tags subnets with
-  `"kubernetes.io/cluster/christopher-eks-cci-cluster" = "shared" -> null`
-after terraform has run so that subsequent runs always show removal of that as
-a change
+- On running `terraform apply` rubnets will be tagged with:
+  `"kubernetes.io/cluster/<basename>-cci-cluster" = "shared" -> null`
+  Subsequent `terraform apply` runs always show removal of that as a change
 
 <!-- Links -->
 [terraform]: https://releases.hashicorp.com/terraform/0.13.5/
