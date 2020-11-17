@@ -3,16 +3,16 @@
 ####################################################
 
 ### NETWORK ###
-resource "google_compute_network" "test_net" {
+resource "google_compute_network" "circleci_net" {
   name                    = "${var.basename}-net"
   auto_create_subnetworks = "true"
 }
 
 
 ### NETWORK - Subnet Data ###
-data "google_compute_subnetwork" "test_net_subnet_data" {
-  name       = google_compute_network.test_net.name
-  depends_on = [google_compute_network.test_net]
+data "google_compute_subnetwork" "circleci_net_subnet_data" {
+  name       = google_compute_network.circleci_net.name
+  depends_on = [google_compute_network.circleci_net]
 }
 
 # GKE cluster settings
@@ -46,8 +46,8 @@ module "kube_private_cluster" {
   enable_intranode_communication = var.enable_intranode_communication
   enable_dashboard               = var.enable_dashboard
 
-  network_uri = google_compute_network.test_net.self_link
-  subnet_uri  = data.google_compute_subnetwork.test_net_subnet_data.self_link
+  network_uri = google_compute_network.circleci_net.self_link
+  subnet_uri  = data.google_compute_subnetwork.circleci_net_subnet_data.self_link
 }
 
 module "nomad" {
@@ -57,7 +57,7 @@ module "nomad" {
   basename        = var.basename
   service_account = var.service_account
   nomad_count     = var.nomad_count
-  network_name    = google_compute_network.test_net.name
+  network_name    = google_compute_network.circleci_net.name
 }
 
 resource "google_storage_bucket" "data_bucket" {
