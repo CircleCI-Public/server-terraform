@@ -108,7 +108,7 @@ certbot certonly \
 
 This will create a certificate along with chain of intermediate
 certificates in `gke-config/live/$domain/fullchain.pem` and private
-key in `gke-config/live/privkey.pem`. These files can be used in
+key in `gke-config/live/$domain/privkey.pem`. These files can be used in
 Kots config to secure your installations with TLS.
 
 ### Resources
@@ -136,7 +136,7 @@ around.
 [helm]: https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
 [awscli]: https://aws.amazon.com/cli/
 [kots]: https://kots.io/kots-cli/getting-started/
-[server-keysets]: https://hub.docker.com/repository/docker/circleci/server-keysets
+[server-keysets]: https://github.com/CircleCI-Public/server-keysets-cli#using-the-docker-container
 [gcloud]: https://cloud.google.com/sdk/install
 [gcloud-service-account-keys]: https://cloud.google.com/docs/authentication/production#creating_a_service_account
 [Google Clouds Supported Resources Page]: https://cloud.google.com/deployment-manager/docs/configuration/supported-resource-types

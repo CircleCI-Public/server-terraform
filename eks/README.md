@@ -39,7 +39,7 @@ configure the CircleCI Server application:
 The following steps are optional if the IAM secret key needs to be encrypted in the terraform state file
 1. Generate a PGP key: `gpg --full-generate-key`
 2. Get a copy of the base64 encoded public key gpg --export <keyname> | base64 | pbcopy
-3. Use the base64 encoded public key to populate the `pgp_key' terraform variable
+3. Use the base64 encoded public key to populate the `pgp_key` terraform variable
 
 ## Deploy EKS Infrastructure with Terraform
 
@@ -97,7 +97,7 @@ certbot certonly \
 
 This will create a certificate along with chain of intermediate
 certificates in `eks-config/live/$domain/fullchain.pem` and private
-key in `eks-config/live/privkey.pem`. These files can be used in
+key in `eks-config/live/$domain/privkey.pem`. These files can be used in
 Kots config to secure your installations with TLS.
 
 You need a public DNS record in Route53 for your secondary domain if your
@@ -129,5 +129,5 @@ a change
 [helm]: https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
 [awscli]: https://aws.amazon.com/cli/
 [kots]: https://kots.io/kots-cli/getting-started/
-[server-keysets]: https://hub.docker.com/repository/docker/circleci/server-keysets
+[server-keysets]: https://github.com/CircleCI-Public/server-keysets-cli#using-the-docker-container
 [aws-keypair-docs]: https://docs.aws.amazon.com/cli/latest/userguide/cli-services-ec2-keypairs.html
