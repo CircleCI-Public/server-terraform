@@ -108,7 +108,7 @@ record for `dev.example.com` for this step to succeed.
 
 ### Known Problems: ###
 
-- `Terraform destroy` fails on subnet and internet gateway sometimes.  The VPC
+- Running `terraform destroy` fails on subnet and internet gateway sometimes.  The VPC
   also will have still be there but the terraform output does not show that.
 These must be deleted manually.
   - Start by deleting all the Load Balancers.  Identify them based on tag.
