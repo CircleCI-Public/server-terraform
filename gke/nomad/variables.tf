@@ -17,7 +17,7 @@ variable "basename" {
 variable "namespace" {
   default     = ""
   type        = string
-  description = "Name of deployment to be used as a base for naming resources."
+  description = "(Optional) The namespace of your CircleCI deployment in an existing cluster"
 }
 
 variable "service_account" {
