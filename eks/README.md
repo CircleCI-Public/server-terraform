@@ -30,10 +30,10 @@ configure the CircleCI Server application:
 
 1. Install any missing CLI tools listed above. Ensure access to listed
    services.
-2. Clone `server-helm-chart` repository to your machine. `git clone
-   git@github.com:circleci/server-helm-chart.git`
+2. Clone `server-terraform` repository to your machine. `git clone
+   git@github.com:circleci/server-terraform.git`
 3. Assume going forward that all paths specified are relative to the root of
-   the `server-helm-chart` repo.
+   the `server-terraform` repo.
 
 ### Optional
 The following steps are optional if the IAM secret key needs to be encrypted in the terraform state file
@@ -46,40 +46,39 @@ The following steps are optional if the IAM secret key needs to be encrypted in 
 1. Choose a basename for your EKS installation and set a BASENAME environment
    variable. Your basename must not exceed 20 characters in length!
 2. Run `aws configure` to authenticate against AWS.  Alternativly you may set
-   AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables.
-3. The AWS_DEFAULT_REGION envar needs to be defined.
-4. Create a S3 bucket for terraform state: `aws s3 mb
+   AWS_ACCESS_KEY, AWS_DEFAULT_REGION and AWS_SECRET_KEY environment variables.
+3. Create a S3 bucket for terraform state: `aws s3 mb
    s3://${BASENAME}-terraform-state`
-5. If you will be using a bastion, you will also need an SSH key. 
+4. If you will be using a bastion, you will also need an SSH key. 
     * Generate an SSH key using a tool like ssh-keygen.  ex: `ssh-keygen -f
       ./circleci-bastion -t rsa -b 4096`.  This key will be used in the
 `bastion_key` terraform variable. 
-6. Navigate to `./terraform/eks`
-7. Modify the `terraform.tfvars.template` file and save as `terraform.tfvars`
-8. Run command: `terraform init`. This will initialize terraform, downloading
+5. Navigate to `./eks`
+6. Modify the `terraform.tfvars.template` file and save as `terraform.tfvars`
+7. Run command: `terraform init`. This will initialize terraform, downloading
    any dependency providers, and creating a state object in a predefined s3
 bucket.
-9. Run command: `terraform plan`. This will compare the remote state to the
+8. Run command: `terraform plan`. This will compare the remote state to the
    definitions in the local terraform and create a plan for additions, changes
 and removals.
-10. Once the plan has been verified, run command: `terraform apply`. When
+9. Once the plan has been verified, run command: `terraform apply`. When
     prompted, confirm the deployment. Deployment time can vary but has
 typically taken approximately ten minutes.  The output will include some data
 values.  Take note of `cluster_name`, `subnet`, `vm_service_security_group`, 
 `access-key-id` and one of  `secret-access-key` or `secret-access-key-encrypted`.
 We'll need those values later.
-11. Once deployment is complete, add the new EKS cluster to your local
+10. Once deployment is complete, add the new EKS cluster to your local
     Kubernetes configuration via aws-cli by running the following command: `aws
 eks update-kubeconfig --name $BASENAME-cci-cluster` Should you use a
 bastion host, you can skip this step.
-12. Verify that the credentials were added by running the following command:
+11. Verify that the credentials were added by running the following command:
     `kubectl config get-contexts` This should return a list of contexts with an
 asterix beside the active context.  In case you are using a bastion host, you
 need to connect to the bastion host first. Terraform will have provided you
 with the IP after `terraform apply`: `ssh ubuntu@<bastion IP>`. After
 connecting to the bastion host you can run the kubectl command above.
 
-## Generate Certificate (optional)
+## Generate Certificate
 
 If you already have a Certificate please skip to the next step.
 
@@ -106,11 +105,6 @@ hostname already contains a subdomain: If you want to register your
 installation as `circleci.dev.example.com`, you will need to have a public
 record for `dev.example.com` for this step to succeed.
 
-### Running Questions: ###
-
-- managed_aws_auth - do we want this enabled or disabled? By default it is
-  enabled; in cloud it is disabled:
-https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/12.2.0
 
 ### Known Problems: ###
 

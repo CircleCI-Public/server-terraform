@@ -2,7 +2,7 @@
 
 ## Assumptions and Requirements
 
-Initial assumption is that a Google Cloud project exists and that the deployer
+It is assumed that a Google Cloud project exists and that the deployer
 has permissions to create, modify, and delete resources and IAM accounts. 
 
 To deploy the infrastructure and application you will need to have the
@@ -45,10 +45,10 @@ curl https://kots.io/install | bash
 
 1. Install any missing CLI tools listed above. Ensure access to listed
    services.
-2. Clone `server-helm-chart` repository to your machine.  
-	`git clone git@github.com:circleci/server-helm-chart.git`
+2. Clone `server-terraform` repository to your machine.  
+	`git clone git@github.com:circleci/server-terraform.git`
 3. Assume going forward that all paths specified are relative to the root of
-   the `server-helm-chart` repo.
+   the `server-terraform` repo.
 
 ## Deploy GKE Infrastructure with Terraform
 
@@ -57,7 +57,7 @@ curl https://kots.io/install | bash
 2. Choose a base name 
     `export BASENAME=<name>`  
     Suggested `<yourname>-dev`
-3. Navigate to `./terraform/gke`
+3. Navigate to `./gke`
 4. Create a bucket for terraform state `gsutil mb
    gs://${BASENAME}-terraform-state`
 6. Modify the `remote-state.tf.template` and save as `remote-state.tf`
