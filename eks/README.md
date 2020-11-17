@@ -49,9 +49,9 @@ The following steps are optional if the IAM secret key needs to be encrypted in 
    AWS_ACCESS_KEY, AWS_DEFAULT_REGION and AWS_SECRET_KEY environment variables.
 3. Create a S3 bucket for terraform state: `aws s3 mb s3://${BASENAME}-terraform-state`
 4. If you will be using a bastion, you will also need an SSH key. 
-    * Generate an SSH key using a tool like ssh-keygen.  ex: `ssh-keygen -f
-      ./circleci-bastion -t rsa -b 4096`.  This key will be used in the
-`bastion_key` terraform variable. 
+    * Generate an SSH key using a tool like ssh-keygen.  
+     ex: `ssh-keygen -f ./circleci-bastion -t rsa -b 4096`
+     This key will be used in the `bastion_key` terraform variable. 
 5. Navigate to `./eks`
 6. Modify the `terraform.tfvars.template` file and save as `terraform.tfvars`
 7. Run command: `terraform init`. This will initialize terraform, downloading
