@@ -103,7 +103,7 @@ resource "google_container_node_pool" "node_pool" {
   location = var.location
   cluster  = google_container_cluster.circleci_cluster.name
 
-  version = "1.16.13-gke.401"
+  version = "1.16.13-gke.404"
 
   autoscaling {
     min_node_count = var.node_min
@@ -136,7 +136,7 @@ resource "google_container_cluster" "circleci_cluster" {
   location    = var.location
   provider    = google-beta
 
-  min_master_version = "1.16.13-gke.401"
+  min_master_version = "1.16.13-gke.404"
 
   network = var.network_uri
   # subnetwork               = var.subnet_uri
