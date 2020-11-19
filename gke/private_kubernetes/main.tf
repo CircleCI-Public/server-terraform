@@ -97,13 +97,20 @@ resource "google_project_iam_member" "k8s_memeber_blob_signer" {
 }
 
 
+### GKE VERSION ###
+data "google_container_engine_versions" "gke" {
+  provider       = google-beta
+  location       = var.location
+  version_prefix = "1.16."
+}
+
 ### NODE POOL ###
 resource "google_container_node_pool" "node_pool" {
   name     = "${var.unique_name}-node-pool"
   location = var.location
   cluster  = google_container_cluster.circleci_cluster.name
 
-  version = "1.16.13-gke.401"
+  version = data.google_container_engine_versions.gke.release_channel_default_version["STABLE"]
 
   autoscaling {
     min_node_count = var.node_min
@@ -136,7 +143,7 @@ resource "google_container_cluster" "circleci_cluster" {
   location    = var.location
   provider    = google-beta
 
-  min_master_version = "1.16.13-gke.401"
+  min_master_version = data.google_container_engine_versions.gke.release_channel_default_version["STABLE"]
 
   network = var.network_uri
   # subnetwork               = var.subnet_uri
