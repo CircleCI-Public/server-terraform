@@ -1,3 +1,17 @@
+locals {
+  ssh_enabled = var.ssh_key != null
+}
+
+resource "aws_key_pair" "ssh_key" {
+  count      = local.ssh_enabled ? 1 : 0
+  key_name   = "${var.basename}-circleci-nomad-ssh-key"
+  public_key = var.ssh_key
+  tags = {
+    Terraform = "true"
+    circleci  = "true"
+  }
+}
+
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 3.0"
@@ -7,9 +21,13 @@ module "asg" {
   # Launch configuration
   lc_name = "${var.basename}-circleci-nomad_lc"
 
-  image_id        = var.ami_id
-  instance_type   = var.nomad_instance_type
-  security_groups = [aws_security_group.nomad_sg[0].id, aws_security_group.ssh_sg[0].id]
+  image_id      = var.ami_id
+  instance_type = var.nomad_instance_type
+  key_name      = local.ssh_enabled ? aws_key_pair.ssh_key[0].id : null
+  security_groups = compact([
+    aws_security_group.nomad_sg[0].id,
+    local.ssh_enabled ? aws_security_group.ssh_sg[0].id : "",
+  ])
 
   root_block_device = [
     {
@@ -66,15 +84,6 @@ resource "aws_security_group" "nomad_sg" {
   description = "SG for CircleCI Server nomad server/client"
   vpc_id      = var.vpc_id
 
-  # We are allowing port 22 for operators
-  # to debug nomad clients
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_cidr_blocks
-  }
-
   # For nomad servers and clients to communicate
   ingress {
     from_port   = 4646
@@ -102,7 +111,7 @@ resource "aws_security_group" "nomad_sg" {
 # We are allowing port 22 for operators
 # to debug nomad clients
 resource "aws_security_group" "ssh_sg" {
-  count       = var.sg_enabled
+  count       = local.ssh_enabled ? 1 : 0
   name        = "${var.basename}-circleci-nomad_ssh"
   description = "SG for CircleCI Server nomad SSH access"
   vpc_id      = var.vpc_id
@@ -111,7 +120,7 @@ resource "aws_security_group" "ssh_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = var.allowed_cidr_blocks
+    cidr_blocks = var.ssh_allowed_cidr_blocks
   }
 
   egress {

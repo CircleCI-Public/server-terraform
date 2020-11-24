@@ -5,7 +5,10 @@ enable_bastion   = true      # Enable a bastion host for the eks cluster
 bastion_key      = ""        # cat the public ssh key to use for the bastion host.
 
 # The CIDR ranges that are allowed to access the Kubernetes cluster.
-allowed_cidr_blocks = [""]
+# Developers, this is typically the public IP address of your home/office network
+# IE ["1.2.3.4/32"]
+# The default is ["0.0.0.0/0"], which implements no IP restrictions
+# allowed_cidr_blocks = [""]
 
 force_destroy    = false    # Forces destroy of the S3 data bucket on `terraform destroy`.  Useful as true for development purposes.  Data in bucket will be unrecoverable
 
@@ -22,4 +25,5 @@ k8s_administrators  = []    # add any AWS users here who should also have access
 #       username = "<username>"
 #   }
 
-nomad_count = 1
+nomad_count   = 1
+nomad_ssh_key = null  # Set to valid SSH public key to enable SSH access to nomad clients

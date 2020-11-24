@@ -87,3 +87,9 @@ variable "nomad_count" {
   type    = number
   default = 1
 }
+
+variable "nomad_ssh_key" {
+  type        = string
+  default     = null
+  description = "SSH key to authenticate access to Nomad clients. If not set SSH access is disabled"
+}
