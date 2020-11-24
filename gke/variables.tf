@@ -101,7 +101,7 @@ variable "enable_dashboard" {
 variable "allowed_cidr_blocks" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
-  description = "List of blocks allowed to access the kubernetes cluster"
+  description = "List of blocks allowed to access the kubernetes cluster. This list also limits access to Nomad clients if `nomad_ssh_enabled` is true."
 }
 
 variable "nomad_count" {
@@ -109,8 +109,8 @@ variable "nomad_count" {
   default = 1
 }
 
-variable "nomad_ssh_key" {
-  type        = string
-  default     = null
-  description = "SSH key to authenticate access to Nomad clients. If not set SSH access is disabled"
+variable "nomad_ssh_enabled" {
+  type        = bool
+  default     = false
+  description = "Enables SSH to Nomad clients. If enabled, use `gcloud compute ssh` to manage SSH keys"
 }

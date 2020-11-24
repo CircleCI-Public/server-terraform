@@ -24,9 +24,8 @@ data "google_compute_zones" "zones_available" {
 }
 
 locals {
-  zone        = substr(strrev(var.project_loc), 1, 1) == "-" ? var.project_loc : data.google_compute_zones.zones_available.names[0]
-  basename    = var.namespace != "" ? "${var.basename}-${replace(var.namespace, "/.*-g/", "")}" : var.basename
-  ssh_enabled = var.ssh_key != null
+  zone     = substr(strrev(var.project_loc), 1, 1) == "-" ? var.project_loc : data.google_compute_zones.zones_available.names[0]
+  basename = var.namespace != "" ? "${var.basename}-${replace(var.namespace, "/.*-g/", "")}" : var.basename
 }
 
 ## SERVICE ACCOUNT ###
@@ -79,10 +78,6 @@ resource "google_compute_instance_template" "nomad_template" {
     scopes = ["cloud-platform"]
   }
 
-  metadata = {
-    ssh-keys = local.ssh_enabled ? "ubuntu:${var.ssh_key}" : null
-  }
-
   metadata_startup_script = templatefile(
     "${path.module}/../../shared/nomad-scripts/nomad-startup.sh.tpl",
     {
@@ -115,7 +110,7 @@ resource "google_compute_instance_template" "nomad_template" {
 }
 
 resource "google_compute_firewall" "nomad_ssh" {
-  count       = local.ssh_enabled ? 1 : 0
+  count       = var.ssh_enabled ? 1 : 0
   name        = "${local.basename}-nomad-ssh"
   description = "${local.basename} firewall rule for CircleCI Server Nomand component"
 

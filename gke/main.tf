@@ -57,9 +57,9 @@ module "nomad" {
   basename                = var.basename
   service_account         = var.service_account
   nomad_count             = var.nomad_count
-  ssh_key                 = var.nomad_ssh_key
+  ssh_enabled             = var.nomad_ssh_enabled
   ssh_allowed_cidr_blocks = var.allowed_cidr_blocks
-  network_name            = google_compute.network.circleci_net.name
+  network_name            = google_compute_network.circleci_net.name
 }
 
 resource "google_storage_bucket" "data_bucket" {
