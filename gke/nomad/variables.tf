@@ -32,8 +32,19 @@ variable "nomad_count" {
   description = "The number of nomad clients to create"
 }
 
+variable "ssh_allowed_cidr_blocks" {
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+  description = "List of allowed source IP addresses that can access Nomad clients via SSH. Has no effect if `ssh_enabled` is not true."
+}
+
+variable "ssh_enabled" {
+  type        = bool
+  default     = false
+  description = "If true, SSH access to Nomad clients is enabled. If enabled, use `gcloud compute ssh` to manage keys."
+}
+
 variable "network_name" {
   type        = string
   description = "Name of the GCP network to attach to nomad"
 }
-

@@ -51,13 +51,15 @@ module "kube_private_cluster" {
 }
 
 module "nomad" {
-  source          = "./nomad"
-  project_loc     = var.project_loc
-  project_id      = var.project_id
-  basename        = var.basename
-  service_account = var.service_account
-  nomad_count     = var.nomad_count
-  network_name    = google_compute_network.circleci_net.name
+  source                  = "./nomad"
+  project_loc             = var.project_loc
+  project_id              = var.project_id
+  basename                = var.basename
+  service_account         = var.service_account
+  nomad_count             = var.nomad_count
+  ssh_enabled             = var.nomad_ssh_enabled
+  ssh_allowed_cidr_blocks = var.allowed_cidr_blocks
+  network_name            = google_compute_network.circleci_net.name
 }
 
 resource "google_storage_bucket" "data_bucket" {

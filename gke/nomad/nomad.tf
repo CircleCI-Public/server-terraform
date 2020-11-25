@@ -96,11 +96,8 @@ resource "google_compute_instance_template" "nomad_template" {
   tags = ["ssh", "nomad"]
 
   network_interface {
-
     network = var.network_name
-
     access_config {}
-
   }
 
   lifecycle {
@@ -113,15 +110,17 @@ resource "google_compute_instance_template" "nomad_template" {
 }
 
 resource "google_compute_firewall" "nomad_ssh" {
+  count       = var.ssh_enabled ? 1 : 0
   name        = "${local.basename}-nomad-ssh"
   description = "${local.basename} firewall rule for CircleCI Server Nomand component"
 
   allow {
     protocol = "tcp"
-    ports    = ["80"]
+    ports    = ["22"]
   }
-  target_tags = ["ssh", "nomad"]
-  network     = var.network_name
+  source_ranges = var.ssh_allowed_cidr_blocks
+  target_tags   = ["ssh", "nomad"]
+  network       = var.network_name
 }
 
 resource "google_compute_instance_group_manager" "nomad_manager" {
