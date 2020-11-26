@@ -8,7 +8,7 @@ data "aws_eks_cluster_auth" "cluster" {
 
 locals {
   cluster_name = "${var.basename}-cci-cluster"
-  k8s_version = "1.18"
+  k8s_version  = "1.18"
 }
 
 provider "kubernetes" {
