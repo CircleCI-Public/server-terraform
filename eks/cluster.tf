@@ -22,7 +22,7 @@ module "eks-cluster" {
   version                         = "13.0.0"
   source                          = "terraform-aws-modules/eks/aws"
   cluster_name                    = local.cluster_name
-  cluster_version                 = "1.16"
+  cluster_version                 = "1.18"
   cluster_endpoint_private_access = var.enable_bastion ? true : false
   cluster_endpoint_public_access  = true
   vpc_id                          = module.vpc.vpc_id
@@ -40,7 +40,7 @@ module "eks-cluster" {
 
   node_groups = {
     circleci-server = {
-      version                       = "1.16"
+      version                       = "1.18"
       instance_type                 = "m4.2xlarge"
       max_capacity                  = 5
       min_capacity                  = 4
