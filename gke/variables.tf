@@ -14,12 +14,6 @@ variable "basename" {
   description = "Name of deployment to be used as a base for naming resources."
 }
 
-variable "service_account" {
-  type        = string
-  default     = null
-  description = "Path to json file for service account that will deploy resources. If not specified will default to $GOOGLE_APPLICATION_CREDENTIALS"
-}
-
 variable "node_spec" {
   type        = string
   default     = "n1-standard-8"
