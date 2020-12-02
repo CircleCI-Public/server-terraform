@@ -74,7 +74,7 @@ and removals.
 10. Once the plan has been verified, run command: `terraform apply` And when
     prompted, confirm the deployment. Deployment time can vary but has
 typically taken approximately ten minutes.
-11. Once deployment is complete, add the new GKE cluster to your local.
+11. Once deployment is complete, add the new GKE cluster to your local
     Kubernetes configuration via gcloud by running the following command:
 ```
 gcloud container clusters get-credentials [CLUSTER NAME] \
