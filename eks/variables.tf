@@ -96,7 +96,7 @@ variable "nomad_ssh_key" {
 
 variable "instance_type" {
   type        = string
-  default     = "m4.2xlarge"
+  default     = "m4.xlarge"
   description = "The machine types used to create nodes"
 }
 
