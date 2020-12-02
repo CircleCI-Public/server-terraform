@@ -28,7 +28,7 @@ Upon `terrafrom apply`, these fields will whitelist your IPs, and add the list o
 If you wish to add/remove admin users from your existing cluster, you only need to update the values in your `terraform.tfvars` and run `terrafrom apply`.
 
 ## Adding Users with Limited Resource Access
-You may not wish for each user to have complete access of to all cluster resources. To more finely tune user access we make use kubernetes' role based access control ([RBAC]).
+You may not wish for each user to have complete access of to all cluster resources. To more finely tune user access we make use of kubernetes' role based access control ([RBAC]).
 In the following example we will create a role which will have limited access to a `develop` namespace and then map it to an IAM user. You will need to be a cluster administrator as detailed above to proceed with the following steps.
 
 First we will need to add the user's ARN to the aws-auth configmap in the kube-system namespace.
@@ -74,8 +74,8 @@ rules:
 `kubectl apply -f read-role.yaml`
 
 
-3. Now we'll create a `role-binding` on our user's ARN and the pod-reader role in the cluster to define their access level.
-- add the following to a file call `read-role-binding.yaml`
+3. Now we will create a `role-binding` on our user's ARN and the pod-reader role in the cluster to define their access level.
+- add the following to a file called `read-role-binding.yaml`
 ```
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -100,11 +100,11 @@ roleRef:
 
 Now your user will be able to access the cluster but will only be able to view pod resources in the develop namespace.
 
-For more details on managing permissions, you may read the google's [RBAC] documentation.
+For more details on managing permissions, you may read Google's [RBAC] documentation.
 
 
 ## Providing Access with IAM Groups
-You may not wish to repeat the process above for each user you wish to add. Many user's will require the same access levels. We can limit the repitition by assigning users to IAM groups.
+You may not wish to repeat the process above for each user you wish to add. Many users will require the same access levels. We can limit the repitition by assigning users to IAM groups.
 Similary to users, groups may also be mapped to roles to provide access management.
 
 1. First create an IAM role:
