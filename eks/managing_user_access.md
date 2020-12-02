@@ -22,7 +22,6 @@ k8s_administrators = [
 }
 ```
 
-Upon `terrafrom apply`, these fields will whitelist your IPs, and add the list of users will be added to the system:masters group for full access to all resources in the cluster.
 
 ### Updating the Cluster admin list
 If you wish to add/remove admin users from your existing cluster, you only need to update the values in your `terraform.tfvars` and run `terrafrom apply`.
