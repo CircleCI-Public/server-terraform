@@ -93,3 +93,27 @@ variable "nomad_ssh_key" {
   default     = null
   description = "SSH key to authenticate access to Nomad clients. If not set SSH access is disabled"
 }
+
+variable "instance_type" {
+  type        = string
+  default     = "m4.2xlarge"
+  description = "The machine types used to create nodes"
+}
+
+variable "max_capacity" {
+  type        = number
+  default     = 5
+  description = "The maximun number of worker nodes in the cluster"
+}
+
+variable "min_capacity" {
+  type        = number
+  default     = 4
+  description = "The minimum number of worker nodes in the cluster"
+}
+
+variable "desired_capacity" {
+  type        = number
+  default     = 4
+  description = "The desired number of worker nodes in the cluster"
+}
