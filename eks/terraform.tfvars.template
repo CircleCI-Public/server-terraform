@@ -27,3 +27,9 @@ k8s_administrators  = []    # add any AWS users here who should also have access
 
 nomad_count   = 1
 nomad_ssh_key = null  # Set to valid SSH public key to enable SSH access to nomad clients
+
+# Cluster node details - uncomment to manage node type and numbers. Below are the default values so if these are fine no need to uncomment
+# instance_type      = "m4.xlarge"
+# max_capacity       = 5
+# min_capacity       = 4
+# desired_capacity   = 4
