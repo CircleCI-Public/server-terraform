@@ -94,7 +94,7 @@ roleRef:
 - and then apply the role-binding to your cluster:
 `kubectl apply -f read-role-binding.yaml`
 
-4. Finally to grant access to the cluster, you will need to whitelist the user's IP address.
+4. Finally, to grant access to the cluster, you will need to whitelist the user's IP address.
 - As with admin users, we will need to add the user's IP to your terrafrom.tfvars and `terraform apply`
 
 Now your user will be able to access the cluster but will only be able to view pod resources in the develop namespace.
