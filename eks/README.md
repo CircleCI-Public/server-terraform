@@ -114,7 +114,7 @@ record for `dev.example.com` for this step to succeed.
   - then run `terraform destroy` again and it will probably show 0 to destroy. Problem solved!
 - Network Interfaces don't get any tags.  This is probably something in the
   module implementation
-- On running `terraform apply` rubnets will be tagged with:
+- On running `terraform apply` subnets will be tagged with:
   `"kubernetes.io/cluster/<basename>-cci-cluster" = "shared" -> null`
   Subsequent `terraform apply` runs always show removal of that as a change
 
