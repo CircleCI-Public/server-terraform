@@ -91,7 +91,7 @@ gcloud container clusters get-credentials [CLUSTER NAME] \
     `allowed-external` rule to include your personal IP.
 13. Verify that the credentials were added by running the following command:
     `kubectl config get-contexts` This should return a list of contexts with an
-asterix beside the active context.
+asterisk beside the active context.
 
 [user default application credentials]: https://cloud.google.com/sdk/gcloud/reference/auth/application-default
 
