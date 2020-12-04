@@ -10,11 +10,7 @@ bastion_key      = ""        # cat the public ssh key to use for the bastion hos
 # The default is ["0.0.0.0/0"], which implements no IP restrictions
 # allowed_cidr_blocks = [""]
 
-force_destroy    = false    # Forces destroy of the S3 data bucket on `terraform destroy`.  Useful as true for development purposes.  Data in bucket will be unrecoverable
-
-# Optional PGP key used to encrypt AWS IAM secret access key at rest
-# if left blank secret key will be unencrypted in terraform output and state files 
-pgp_key          = null       
+force_destroy    = false    # Forces destroy of the S3 data bucket on `terraform destroy`.  Useful as true for development purposes.  Data in bucket will be unrecoverable   
 
 k8s_administrators  = []    # add any AWS users here who should also have access to the cluster
 #  Read more here: https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html
