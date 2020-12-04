@@ -11,12 +11,8 @@ following CLIs installed:
 
 * [terraform] (tested with 0.13.5)
 * [kubectl] (tested with 1.14.6)
-* [kustomize] (tested with 3.6.1)
-* [helm] (tested with 3.0.1)
 * [awscli] (tested with 1.16.261)
-* [kots]
 * [server-keysets]
-* Optional: [GPG](https://gpgtools.org/)
 
 
 Additionally you will require the following permissions and access in order to
@@ -97,7 +93,7 @@ certbot certonly \
 This will create a certificate along with chain of intermediate
 certificates in `eks-config/live/$domain/fullchain.pem` and private
 key in `eks-config/live/$domain/privkey.pem`. These files can be used in
-Kots config to secure your installations with TLS.
+your Server 3.0 config to secure your installations with TLS.
 
 You need a public DNS record in Route53 for your secondary domain if your
 hostname already contains a subdomain: If you want to register your
@@ -120,10 +116,7 @@ record for `dev.example.com` for this step to succeed.
 
 <!-- Links -->
 [terraform]: https://releases.hashicorp.com/terraform/0.13.5/
-[kubectl]: https://storage.googleapis.com/kubernetes-release/release/v1.14.6/bin/darwin/amd64/kubectl
-[kustomize]: https://github.com/kubernetes-sigs/kustomize/releases/tag/kustomize%2Fv3.6.1
-[helm]: https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
+[kubectl]: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 [awscli]: https://aws.amazon.com/cli/
-[kots]: https://kots.io/kots-cli/getting-started/
 [server-keysets]: https://github.com/CircleCI-Public/server-keysets-cli#using-the-docker-container
 [aws-keypair-docs]: https://docs.aws.amazon.com/cli/latest/userguide/cli-services-ec2-keypairs.html
