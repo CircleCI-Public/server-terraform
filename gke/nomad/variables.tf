@@ -20,12 +20,6 @@ variable "namespace" {
   description = "(Optional) The namespace of your CircleCI deployment in an existing cluster"
 }
 
-variable "service_account" {
-  type        = string
-  default     = null
-  description = "Path to json file for service account that will deploy resources. If not specified will default to $GOOGLE_APPLICATION_CREDENTIALS"
-}
-
 variable "nomad_count" {
   type        = number
   default     = 1

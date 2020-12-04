@@ -52,8 +52,14 @@ curl https://kots.io/install | bash
 
 ## Deploy GKE Infrastructure with Terraform
 
-1. Configure terraform to use Service Account Credentials
-    `export GOOGLE_APPLICATION_CREDENTIALS="<path to SAkey.json>"`
+1. Configure Google Cloud credentials. You can do this in one of two ways:
+    * Set up [user default application credentials]  via `gcloud auth
+      application-default login`. You may use the `--project` flag to select a
+GCP project.
+    * Use service account credentials. First configure environment variables
+      `export GOOGLE_APPLICATION_CREDENTIALS="<path to SAkey.json>"` and then
+activate your service account via `gcloud auth activate-service-account
+--key-file=$GOOGLE_APPLICATION_CREDENTIALS`
 2. Choose a base name 
     `export BASENAME=<name>`  
     Suggested `<yourname>-dev`
@@ -85,7 +91,9 @@ gcloud container clusters get-credentials [CLUSTER NAME] \
     `allowed-external` rule to include your personal IP.
 13. Verify that the credentials were added by running the following command:
     `kubectl config get-contexts` This should return a list of contexts with an
-asterix beside the active context.
+asterisk beside the active context.
+
+[user default application credentials]: https://cloud.google.com/sdk/gcloud/reference/auth/application-default
 
 ## Generate Certificate (optional)
 
