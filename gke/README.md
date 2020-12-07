@@ -10,10 +10,7 @@ following CLIs installed:
 
 * [terraform] (tested with 0.13.5)
 * [kubectl] (tested with 1.14.6)
-* [kustomize] (tested with 3.6.1)
-* [helm] (tested with 3.0.1)
 * [gcloud] (tested with 301.0.0)
-* [kots]
 * [server-keysets]
   (Actual installation is unnecessary; the Docker image will be pulled
   automatically when you attempt to use it.)
@@ -139,11 +136,7 @@ around.
 
 <!-- Links -->
 [terraform]: https://releases.hashicorp.com/terraform/0.13.5/
-[kubectl]: https://storage.googleapis.com/kubernetes-release/release/v1.14.6/bin/darwin/amd64/kubectl
-[kustomize]: https://github.com/kubernetes-sigs/kustomize/releases/tag/kustomize%2Fv3.6.1
-[helm]: https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
-[awscli]: https://aws.amazon.com/cli/
-[kots]: https://kots.io/kots-cli/getting-started/
+[kubectl]: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 [server-keysets]: https://github.com/CircleCI-Public/server-keysets-cli#using-the-docker-container
 [gcloud]: https://cloud.google.com/sdk/install
 [gcloud-service-account-keys]: https://cloud.google.com/docs/authentication/production#creating_a_service_account

@@ -32,10 +32,6 @@ variable "bastion_key" {
   default = ""
 }
 
-variable "pgp_key" {
-  default = null
-}
-
 variable "aws_subnet_cidr_block" {
   default = ["10.0.0.0/16"]
 }
