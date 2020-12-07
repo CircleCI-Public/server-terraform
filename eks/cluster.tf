@@ -42,10 +42,10 @@ module "eks-cluster" {
   node_groups = {
     circleci-server = {
       version                       = local.k8s_version
-      instance_type                 = "m4.2xlarge"
-      max_capacity                  = 5
-      min_capacity                  = 4
-      desired_capacity              = 4
+      instance_type                 = var.instance_type
+      max_capacity                  = var.max_capacity
+      min_capacity                  = var.min_capacity
+      desired_capacity              = var.desired_capacity
       additional_security_group_ids = [aws_security_group.eks_nomad_sg[0].id]
     }
   }
