@@ -58,7 +58,7 @@ variable "node_auto_upgrade" {
 
 variable "initial_nodes" {
   type        = number
-  default     = 1
+  default     = 3
   description = "Number of nodes per region at deployment."
 }
 
