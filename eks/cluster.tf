@@ -1,22 +1,6 @@
-data "aws_eks_cluster" "cluster" {
-  name = module.eks-cluster.cluster_id
-}
-
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks-cluster.cluster_id
-}
-
 locals {
   cluster_name = "${var.basename}-cci-cluster"
   k8s_version  = "1.18"
-}
-
-provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
-  load_config_file       = false
-  version                = "~> 1.11"
 }
 
 module "eks-cluster" {
@@ -68,82 +52,6 @@ resource "aws_security_group_rule" "eks_api_access" {
   source_security_group_id = aws_security_group.bastion_ssh[0.0].id
   security_group_id        = module.eks-cluster.cluster_security_group_id
   description              = "Allow CircleCI Bastion SG to communicate with the EKS cluster API."
-}
-
-resource "aws_iam_policy" "data-full-access" {
-  name        = "${var.basename}-data-full-access"
-  description = "Allows ressources access to CircleCI Server S3 buckets"
-  policy      = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:*"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.data_bucket.arn}",
-        "${aws_s3_bucket.data_bucket.arn}/*"
-      ]
-    },
-    {
-      "Action": [
-          "iam:GetRole",
-          "sts:AssumeRole",
-          "sts:GetFederationToken"
-        ],
-        "Resource": [
-            "*"
-        ],
-        "Effect": "Allow"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "s3_full_access" {
-  role       = module.eks-cluster.worker_iam_role_name
-  policy_arn = aws_iam_policy.data-full-access.arn
-}
-
-resource "aws_iam_policy" "vm-service-ec2" {
-  name        = "${var.basename}-vm-service-ec2"
-  description = "Security group for CircleCI Server VM Service EC2 instances"
-  policy      = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:RunInstances",
-        "ec2:CreateTags",
-        "ec2:TerminateInstances",
-        "ec2:CreateVolume",
-        "ec2:DeleteVolume",
-        "ec2:AttachVolume",
-        "ec2:DetachVolume"
-      ],
-      "Resource": [
-        "*"
-      ]
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "vm_ec2_access" {
-  role       = module.eks-cluster.worker_iam_role_name
-  policy_arn = aws_iam_policy.vm-service-ec2.arn
-}
-
-//TODO: This needs to be restricted to something reasonable
-resource "aws_iam_role_policy_attachment" "route53_full_access" {
-  role       = module.eks-cluster.worker_iam_role_name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonRoute53FullAccess"
 }
 
 resource "aws_security_group" "eks_nomad_sg" {
