@@ -3,7 +3,7 @@
 ## Assumptions and Requirements
 
 It is assumed that a Google Cloud project exists and that the deployer
-has permissions to create, modify, and delete resources and IAM accounts. 
+has permissions to create, modify, and delete resources and Service Accounts.
 
 To deploy the infrastructure and application you will need to have the
 following CLIs installed:
@@ -42,7 +42,7 @@ curl https://kots.io/install | bash
 
 1. Install any missing CLI tools listed above. Ensure access to listed
    services.
-2. Clone `server-terraform` repository to your machine.  
+2. Clone `server-terraform` repository to your machine.
 	`git clone git@github.com:circleci/server-terraform.git`
 3. Assume going forward that all paths specified are relative to the root of
    the `server-terraform` repo.
@@ -57,8 +57,8 @@ GCP project.
       `export GOOGLE_APPLICATION_CREDENTIALS="<path to SAkey.json>"` and then
 activate your service account via `gcloud auth activate-service-account
 --key-file=$GOOGLE_APPLICATION_CREDENTIALS`
-2. Choose a base name 
-    `export BASENAME=<name>`  
+2. Choose a base name
+    `export BASENAME=<name>`
     Suggested `<yourname>-dev`
 3. Navigate to `./gke`
 4. Create a bucket for terraform state `gsutil mb
@@ -107,7 +107,7 @@ certbot certonly \
     --dns-google-credentials ${GOOGLE_APPLICATION_CREDENTIALS} \
     --config-dir=gke-config \
     --work-dir=gke-work \
-    --logs-dir=gke-logs \ 
+    --logs-dir=gke-logs \
     -d $domain
 ```
 
@@ -119,6 +119,17 @@ Kots config to secure your installations with TLS.
 ### Resources
 
 [Google Clouds Supported Resources Page]
+
+#### Service Account for Nomad clients
+
+By default we create a Service Account for the Nomad clients but we
+do not add any privileges to them. In the event an operator wants to
+assign privileges to the Nomad clients, they should do so through
+`nomad_service_account`.
+
+Please note that inherent risk of granting privileges to the Nomad clients
+as arbitrary code runs in them. This is an advanced feature that should only
+be used with the full understanding of the privileges being assigned.
 
 #### GCloud tip for machines and clusters that don't have external networking interfaces
 
