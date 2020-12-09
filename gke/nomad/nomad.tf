@@ -35,39 +35,10 @@ resource "google_service_account" "nomad_service_account" {
   display_name = "${local.basename}-nomad-sa"
   description  = "${local.basename} service account for CircleCI Server Nomad component"
 }
-resource "google_project_iam_member" "nomad_member_compute_admin" {
-  depends_on = [google_service_account.nomad_service_account]
-  role       = "roles/compute.admin"
-  member     = "serviceAccount:${google_service_account.nomad_service_account.email}"
-}
-resource "google_project_iam_member" "nomad_member_storage" {
-  depends_on = [google_service_account.nomad_service_account]
-  role       = "roles/storage.admin"
-  member     = "serviceAccount:${google_service_account.nomad_service_account.email}"
-}
-resource "google_project_iam_member" "nomad_member_logging" {
-  depends_on = [google_service_account.nomad_service_account]
-  role       = "roles/logging.admin"
-  member     = "serviceAccount:${google_service_account.nomad_service_account.email}"
-}
-resource "google_project_iam_member" "nomad_member_monitoring" {
-  depends_on = [google_service_account.nomad_service_account]
-  role       = "roles/monitoring.admin"
-  member     = "serviceAccount:${google_service_account.nomad_service_account.email}"
-}
-resource "google_project_iam_member" "nomad_member_service_controller" {
-  depends_on = [google_service_account.nomad_service_account]
-  role       = "roles/servicemanagement.serviceController"
-  member     = "serviceAccount:${google_service_account.nomad_service_account.email}"
-}
-resource "google_project_iam_member" "nomad_member_service_management" {
-  depends_on = [google_service_account.nomad_service_account]
-  role       = "roles/servicemanagement.admin"
-  member     = "serviceAccount:${google_service_account.nomad_service_account.email}"
-}
+
 
 resource "google_compute_instance_template" "nomad_template" {
-  # We've add this wait to ensure that 
+  # We've add this wait to ensure that
   depends_on = [time_sleep.wait_120_seconds]
 
   name_prefix  = "${local.basename}-nomad-template"
