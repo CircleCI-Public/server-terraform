@@ -136,6 +136,9 @@ resource "google_container_node_pool" "node_pool" {
 
 
 ### GKE CLUSTER ###
+locals {
+  private_endpoint = var.enable_bastion ? true : var.private_endpoint
+}
 resource "google_container_cluster" "circleci_cluster" {
   depends_on  = [google_project_service.container_service]
   name        = "${var.unique_name}-k8s-cluster"
@@ -156,7 +159,7 @@ resource "google_container_cluster" "circleci_cluster" {
   private_cluster_config {
     master_ipv4_cidr_block  = var.master_address_range
     enable_private_nodes    = true
-    enable_private_endpoint = false
+    enable_private_endpoint = local.private_endpoint
   }
 
   ip_allocation_policy {
@@ -165,7 +168,7 @@ resource "google_container_cluster" "circleci_cluster" {
   master_authorized_networks_config {
     dynamic "cidr_blocks" {
       iterator = block
-      for_each = var.allowed_external_cidr_blocks
+      for_each = local.private_endpoint ? [] : var.allowed_external_cidr_blocks
       content {
         cidr_block   = block.value
         display_name = block.value

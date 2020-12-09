@@ -20,6 +20,10 @@ resource "google_compute_instance" "bastion" {
     }
   }
 
+  metadata = {
+    enable-oslogin = "TRUE"
+  }
+
   network_interface {
     network = var.network_uri
 

@@ -71,7 +71,7 @@ variable "enable_nat" {
 variable "enable_bastion" {
   type        = bool
   default     = true
-  description = "Include a bastion/jump server in deployment."
+  description = "Include a bastion/jump server in deployment. You can restrict the range of IPs that can connect to the bastion using `allowed_cidr_blocks`"
 }
 
 variable "enable_istio" {
@@ -92,10 +92,16 @@ variable "enable_dashboard" {
   description = "Enable Kubernetes dashboard."
 }
 
+variable "private_k8s_endpoint" {
+  type        = bool
+  default     = true
+  description = "By default, the Kubernetes endpoint is only accessible via the bastion host. Set to false if you want access via the public internet. You can use IP whitelisting using `allowed_cidr_blocks` to tighten access for both cases."
+}
+
 variable "allowed_cidr_blocks" {
   type        = list(string)
-  default     = ["0.0.0.0/0"]
-  description = "List of blocks allowed to access the kubernetes cluster. This list also limits access to Nomad clients if `nomad_ssh_enabled` is true."
+  default     = []
+  description = "This configures the allowable source IP blocks, depending on your configuration to your bastion host and/or Kubernetes cluster and/or Nomad clients"
 }
 
 variable "nomad_count" {
@@ -106,5 +112,11 @@ variable "nomad_count" {
 variable "nomad_ssh_enabled" {
   type        = bool
   default     = false
-  description = "Enables SSH to Nomad clients. If enabled, use `gcloud compute ssh` to manage SSH keys"
+  description = "Enables SSH to Nomad clients. If enabled, use `gcloud compute ssh` to manage SSH keys. If you use a bastion host and a private endpoint, you can still connect to Nomad clients with this value set to `false` via the bastion host using their private IPs"
+}
+
+variable "nomad_sa_access" {
+  type        = string
+  default     = "allAuthenticatedUsers"
+  description = "Who can use the Nomad ServiceAccount, e.g. for managing SSH keys on Nomad clients. Can be `user:{emailid}` for a single user, `group:{emailid}` for a Google group, or `allAuthenticatedUsers` to allow all authenticated users"
 }

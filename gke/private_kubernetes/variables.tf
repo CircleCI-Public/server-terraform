@@ -1,6 +1,6 @@
 
 variable "allowed_external_cidr_blocks" {
-  type = list
+  type = list(any)
 }
 
 variable "unique_name" {
@@ -116,4 +116,8 @@ variable "network_uri" {
 }
 variable "subnet_uri" {
   type = string
+}
+
+variable "private_endpoint" {
+  type = bool
 }

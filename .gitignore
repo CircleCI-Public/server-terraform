@@ -6,6 +6,8 @@
 terraform.tfvars
 remote-state.tf
 terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
 
 # Mac
 .DS_Store
