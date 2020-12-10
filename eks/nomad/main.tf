@@ -89,7 +89,7 @@ resource "aws_security_group" "nomad_sg" {
     from_port   = 4646
     to_port     = 4648
     protocol    = "tcp"
-    cidr_blocks = var.aws_subnet_cidr_block
+    cidr_blocks = [var.aws_subnet_cidr_block]
   }
 
   # For SSHing into a job as an end user (not operators)
