@@ -41,6 +41,7 @@ resource "aws_security_group" "bastion_ssh" {
 }
 
 resource "aws_iam_role" "bastion_role" {
+  count       = var.enable_bastion ? 1 : 0
   name        = "${var.basename}-circleci-cluster-bastion_role"
   description = "IAM role for the EKS bastion host"
 
@@ -68,6 +69,7 @@ resource "aws_iam_role" "bastion_role" {
 }
 
 resource "aws_iam_policy" "bastion_policy" {
+  count       = var.enable_bastion ? 1 : 0
   name        = "${var.basename}-circleci-cluster-bastion_policy"
   path        = "/"
   description = "IAM policy for the CircleCI Server EKS bastion host"
@@ -92,13 +94,15 @@ resource "aws_iam_policy" "bastion_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "bastion_policy_attachment" {
-  role       = aws_iam_role.bastion_role.name
-  policy_arn = aws_iam_policy.bastion_policy.arn
+  count      = var.enable_bastion ? 1 : 0
+  role       = aws_iam_role.bastion_role[0].name
+  policy_arn = aws_iam_policy.bastion_policy[0].arn
 }
 
 resource "aws_iam_instance_profile" "bastion_iam_profile" {
-  name = "${var.basename}-circleci-bastion_iam_profile"
-  role = aws_iam_role.bastion_role.name
+  count = var.enable_bastion ? 1 : 0
+  name  = "${var.basename}-circleci-bastion_iam_profile"
+  role  = aws_iam_role.bastion_role[0].name
 }
 
 resource "aws_instance" "bastion" {
@@ -122,7 +126,7 @@ resource "aws_instance" "bastion" {
   key_name               = aws_key_pair.bastion_key[0.0].key_name
   vpc_security_group_ids = [module.vpc.default_security_group_id, aws_security_group.bastion_ssh[0.0].id]
   subnet_id              = module.vpc.public_subnets[0]
-  iam_instance_profile   = aws_iam_instance_profile.bastion_iam_profile.name
+  iam_instance_profile   = aws_iam_instance_profile.bastion_iam_profile[0].name
 
   tags = {
     Terraform   = "true"

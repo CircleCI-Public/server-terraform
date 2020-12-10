@@ -30,13 +30,13 @@ module "eks-cluster" {
   subnets                         = module.vpc.private_subnets
   cluster_enabled_log_types       = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   wait_for_cluster_cmd            = "for i in `seq 1 60`; do curl -k -s $ENDPOINT/healthz >/dev/null && exit 0 || true; sleep 5; done; echo TIMEOUT && exit 1"
-  map_roles = [
+  map_roles = var.enable_bastion ? [
     {
-      rolearn  = aws_iam_role.bastion_role.arn
+      rolearn  = aws_iam_role.bastion_role[0].arn
       username = "bastion"
       groups   = ["system:masters"]
     }
-  ]
+  ] : []
   map_users = var.k8s_administrators
 
   node_groups = {
