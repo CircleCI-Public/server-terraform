@@ -69,12 +69,7 @@ module "asg" {
       key                 = "Environment"
       value               = "circleci"
       propagate_at_launch = true
-    },
-    {
-      key                 = "Name"
-      value               = "${var.basename}-circleci-nomad-client"
-      propagate_at_launch = true
-    },
+    }
   ]
 }
 
