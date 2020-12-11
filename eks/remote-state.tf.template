@@ -1,0 +1,11 @@
+# can't use ${var.basename} or ${var.aws_region} here due to Terraform restrictions
+# of not being able to use variables in `terraform` sections
+
+terraform {
+  backend "s3" {
+    bucket  = "<basename>-terraform-state"  # replace with basename from terraform.tfvars
+    key     = "terraform.tfstate"
+    region  = "<region>"  # replace with aws_region from terraform.tfvars
+  }
+}
+

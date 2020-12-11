@@ -44,23 +44,25 @@ configure the CircleCI Server application:
      This key will be used in the `bastion_key` terraform variable. 
 5. Navigate to `./eks`
 6. Modify the `terraform.tfvars.template` file and save as `terraform.tfvars`
-7. Run command: `terraform init`. This will initialize terraform, downloading
+7. Modify the `remote_state.tf.template` file using the same values from
+   `terraform.tfvars` and save as `remote_state.tf`
+8. Run command: `terraform init`. This will initialize terraform, downloading
    any dependency providers, and creating a state object in a predefined s3
 bucket.
-8. Run command: `terraform plan`. This will compare the remote state to the
+9. Run command: `terraform plan`. This will compare the remote state to the
    definitions in the local terraform and create a plan for additions, changes
 and removals.
-9. Once the plan has been verified, run command: `terraform apply`. When
+10. Once the plan has been verified, run command: `terraform apply`. When
     prompted, confirm the deployment. Deployment time can vary but has
 typically taken approximately ten minutes.  The output will include some data
 values.  Take note of `cluster_name`, `subnet`, `vm_service_security_group`, 
 `access-key-id` and one of  `secret-access-key` or `secret-access-key-encrypted`.
 We'll need those values later.
-10. Once deployment is complete, add the new EKS cluster to your local
+11. Once deployment is complete, add the new EKS cluster to your local
     Kubernetes configuration via aws-cli by running the following command: `aws
 eks update-kubeconfig --name $BASENAME-cci-cluster` Should you use a
 bastion host, you can skip this step.
-11. Verify that the credentials were added by running the following command:
+12. Verify that the credentials were added by running the following command:
     `kubectl config get-contexts` This should return a list of contexts with an
 asterix beside the active context.  In case you are using a bastion host, you
 need to connect to the bastion host first. Terraform will have provided you
