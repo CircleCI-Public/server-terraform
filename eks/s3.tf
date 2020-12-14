@@ -5,7 +5,7 @@ resource "aws_kms_key" "data_bucket_key" {
   deletion_window_in_days = 10
 
 
-# This policy allows the root to manage the keys - needed for terraform to manage the keys and provides the cluster nodes with limited access to keys
+  # This policy allows the root to manage the keys - needed for terraform to manage the keys and provides the cluster nodes with limited access to keys
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -65,17 +65,3 @@ resource "aws_s3_bucket" "data_bucket" {
     force_destroy = true
   }
 }
-
-
-output "user_arn" {
-  value = data.aws_caller_identity.current.arn
-}
-
-output "cluster_arn" {
-  value = module.eks-cluster.cluster_iam_role_arn
-}
-
-output "worker_arn" {
-  value = module.eks-cluster.worker_iam_role_arn
-}
-
