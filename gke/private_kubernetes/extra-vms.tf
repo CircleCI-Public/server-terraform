@@ -1,3 +1,10 @@
+### SERVICE ACCOUNT ###
+resource "google_service_account" "k8s_bastion_service_account" {
+  account_id   = "${var.unique_name}-k8s-bastion-sa"
+  display_name = "${var.unique_name}-k8s-bastion-sa"
+  description  = "${var.unique_name} service account for CircleCI Server bastion host"
+}
+
 resource "google_compute_instance" "bastion" {
   count                     = var.enable_bastion ? 1 : 0
   name                      = "${var.unique_name}-bastion"
@@ -20,7 +27,7 @@ resource "google_compute_instance" "bastion" {
   }
 
   service_account {
-    email  = google_service_account.k8s_service_account.email
+    email  = google_service_account.k8s_bastion_service_account.email
     scopes = ["cloud-platform"]
   }
 
