@@ -76,34 +76,34 @@ resource "aws_security_group_rule" "eks_api_access" {
 resource "aws_iam_policy" "data-full-access" {
   name        = "${var.basename}-data-full-access"
   description = "Allows ressources access to CircleCI Server S3 buckets"
-  policy      = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
+  policy      = <<-EOF
     {
-      "Effect": "Allow",
-      "Action": [
-        "s3:*"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.data_bucket.arn}",
-        "${aws_s3_bucket.data_bucket.arn}/*"
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:*"
+          ],
+          "Resource": [
+            "${aws_s3_bucket.data_bucket.arn}",
+            "${aws_s3_bucket.data_bucket.arn}/*"
+          ]
+        },
+        {
+          "Action": [
+              "iam:GetRole",
+              "sts:AssumeRole",
+              "sts:GetFederationToken"
+            ],
+            "Resource": [
+                "*"
+            ],
+            "Effect": "Allow"
+        }
       ]
-    },
-    {
-      "Action": [
-          "iam:GetRole",
-          "sts:AssumeRole",
-          "sts:GetFederationToken"
-        ],
-        "Resource": [
-            "*"
-        ],
-        "Effect": "Allow"
     }
-  ]
-}
-EOF
+  EOF
 }
 
 resource "aws_iam_role_policy_attachment" "s3_full_access" {
@@ -138,15 +138,46 @@ resource "aws_iam_policy" "vm-service-ec2" {
 EOF
 }
 
+resource "aws_iam_policy" "external_dns" {
+  name        = "${var.basename}-external-dns-policy"
+  description = "IAM Policy to allow the external-dns service to set DNS records"
+  policy      = <<-EOF
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "route53:ChangeResourceRecordSets"
+          ],
+          "Resource": [
+            "arn:aws:route53:::hostedzone/*"
+          ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "route53:ListHostedZones",
+            "route53:ListResourceRecordSets"
+          ],
+          "Resource": [
+            "*"
+          ]
+        }
+      ]
+    }
+  EOF
+}
+
+
 resource "aws_iam_role_policy_attachment" "vm_ec2_access" {
   role       = module.eks-cluster.worker_iam_role_name
   policy_arn = aws_iam_policy.vm-service-ec2.arn
 }
 
-//TODO: This needs to be restricted to something reasonable
-resource "aws_iam_role_policy_attachment" "route53_full_access" {
+resource "aws_iam_role_policy_attachment" "external_dns_route53_access" {
   role       = module.eks-cluster.worker_iam_role_name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonRoute53FullAccess"
+  policy_arn = aws_iam_policy.external_dns.arn
 }
 
 resource "aws_security_group" "eks_nomad_sg" {
