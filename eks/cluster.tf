@@ -34,7 +34,7 @@ module "eks-cluster" {
     var.k8s_roles,
     [
       {
-        rolearn  = aws_iam_role.bastion_role.arn
+        rolearn  = aws_iam_role.bastion_role[0].arn
         username = "bastion"
         groups   = ["system:masters"]
       }
