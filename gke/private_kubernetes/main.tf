@@ -186,6 +186,9 @@ resource "google_container_cluster" "circleci_cluster" {
   #     minimum = 4
   #   }
   # }
+  network_policy {
+    enabled = true
+  }
 
   addons_config {
     horizontal_pod_autoscaling {
@@ -193,6 +196,9 @@ resource "google_container_cluster" "circleci_cluster" {
     }
     istio_config {
       disabled = var.enable_istio ? false : true
+    }
+    network_policy_config {
+      disabled = false
     }
   }
 
