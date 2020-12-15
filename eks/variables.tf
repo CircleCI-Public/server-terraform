@@ -8,7 +8,8 @@ variable "basename" {
 }
 
 variable "aws_profile" {
-  default = ""
+  default     = ""
+  description = "If using multiple profiles locally in a multi-account setup, this allows you to choose one"
 }
 
 variable "aws_region" {
