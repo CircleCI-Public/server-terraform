@@ -19,3 +19,15 @@ output "vm_service_security_group" {
   value       = aws_security_group.eks_nomad_sg[0].id
   description = "Security group to be used when creating VMs"
 }
+
+output "nomad_server_cert" {
+  value = module.nomad.nomad_server_cert
+}
+
+output "nomad_server_key" {
+  value = module.nomad.nomad_server_key
+}
+
+output "nomad_tls_ca" {
+  value = module.nomad.nomad_tls_ca
+}

@@ -1,3 +1,8 @@
+module "nomad_tls" {
+  source   = "../../shared/modules/tls"
+  basename = local.basename
+}
+
 ### REQUIRED SERVICE API ###
 resource "google_project_service" "cloudresourcemanager_service" {
   project            = var.project_id
@@ -51,8 +56,11 @@ resource "google_compute_instance_template" "nomad_template" {
   metadata_startup_script = templatefile(
     "${path.module}/../../shared/nomad-scripts/nomad-startup.sh.tpl",
     {
-      basename       = local.basename
-      cloud_provider = "GCP"
+      basename        = local.basename
+      cloud_provider  = "GCP"
+      client_tls_cert = module.nomad_tls.nomad_client_cert
+      client_tls_key  = module.nomad_tls.nomad_client_key
+      tls_ca          = module.nomad_tls.nomad_tls_ca
     }
   )
 
@@ -80,7 +88,6 @@ resource "google_compute_instance_template" "nomad_template" {
   labels = {
     circleci = true
   }
-
 }
 
 resource "google_compute_firewall" "nomad_ssh" {
@@ -113,4 +120,18 @@ resource "google_compute_instance_group_manager" "nomad_manager" {
 
 resource "time_sleep" "wait_120_seconds" {
   create_duration = "120s"
+}
+
+# OUTPUTS
+
+output "nomad_server_cert" {
+  value = module.nomad_tls.nomad_server_cert
+}
+
+output "nomad_server_key" {
+  value = module.nomad_tls.nomad_server_key
+}
+
+output "nomad_tls_ca" {
+  value = module.nomad_tls.nomad_tls_ca
 }

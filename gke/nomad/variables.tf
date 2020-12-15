@@ -48,3 +48,4 @@ variable "network_name" {
   type        = string
   description = "Name of the GCP network to attach to nomad"
 }
+

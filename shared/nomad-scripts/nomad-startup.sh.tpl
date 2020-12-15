@@ -64,6 +64,20 @@ unzip nomad.zip
 mv nomad /usr/bin
 
 echo "--------------------------------------"
+echo "       Installling TLS certs"
+echo "--------------------------------------"
+mkdir -p /etc/ssl/nomad
+cat <<EOT > /etc/ssl/nomad/cert.pem
+${client_tls_cert}
+EOT
+cat <<EOT > /etc/ssl/nomad/key.pem
+${client_tls_key}
+EOT
+cat <<EOT > /etc/ssl/nomad/ca.pem
+${tls_ca}
+EOT
+
+echo "--------------------------------------"
 echo "      Creating config.hcl"
 echo "--------------------------------------"
 
@@ -87,6 +101,18 @@ client {
     node_class = "linux-64bit"
     options = {"driver.raw_exec.enable" = "1"}
 }
+tls {
+        http = false
+        rpc  = true
+
+        # This verifies the CN ([role].[region].nomad) in the certificate,
+        # not the hostname or DNS name of the of the remote party.
+        # https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
+        verify_server_hostname = true
+        ca_file   = "/etc/ssl/nomad/ca.pem"
+        cert_file = "/etc/ssl/nomad/cert.pem"
+        key_file  = "/etc/ssl/nomad/key.pem"
+      }
 EOT
 
 echo "--------------------------------------"
