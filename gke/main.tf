@@ -45,6 +45,7 @@ module "kube_private_cluster" {
   enable_istio                   = var.enable_istio
   enable_intranode_communication = var.enable_intranode_communication
   enable_dashboard               = var.enable_dashboard
+  private_endpoint               = var.private_k8s_endpoint
 
   network_uri = google_compute_network.circleci_net.self_link
   subnet_uri  = data.google_compute_subnetwork.circleci_net_subnet_data.self_link
@@ -59,6 +60,7 @@ module "nomad" {
   ssh_enabled             = var.nomad_ssh_enabled
   ssh_allowed_cidr_blocks = var.allowed_cidr_blocks
   network_name            = google_compute_network.circleci_net.name
+  nomad_sa_access         = var.nomad_sa_access
 }
 
 resource "google_storage_bucket" "data_bucket" {
@@ -69,7 +71,7 @@ resource "google_storage_bucket" "data_bucket" {
 }
 
 
-# Outputs 
+# Outputs
 
 output "cluster" {
   value = "${module.kube_private_cluster.cluster_name} (${module.kube_private_cluster.cluster_public_endpoint})"

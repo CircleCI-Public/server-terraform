@@ -36,7 +36,6 @@ resource "google_service_account" "nomad_service_account" {
   description  = "${local.basename} service account for CircleCI Server Nomad component"
 }
 
-
 resource "google_compute_instance_template" "nomad_template" {
   # We've add this wait to ensure that
   depends_on = [time_sleep.wait_120_seconds]
@@ -56,6 +55,10 @@ resource "google_compute_instance_template" "nomad_template" {
       cloud_provider = "GCP"
     }
   )
+
+  metadata = {
+    enable-oslogin = "TRUE"
+  }
 
   disk {
     source_image = "ubuntu-os-cloud/ubuntu-1604-lts"

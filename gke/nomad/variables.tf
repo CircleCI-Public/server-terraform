@@ -35,7 +35,13 @@ variable "ssh_allowed_cidr_blocks" {
 variable "ssh_enabled" {
   type        = bool
   default     = false
-  description = "If true, SSH access to Nomad clients is enabled. If enabled, use `gcloud compute ssh` to manage keys."
+  description = "If true, SSH access from the internet to Nomad clients is enabled. If enabled, use `gcloud compute ssh` to manage keys."
+}
+
+variable "nomad_sa_access" {
+  type        = string
+  default     = "allAuthenticatedUsers"
+  description = "Who can use the Nomad ServiceAccount, e.g. for managing SSH keys on Nomad clients. Can be `user:{emailid}` for a single user, `group:{emailid}` for a Google group, or `allAuthenticatedUsers` to allow all authenticated users"
 }
 
 variable "network_name" {
