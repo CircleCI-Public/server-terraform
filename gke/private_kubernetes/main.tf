@@ -190,7 +190,8 @@ resource "google_container_cluster" "circleci_cluster" {
   #   }
   # }
   network_policy {
-    enabled = true
+    enabled  = true
+    provider = "CALICO"
   }
 
   addons_config {
