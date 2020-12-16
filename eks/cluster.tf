@@ -89,17 +89,6 @@ resource "aws_iam_policy" "data-full-access" {
             "${aws_s3_bucket.data_bucket.arn}",
             "${aws_s3_bucket.data_bucket.arn}/*"
           ]
-        },
-        {
-          "Action": [
-              "iam:GetRole",
-              "sts:AssumeRole",
-              "sts:GetFederationToken"
-            ],
-            "Resource": [
-                "*"
-            ],
-            "Effect": "Allow"
         }
       ]
     }
@@ -109,6 +98,36 @@ resource "aws_iam_policy" "data-full-access" {
 resource "aws_iam_role_policy_attachment" "s3_full_access" {
   role       = module.eks-cluster.worker_iam_role_name
   policy_arn = aws_iam_policy.data-full-access.arn
+}
+
+resource "aws_iam_policy" "output_processor_sts" {
+  // Output processor uses STS to create short lived credentials. This policy
+  // allows output processor to get and assume the role of the nodes its
+  // already on.
+  name        = "${var.basename}-output-processor-sts"
+  description = "Allows output process to assume node role and use STS"
+  policy      = <<-EOF
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": [
+            "iam:GetRole",
+            "sts:AssumeRole"
+          ],
+          "Resource": [
+            "${module.eks-cluster.worker_iam_role_arn}"
+          ],
+          "Effect": "Allow"
+        }
+      ]
+    }
+  EOF
+}
+
+resource "aws_iam_role_policy_attachment" "output_processor_sts" {
+  role       = module.eks-cluster.worker_iam_role_name
+  policy_arn = aws_iam_policy.output_processor_sts.arn
 }
 
 resource "aws_iam_policy" "vm-service-ec2" {
