@@ -3,7 +3,7 @@ terraform {
     kubernetes = {
       version = "~> 1.11"
     }
-    aws        = {
+    aws = {
       version = "~> 3.0.0"
     }
   }
