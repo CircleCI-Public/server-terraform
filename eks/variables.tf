@@ -37,8 +37,16 @@ variable "bastion_key" {
   default = ""
 }
 
-variable "aws_subnet_cidr_block" {
-  default = ["10.0.0.0/16"]
+variable "aws_vpc_cidr_block" {
+  default = "10.0.0.0/16"
+}
+
+variable "aws_vpc_public_cidr_blocks" {
+  default = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
+}
+
+variable "aws_vpc_private_cidr_blocks" {
+  default = ["10.0.96.0/19", "10.0.128.0/19", "10.0.160.0/19"]
 }
 
 variable "allowed_cidr_blocks" {

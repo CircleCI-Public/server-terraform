@@ -6,16 +6,16 @@ module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
   name = "${var.basename}-circleci"
-  cidr = "10.0.0.0/16"
+  cidr = var.aws_vpc_cidr_block
 
   azs = data.aws_availability_zones.available.names
 
   # Public segment of VPC hosts public load balancers, nomad clients (for SSH access),
   # NAT gateways for the private segment.
-  public_subnets = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
+  public_subnets = var.aws_vpc_public_cidr_blocks
 
   # Private segment of VPC hosts internal load balancers, EKS pods and nodes.
-  private_subnets = ["10.0.96.0/19", "10.0.128.0/19", "10.0.160.0/19"]
+  private_subnets = var.aws_vpc_private_cidr_blocks
 
   enable_nat_gateway = true
   single_nat_gateway = true

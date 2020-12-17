@@ -7,7 +7,7 @@ variable "nomad_instance_type" {
 }
 
 variable "aws_subnet_cidr_block" {
-  default = ["10.0.0.0/16"]
+  default = "10.0.0.0/16"
 }
 
 variable "sg_enabled" {
