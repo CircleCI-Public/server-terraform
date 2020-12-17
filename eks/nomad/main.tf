@@ -49,9 +49,9 @@ module "asg" {
   asg_name                  = "${var.basename}-circleci-nomad_asg"
   vpc_zone_identifier       = var.vpc_zone_identifier
   health_check_type         = "EC2"
-  min_size                  = "${var.nomad_count}"
-  max_size                  = "${var.nomad_count}"
-  desired_capacity          = "${var.nomad_count}"
+  min_size                  = var.nomad_count
+  max_size                  = var.nomad_count
+  desired_capacity          = var.nomad_count
   wait_for_capacity_timeout = 0 # skip all Capacity Waiting behavior
 
   tags = [
