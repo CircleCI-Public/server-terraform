@@ -5,6 +5,21 @@ resource "google_service_account" "k8s_bastion_service_account" {
   description  = "${var.unique_name} service account for CircleCI Server bastion host"
 }
 
+resource "google_project_iam_member" "k8s_bastion_container_admin" {
+  count      = var.privileged_bastion ? 1 : 0
+  depends_on = [google_service_account.k8s_bastion_service_account]
+  role       = "roles/container.admin"
+  member     = "serviceAccount:${google_service_account.k8s_bastion_service_account.email}"
+}
+
+resource "google_project_iam_member" "k8s_bastion_compute_admin" {
+  count      = var.privileged_bastion ? 1 : 0
+  depends_on = [google_service_account.k8s_bastion_service_account]
+  role       = "roles/compute.admin"
+  member     = "serviceAccount:${google_service_account.k8s_bastion_service_account.email}"
+}
+
+
 resource "google_compute_instance" "bastion" {
   count                     = var.enable_bastion ? 1 : 0
   name                      = "${var.unique_name}-bastion"

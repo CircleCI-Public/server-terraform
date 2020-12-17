@@ -74,6 +74,12 @@ variable "enable_bastion" {
   description = "Include a bastion/jump server in deployment. You can restrict the range of IPs that can connect to the bastion using `allowed_cidr_blocks`"
 }
 
+variable "privileged_bastion" {
+  type        = bool
+  default     = false
+  description = "Grants container and compute admin access to the bastion Service Account. Set only to true if you understand the security implications of doing this"
+}
+
 variable "enable_istio" {
   type        = bool
   default     = false
