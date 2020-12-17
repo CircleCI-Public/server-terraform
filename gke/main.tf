@@ -42,6 +42,7 @@ module "kube_private_cluster" {
   allowed_external_cidr_blocks   = var.allowed_cidr_blocks
   enable_nat                     = var.enable_nat
   enable_bastion                 = var.enable_bastion
+  privileged_bastion             = var.privileged_bastion
   enable_istio                   = var.enable_istio
   enable_intranode_communication = var.enable_intranode_communication
   enable_dashboard               = var.enable_dashboard

@@ -121,3 +121,7 @@ variable "subnet_uri" {
 variable "private_endpoint" {
   type = bool
 }
+
+variable "privileged_bastion" {
+  type = bool
+}
