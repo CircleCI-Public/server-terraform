@@ -9,7 +9,7 @@ To deploy the infrastructure and application you will need to have the
 following CLIs installed:
 
 
-* [terraform] (tested with 0.13.5)
+* [terraform] (tested with 0.14.2)
 * [kubectl] (tested with 1.14.6)
 * [awscli] (tested with 1.16.261)
 * [server-keysets]
@@ -111,7 +111,7 @@ record for `dev.example.com` for this step to succeed.
   Subsequent `terraform apply` runs always show removal of that as a change
 
 <!-- Links -->
-[terraform]: https://releases.hashicorp.com/terraform/0.13.5/
+[terraform]: https://releases.hashicorp.com/terraform/0.14.2/
 [kubectl]: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 [awscli]: https://aws.amazon.com/cli/
 [server-keysets]: https://github.com/CircleCI-Public/server-keysets-cli#using-the-docker-container

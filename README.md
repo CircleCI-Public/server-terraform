@@ -5,7 +5,7 @@ This repository contains the terraform scripts for deploying the resources neces
 Currently this project is still in beta and supports 2 cloud providers, AWS and GCP with the intent to expand support in future releases.
 
 ## Compatibility
-The modules in this repository are meant to be used with [terraform v0.13.5](https://releases.hashicorp.com/terraform/0.13.5/)
+The modules in this repository are meant to be used with [terraform v0.14.2](https://releases.hashicorp.com/terraform/0.14.2/)
 
 ## How to get started
 Documentation on setting up an environment for launching in either cloud providers we support are found here:
