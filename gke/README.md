@@ -8,7 +8,7 @@ has permissions to create, modify, and delete resources and Service Accounts.
 To deploy the infrastructure and application you will need to have the
 following CLIs installed:
 
-* [terraform] (tested with 0.13.5)
+* [terraform] (tested with 0.14.2)
 * [kubectl] (tested with 1.14.6)
 * [gcloud] (tested with 301.0.0)
 * [server-keysets]
@@ -153,7 +153,7 @@ forward creds to the next machine for you so that you don't have to copy a key
 around.
 
 <!-- Links -->
-[terraform]: https://releases.hashicorp.com/terraform/0.13.5/
+[terraform]: https://releases.hashicorp.com/terraform/0.14.2/
 [kubectl]: https://kubernetes.io/docs/tasks/tools/install-kubectl/
 [server-keysets]: https://github.com/CircleCI-Public/server-keysets-cli#using-the-docker-container
 [gcloud]: https://cloud.google.com/sdk/install
