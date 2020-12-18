@@ -1,8 +1,8 @@
 # Backend configuration. Can't take variables.
 terraform {
   required_providers {
-    google      = "~> 3.42.0"
-    google-beta = "~> 3.42.0"
+    google      = "~> 3.51.0"
+    google-beta = "~> 3.51.0"
   }
 }
 

@@ -99,9 +99,8 @@ resource "google_project_iam_member" "k8s_memeber_blob_signer" {
 
 ### GKE VERSION ###
 data "google_container_engine_versions" "gke" {
-  provider       = google-beta
+  provider       = google
   location       = var.location
-  version_prefix = "1.16."
 }
 
 ### NODE POOL ###
@@ -110,7 +109,7 @@ resource "google_container_node_pool" "node_pool" {
   location = var.location
   cluster  = google_container_cluster.circleci_cluster.name
 
-  version = data.google_container_engine_versions.gke.release_channel_default_version["STABLE"]
+  version = data.google_container_engine_versions.gke.release_channel_default_version["REGULAR"]
 
   autoscaling {
     min_node_count = var.node_min
@@ -146,7 +145,7 @@ resource "google_container_cluster" "circleci_cluster" {
   location    = var.location
   provider    = google-beta
 
-  min_master_version = data.google_container_engine_versions.gke.release_channel_default_version["STABLE"]
+  min_master_version = data.google_container_engine_versions.gke.release_channel_default_version["REGULAR"]
 
   network = var.network_uri
   # subnetwork               = var.subnet_uri
@@ -176,19 +175,6 @@ resource "google_container_cluster" "circleci_cluster" {
     }
   }
 
-  # cluster_autoscaling {
-  #   enabled = false
-  #   resource_limits {
-  #     resource_type = "cpu"
-  #     maximum = var.node_pool_cpu_max
-  #     minimum = 1
-  #   }
-  #   resource_limits {
-  #     resource_type = "memory"
-  #     maximum = var.node_pool_ram_max
-  #     minimum = 4
-  #   }
-  # }
   network_policy {
     enabled  = true
     provider = "CALICO"
