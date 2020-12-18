@@ -75,34 +75,23 @@ resource "aws_security_group_rule" "eks_api_access" {
 resource "aws_iam_policy" "data-full-access" {
   name        = "${var.basename}-data-full-access"
   description = "Allows ressources access to CircleCI Server S3 buckets"
-  policy      = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
+  policy      = <<-EOF
     {
-      "Effect": "Allow",
-      "Action": [
-        "s3:*"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.data_bucket.arn}",
-        "${aws_s3_bucket.data_bucket.arn}/*"
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "s3:*"
+          ],
+          "Resource": [
+            "${aws_s3_bucket.data_bucket.arn}",
+            "${aws_s3_bucket.data_bucket.arn}/*"
+          ]
+        }
       ]
-    },
-    {
-      "Action": [
-          "iam:GetRole",
-          "sts:AssumeRole",
-          "sts:GetFederationToken"
-        ],
-        "Resource": [
-            "*"
-        ],
-        "Effect": "Allow"
     }
-  ]
-}
-EOF
+  EOF
 }
 
 resource "aws_iam_role_policy_attachment" "s3_full_access" {
@@ -110,31 +99,149 @@ resource "aws_iam_role_policy_attachment" "s3_full_access" {
   policy_arn = aws_iam_policy.data-full-access.arn
 }
 
+resource "aws_iam_policy" "output_processor_sts" {
+  // Output processor uses STS to create short lived credentials. This policy
+  // allows output processor to get and assume the role of the nodes its
+  // already on.
+  name        = "${var.basename}-output-processor-sts"
+  description = "Allows output process to assume node role and use STS"
+  policy      = <<-EOF
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": [
+            "iam:GetRole",
+            "sts:AssumeRole"
+          ],
+          "Resource": [
+            "${module.eks-cluster.worker_iam_role_arn}"
+          ],
+          "Effect": "Allow"
+        }
+      ]
+    }
+  EOF
+}
+
+resource "aws_iam_role_policy_attachment" "output_processor_sts" {
+  role       = module.eks-cluster.worker_iam_role_name
+  policy_arn = aws_iam_policy.output_processor_sts.arn
+}
+
 resource "aws_iam_policy" "vm-service-ec2" {
   name        = "${var.basename}-vm-service-ec2"
   description = "Security group for CircleCI Server VM Service EC2 instances"
-  policy      = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
+  policy      = <<-EOF
     {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:RunInstances",
-        "ec2:CreateTags",
-        "ec2:TerminateInstances",
-        "ec2:CreateVolume",
-        "ec2:DeleteVolume",
-        "ec2:AttachVolume",
-        "ec2:DetachVolume"
-      ],
-      "Resource": [
-        "*"
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": "ec2:RunInstances",
+          "Effect": "Allow",
+          "Resource": [
+            "arn:aws:ec2:*::image/*",
+            "arn:aws:ec2:*::snapshot/*",
+            "arn:aws:ec2:*:*:key-pair/*",
+            "arn:aws:ec2:*:*:launch-template/*",
+            "arn:aws:ec2:*:*:network-interface/*",
+            "arn:aws:ec2:*:*:placement-group/*",
+            "arn:aws:ec2:*:*:volume/*",
+            "arn:aws:ec2:*:*:subnet/*",
+            "arn:aws:ec2:*:*:security-group/${aws_security_group.eks_nomad_sg[0].id}"
+          ]
+        },
+        {
+          "Action": "ec2:RunInstances",
+          "Effect": "Allow",
+          "Resource": "arn:aws:ec2:*:*:instance/*",
+          "Condition": {
+            "StringEquals": {
+              "aws:RequestTag/ManagedBy": "circleci-vm-service"
+            }
+          }
+        },
+        {
+          "Action": [
+            "ec2:CreateVolume"
+          ],
+          "Effect": "Allow",
+          "Resource": [
+            "arn:aws:ec2:*:*:volume/*"
+          ],
+          "Condition": {
+            "StringEquals": {
+              "aws:RequestTag/ManagedBy": "circleci-vm-service"
+            }
+          }
+        },
+        {
+          "Action": [
+            "ec2:Describe*"
+          ],
+          "Effect": "Allow",
+          "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "ec2:CreateTags"
+          ],
+          "Resource": "arn:aws:ec2:*:*:*/*",
+          "Condition": {
+            "StringEquals": {
+              "ec2:CreateAction" : "CreateVolume"
+            }
+          }
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "ec2:CreateTags"
+          ],
+          "Resource": "arn:aws:ec2:*:*:*/*",
+          "Condition": {
+            "StringEquals": {
+              "ec2:CreateAction" : "RunInstances"
+            }
+          }
+        },
+        {
+          "Action": [
+            "ec2:CreateTags",
+            "ec2:StartInstances",
+            "ec2:StopInstances",
+            "ec2:TerminateInstances",
+            "ec2:AttachVolume",
+            "ec2:DetachVolume",
+            "ec2:DeleteVolume"
+          ],
+          "Effect": "Allow",
+          "Resource": "arn:aws:ec2:*:*:*/*",
+          "Condition": {
+            "StringEquals": {
+              "ec2:ResourceTag/ManagedBy": "circleci-vm-service"
+            }
+          }
+        },
+        {
+          "Action": [
+            "ec2:RunInstances",
+            "ec2:StartInstances",
+            "ec2:StopInstances",
+            "ec2:TerminateInstances"
+          ],
+          "Effect": "Allow",
+          "Resource": "arn:aws:ec2:*:*:subnet/*",
+          "Condition": {
+            "StringEquals": {
+              "ec2:Vpc": "${module.vpc.vpc_arn}"
+            }
+          }
+        }
       ]
-    }
-  ]
-}
-EOF
+    } 
+  EOF
 }
 
 resource "aws_iam_role_policy_attachment" "vm_ec2_access" {
@@ -142,10 +249,40 @@ resource "aws_iam_role_policy_attachment" "vm_ec2_access" {
   policy_arn = aws_iam_policy.vm-service-ec2.arn
 }
 
-//TODO: This needs to be restricted to something reasonable
-resource "aws_iam_role_policy_attachment" "route53_full_access" {
+resource "aws_iam_policy" "external_dns" {
+  name        = "${var.basename}-external-dns-policy"
+  description = "IAM Policy to allow the external-dns service to set DNS records"
+  policy      = <<-EOF
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "route53:ChangeResourceRecordSets"
+          ],
+          "Resource": [
+            "arn:aws:route53:::hostedzone/*"
+          ]
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "route53:ListHostedZones",
+            "route53:ListResourceRecordSets"
+          ],
+          "Resource": [
+            "*"
+          ]
+        }
+      ]
+    }
+  EOF
+}
+
+resource "aws_iam_role_policy_attachment" "external_dns_route53_access" {
   role       = module.eks-cluster.worker_iam_role_name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonRoute53FullAccess"
+  policy_arn = aws_iam_policy.external_dns.arn
 }
 
 resource "aws_security_group" "eks_nomad_sg" {
