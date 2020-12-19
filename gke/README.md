@@ -2,8 +2,8 @@
 
 ## Assumptions and Requirements
 
-It is assumed that a Google Cloud project exists and that the deployer
-has permissions to create, modify, and delete resources and Service Accounts.
+It is assumed that a Google Cloud project exists and that the Compute Engine Default Service Account has the following roles: 
+Role Administrator, Security Admin, Project IAM Admin.
 
 To deploy the infrastructure and application you will need to have the
 following CLIs installed:
@@ -81,7 +81,7 @@ and removals.
 typically taken approximately ten minutes.
 11. Once deployment is complete, Terraform will display the name of the bastion host and the name and IP of the cluster. You can now connect to your bastion host:
 
-`gcloud compute ssh <bastion-host-name> --project <project-name> --region <region-name>`
+`gcloud compute ssh <bastion-host-name> --project <project-name> --zone <zone-name>`
 
 The `--project` and `--region` flags can be omitted if `gcloud` the default values configured during initialization can be used. If you have previously used service account credentials, switch back to use your user account credentials before connecting to the bastion: `gcloud auth login`.
 
