@@ -53,10 +53,10 @@ resource "google_compute_instance" "bastion" {
   depends_on = [google_container_cluster.circleci_cluster]
 
   metadata_startup_script = join("\n", [
-    "curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.14.10/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/bin/",
+    "curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.20.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/bin/",
     "echo \"gcloud container clusters get-credentials --internal-ip --region ${var.location} ${var.unique_name}-k8s-cluster\" > update-kubeconfig && chmod +x update-kubeconfig && sudo mv ./update-kubeconfig /usr/bin/update-kubeconfig && update-kubeconfig",
-    "curl -LO https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv3.5.4/kustomize_v3.5.4_linux_amd64.tar.gz && tar xzf ./kustomize_v3.5.4_linux_amd64.tar.gz && sudo mv ./kustomize /usr/bin/",
-    "curl -LO https://github.com/replicatedhq/kots/releases/download/v1.24.1/kots_linux_amd64.tar.gz && tar xzf kots_linux_amd64.tar.gz && sudo mv ./kots /usr/bin/kubectl-kots",
-    "curl -LO https://github.com/replicatedhq/troubleshoot/releases/download/v0.9.51/preflight_linux_amd64.tar.gz && tar xzf preflight_linux_amd64.tar.gz && sudo mv ./preflight /usr/bin/kubectl-preflight"
+    "curl -LO https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv3.8.8/kustomize_v3.8.8_linux_amd64.tar.gz && tar xzf ./kustomize_v3.8.8_linux_amd64.tar.gz && sudo mv ./kustomize /usr/bin/",
+    "curl -LO https://github.com/replicatedhq/kots/releases/download/v1.25.2/kots_linux_amd64.tar.gz && tar xzf kots_linux_amd64.tar.gz && sudo mv ./kots /usr/bin/kubectl-kots",
+    "curl -LO https://github.com/replicatedhq/troubleshoot/releases/download/v0.9.54/preflight_linux_amd64.tar.gz && tar xzf preflight_linux_amd64.tar.gz && sudo mv ./preflight /usr/bin/kubectl-preflight"
   ])
 }
