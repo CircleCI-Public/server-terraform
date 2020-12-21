@@ -97,6 +97,19 @@ resource "google_compute_firewall" "nomad_ssh" {
   network       = var.network_name
 }
 
+resource "google_compute_firewall" "nomad_job_ssh" {
+  name        = "${local.basename}-nomad-ssh"
+  description = "${local.basename} firewall rule for CircleCI Server Nomand component to allow SSH access to jobs"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["64535-65535"]
+  }
+  source_ranges = var.ssh_allowed_cidr_blocks
+  target_tags   = ["nomad"]
+  network       = var.network_name
+}
+
 resource "google_compute_instance_group_manager" "nomad_manager" {
   depends_on         = [google_compute_instance_template.nomad_template]
   name               = "${local.basename}-nomad-manager"
