@@ -99,8 +99,8 @@ resource "google_project_iam_member" "k8s_memeber_blob_signer" {
 
 ### GKE VERSION ###
 data "google_container_engine_versions" "gke" {
-  provider       = google
-  location       = var.location
+  provider = google
+  location = var.location
 }
 
 ### NODE POOL ###
