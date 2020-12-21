@@ -12,6 +12,11 @@ resource "aws_key_pair" "ssh_key" {
   }
 }
 
+module "nomad_tls" {
+  source   = "../../shared/modules/tls"
+  basename = var.basename
+}
+
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "~> 3.0"
@@ -40,8 +45,11 @@ module "asg" {
   user_data_base64 = base64encode(templatefile(
     "${path.module}/../../shared/nomad-scripts/nomad-startup.sh.tpl",
     {
-      basename       = var.basename
-      cloud_provider = "AWS"
+      basename        = var.basename
+      cloud_provider  = "AWS"
+      client_tls_cert = module.nomad_tls.nomad_client_cert
+      client_tls_key  = module.nomad_tls.nomad_client_key
+      tls_ca          = module.nomad_tls.nomad_tls_ca
     }
   ))
 
@@ -124,4 +132,17 @@ resource "aws_security_group" "ssh_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+# OUTPUTS
+output "nomad_server_cert" {
+  value = module.nomad_tls.nomad_server_cert
+}
+
+output "nomad_server_key" {
+  value = module.nomad_tls.nomad_server_key
+}
+
+output "nomad_tls_ca" {
+  value = module.nomad_tls.nomad_tls_ca
 }
