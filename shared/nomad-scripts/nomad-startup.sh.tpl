@@ -218,8 +218,13 @@ echo "--------------------------------------"
 echo "  Securing Docker network interfaces"
 echo "--------------------------------------"
 docker_chain="DOCKER-USER"
-/sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination 169.254.169.254/32 -p tcp --dport 53 --jump RETURN # Allow DNS queries
-/sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination 169.254.169.254/32 -p udp --dport 53 --jump RETURN # Allow DNS queries
+if [ "$CLOUD_PROVIDER" == "GCP" ]; then
+    /sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination 169.254.169.254/32 -p tcp --dport 53 --jump RETURN # Allow DNS queries
+    /sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination 169.254.169.254/32 -p udp --dport 53 --jump RETURN # Allow DNS queries
+else if [ "$CLOUD_PROVIDER" == "AWS" ]; then
+    /sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination 169.254.169.253/32 -p tcp --dport 53 --jump RETURN # Allow DNS queries
+    /sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination 169.254.169.253/32 -p udp --dport 53 --jump RETURN # Allow DNS queries
+fi
 /sbin/iptables --wait --insert $docker_chain 3 -i docker+ --destination 169.254.0.0/16 --jump DROP
 /sbin/iptables --wait --insert $docker_chain 4 -i br-+ --destination 169.254.0.0/16 --jump DROP
 /sbin/iptables --wait --insert $docker_chain 5 -i docker+ --destination "10.0.0.0/8" --jump DROP
