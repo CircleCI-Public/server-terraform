@@ -105,7 +105,7 @@ resource "google_compute_firewall" "nomad_ssh" {
 }
 
 resource "google_compute_firewall" "nomad_job_ssh" {
-  name        = "${local.basename}-nomad-ssh"
+  name        = "${local.basename}-nomad-job-ssh"
   description = "${local.basename} firewall rule for CircleCI Server Nomand component to allow SSH access to jobs"
 
   allow {
