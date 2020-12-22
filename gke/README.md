@@ -61,7 +61,8 @@ activate your service account via `gcloud auth activate-service-account
 --key-file=$GOOGLE_APPLICATION_CREDENTIALS`
 2. Choose a base name
     `export BASENAME=<name>`
-    Suggested `<yourname>-dev`
+    Suggested `<yourname>-dev`. This will be used to name Google Cloud resources,
+    and should be no longer than 15 characters to fit their naming constraints.
 3. Navigate to `./gke`
 4. Create a bucket for terraform state `gsutil mb
    gs://${BASENAME}-terraform-state`
