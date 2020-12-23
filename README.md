@@ -25,5 +25,5 @@ Creating a Branch
 - PRs are reviewed and approved by members of CircleCI's Server team
 
 ### Reporting Issues
-- Feature requests or problems found may be reported by createing an issue within this repository
+- Feature requests or problems found may be reported by creating an issue within this repository
 - CircleCI's Server team will review and respond to issues.
