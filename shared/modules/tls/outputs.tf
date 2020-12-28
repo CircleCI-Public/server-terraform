@@ -1,5 +1,5 @@
 output "nomad_server_cert" {
-  value = tls_locally_signed_cert.nomad_server.cert_pem
+  value = tls_locally_signed_cert.nomad_server[0].cert_pem
 }
 
 output "nomad_server_key" {
@@ -7,7 +7,7 @@ output "nomad_server_key" {
 }
 
 output "nomad_client_cert" {
-  value = tls_locally_signed_cert.nomad_client.cert_pem
+  value = tls_locally_signed_cert.nomad_client[0].cert_pem
 }
 
 output "nomad_client_key" {
@@ -15,5 +15,5 @@ output "nomad_client_key" {
 }
 
 output "nomad_tls_ca" {
-  value = tls_self_signed_cert.nomad_ca.cert_pem
+  value = tls_self_signed_cert.nomad_ca[0].cert_pem
 }
