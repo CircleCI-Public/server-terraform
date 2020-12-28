@@ -102,17 +102,17 @@ client {
     options = {"driver.raw_exec.enable" = "1"}
 }
 tls {
-        http = false
-        rpc  = true
+    http = false
+    rpc  = true
 
-        # This verifies the CN ([role].[region].nomad) in the certificate,
-        # not the hostname or DNS name of the of the remote party.
-        # https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
-        verify_server_hostname = true
-        ca_file   = "/etc/ssl/nomad/ca.pem"
-        cert_file = "/etc/ssl/nomad/cert.pem"
-        key_file  = "/etc/ssl/nomad/key.pem"
-      }
+    # This verifies the CN ([role].[region].nomad) in the certificate,
+    # not the hostname or DNS name of the of the remote party.
+    # https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
+    verify_server_hostname = true
+    ca_file   = "/etc/ssl/nomad/ca.pem"
+    cert_file = "/etc/ssl/nomad/cert.pem"
+    key_file  = "/etc/ssl/nomad/key.pem"
+}
 EOT
 
 echo "--------------------------------------"
