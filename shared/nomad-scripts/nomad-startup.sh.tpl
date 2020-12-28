@@ -101,6 +101,10 @@ client {
     node_class = "linux-64bit"
     options = {"driver.raw_exec.enable" = "1"}
 }
+EOT
+
+if [ $client_tls_cert != "null" ];
+then cat <<EOT >> /etc/nomad/config.hcl
 tls {
     http = false
     rpc  = true
@@ -114,6 +118,7 @@ tls {
     key_file  = "/etc/ssl/nomad/key.pem"
 }
 EOT
+fi
 
 echo "--------------------------------------"
 echo "      Creating nomad.conf"
