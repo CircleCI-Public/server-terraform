@@ -10,7 +10,7 @@ following CLIs installed:
 
 
 * [terraform] (tested with 0.14.2)
-* [kubectl] (tested with 1.14.6)
+* [kubectl] (tested with 1.20.0
 * [awscli] (tested with 1.16.261)
 * [server-keysets]
 
