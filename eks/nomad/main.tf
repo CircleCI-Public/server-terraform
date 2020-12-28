@@ -19,7 +19,7 @@ module "nomad_tls" {
 
 module "asg" {
   source  = "terraform-aws-modules/autoscaling/aws"
-  version = "~> 3.0"
+  version = "~> 3.8"
 
   name = "${var.basename}-circleci-nomad_asg"
 
