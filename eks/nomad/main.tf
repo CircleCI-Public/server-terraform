@@ -15,6 +15,7 @@ resource "aws_key_pair" "ssh_key" {
 module "nomad_tls" {
   source   = "../../shared/modules/tls"
   basename = var.basename
+  enabled  = 1 # It can be dangerous to modify this value
 }
 
 module "asg" {

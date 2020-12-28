@@ -1,6 +1,7 @@
 module "nomad_tls" {
   source   = "../../shared/modules/tls"
   basename = local.basename
+  enabled  = 1 # It can be dangerous to modify this value
 }
 
 ### REQUIRED SERVICE API ###
