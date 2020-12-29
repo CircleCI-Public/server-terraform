@@ -47,6 +47,7 @@ module "kube_private_cluster" {
   enable_intranode_communication = var.enable_intranode_communication
   enable_dashboard               = var.enable_dashboard
   private_endpoint               = var.private_k8s_endpoint
+  private_vms                    = var.private_vms
 
   network_uri = google_compute_network.circleci_net.self_link
   subnet_uri  = data.google_compute_subnetwork.circleci_net_subnet_data.self_link
