@@ -1,7 +1,7 @@
 module "nomad_tls" {
   source   = "../../shared/modules/tls"
   basename = local.basename
-  count    = var.enable_mtls
+  count    = var.enable_mtls ? 1 : 0
 }
 
 ### REQUIRED SERVICE API ###

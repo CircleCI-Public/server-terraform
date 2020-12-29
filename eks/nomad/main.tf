@@ -15,7 +15,7 @@ resource "aws_key_pair" "ssh_key" {
 module "nomad_tls" {
   source   = "../../shared/modules/tls"
   basename = var.basename
-  count    = var.enable_mtls
+  count    = var.enable_mtls ? 1 : 0
 }
 
 module "asg" {

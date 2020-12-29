@@ -50,7 +50,7 @@ variable "network_name" {
 }
 
 variable "enable_mtls" {
-  type        = number
-  default     = 1
+  type        = bool
+  default     = true
   description = "MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
 }
