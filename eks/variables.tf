@@ -126,3 +126,9 @@ variable "desired_capacity" {
   default     = 4
   description = "The desired number of worker nodes in the cluster"
 }
+
+variable "enable_mtls" {
+  type        = number
+  default     = 1
+  description = "MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
+}

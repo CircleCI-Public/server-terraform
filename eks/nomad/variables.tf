@@ -41,3 +41,9 @@ variable "ssh_key" {
   default     = null
   description = "SSH key to authenticate access to Nomad clients. If not set, SSH is disabled"
 }
+
+variable "enable_mtls" {
+  type        = number
+  default     = 1
+  description = "MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
+}

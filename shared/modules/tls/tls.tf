@@ -40,8 +40,6 @@ resource "tls_self_signed_cert" "nomad_ca" {
   ]
 
   is_ca_certificate = true
-
-  count = var.enabled
 }
 
 resource "tls_private_key" "nomad_client" {
@@ -65,15 +63,13 @@ resource "tls_cert_request" "nomad_client" {
   ip_addresses = [
     "127.0.0.1",
   ]
-
-  count = var.enabled
 }
 
 resource "tls_locally_signed_cert" "nomad_client" {
-  cert_request_pem   = tls_cert_request.nomad_client[0].cert_request_pem
+  cert_request_pem   = tls_cert_request.nomad_client.cert_request_pem
   ca_key_algorithm   = tls_private_key.nomad_ca.algorithm
   ca_private_key_pem = tls_private_key.nomad_ca.private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.nomad_ca[0].cert_pem
+  ca_cert_pem        = tls_self_signed_cert.nomad_ca.cert_pem
 
   validity_period_hours = local.cert_validity_period
 
@@ -84,8 +80,6 @@ resource "tls_locally_signed_cert" "nomad_client" {
     "key_encipherment",
     "server_auth",
   ]
-
-  count = var.enabled
 }
 
 resource "tls_private_key" "nomad_server" {
@@ -109,15 +103,13 @@ resource "tls_cert_request" "nomad_server" {
   ip_addresses = [
     "127.0.0.1",
   ]
-
-  count = var.enabled
 }
 
 resource "tls_locally_signed_cert" "nomad_server" {
-  cert_request_pem   = tls_cert_request.nomad_server[0].cert_request_pem
+  cert_request_pem   = tls_cert_request.nomad_server.cert_request_pem
   ca_key_algorithm   = tls_private_key.nomad_ca.algorithm
   ca_private_key_pem = tls_private_key.nomad_ca.private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.nomad_ca[0].cert_pem
+  ca_cert_pem        = tls_self_signed_cert.nomad_ca.cert_pem
 
   validity_period_hours = local.cert_validity_period
 
@@ -128,6 +120,4 @@ resource "tls_locally_signed_cert" "nomad_server" {
     "key_encipherment",
     "server_auth",
   ]
-
-  count = var.enabled
 }

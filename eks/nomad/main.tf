@@ -15,7 +15,7 @@ resource "aws_key_pair" "ssh_key" {
 module "nomad_tls" {
   source   = "../../shared/modules/tls"
   basename = var.basename
-  enabled  = 1 # It can be dangerous to modify this value
+  count    = var.enable_mtls
 }
 
 module "asg" {
@@ -48,9 +48,9 @@ module "asg" {
     {
       basename        = var.basename
       cloud_provider  = "AWS"
-      client_tls_cert = module.nomad_tls.nomad_client_cert
-      client_tls_key  = module.nomad_tls.nomad_client_key
-      tls_ca          = module.nomad_tls.nomad_tls_ca
+      client_tls_cert = module.nomad_tls ? module.nomad_tls.nomad_client_cert : ""
+      client_tls_key  = module.nomad_tls ? module.nomad_tls.nomad_client_key : ""
+      tls_ca          = module.nomad_tls ? module.nomad_tls.nomad_tls_ca : ""
     }
   ))
 
@@ -133,17 +133,4 @@ resource "aws_security_group" "ssh_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
-
-# OUTPUTS
-output "nomad_server_cert" {
-  value = module.nomad_tls.nomad_server_cert
-}
-
-output "nomad_server_key" {
-  value = module.nomad_tls.nomad_server_key
-}
-
-output "nomad_tls_ca" {
-  value = module.nomad_tls.nomad_tls_ca
 }
