@@ -104,10 +104,17 @@ variable "private_k8s_endpoint" {
   description = "By default, the Kubernetes endpoint is only accessible via the bastion host. Set to false if you want access via the public internet. You can use IP whitelisting using `allowed_cidr_blocks` to tighten access for both cases."
 }
 
+variable "private_vms" {
+  type        = bool
+  default     = true
+  description = "By default, the VMs spun up for remote docker and machine executioners are only accessible via the bastion host. Set to false if you want access via the public internet. You can use IP whitelisting using `allowed_cidr_blocks` to tighten access for both cases."
+}
+
+
 variable "allowed_cidr_blocks" {
   type        = list(string)
   default     = []
-  description = "This configures the allowable source IP blocks, depending on your configuration to your bastion host and/or Kubernetes cluster and/or Nomad clients"
+  description = "This configures the allowable source IP blocks, depending on your configuration to your bastion host and/or Kubernetes cluster and/or Nomad clients and/or VMs"
 }
 
 variable "nomad_count" {

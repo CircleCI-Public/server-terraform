@@ -16,7 +16,8 @@ enable_bastion                 = true
 enable_istio                   = false
 enable_intranode_communication = false
 enable_dashboard               = false
-private_k8s_endpoint               = true
+private_k8s_endpoint           = true
+private_vms                    = true
 
 # The CIDR ranges that are allowed to access those components of your
 # installation that should be accessible via the public internet. By default

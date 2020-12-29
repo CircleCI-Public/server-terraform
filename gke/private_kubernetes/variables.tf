@@ -122,6 +122,10 @@ variable "private_endpoint" {
   type = bool
 }
 
+variable "private_vms" {
+  type = bool
+}
+
 variable "privileged_bastion" {
   type = bool
 }
