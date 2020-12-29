@@ -107,7 +107,7 @@ variable "private_k8s_endpoint" {
 variable "private_vms" {
   type        = bool
   default     = true
-  description = "By default, the VMs spun up for remote docker and machine executioners are only accessible via the bastion host. Set to false if you want access via the public internet. You can use IP whitelisting using `allowed_cidr_blocks` to tighten access for both cases."
+  description = "By default, the VMs for the remote docker and machine executors are only accessible via the bastion host. Set to false if you want access via the public internet, in which case you will need to whitelist IPs using `allowed_cidr_blocks`"
 }
 
 
