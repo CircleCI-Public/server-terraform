@@ -53,44 +53,9 @@ module "kube_private_cluster" {
   subnet_uri  = data.google_compute_subnetwork.circleci_net_subnet_data.self_link
 }
 
-module "nomad" {
-  source                  = "./nomad"
-  project_loc             = var.project_loc
-  project_id              = var.project_id
-  basename                = var.basename
-  nomad_count             = var.nomad_count
-  ssh_enabled             = var.nomad_ssh_enabled
-  ssh_allowed_cidr_blocks = var.allowed_cidr_blocks
-  network_name            = google_compute_network.circleci_net.name
-  nomad_sa_access         = var.nomad_sa_access
-}
-
 resource "google_storage_bucket" "data_bucket" {
   name = "${var.basename}-data"
   labels = {
     circleci = true
   }
-}
-
-
-# Outputs
-
-output "cluster" {
-  value = "${module.kube_private_cluster.cluster_name} (${module.kube_private_cluster.cluster_public_endpoint})"
-}
-
-output "bastion" {
-  value = module.kube_private_cluster.bastion > 0 ? module.kube_private_cluster.bastion_name : "Not created."
-}
-
-output "nomad_server_cert" {
-  value = module.nomad.nomad_server_cert
-}
-
-output "nomad_server_key" {
-  value = module.nomad.nomad_server_key
-}
-
-output "nomad_tls_ca" {
-  value = module.nomad.nomad_tls_ca
 }

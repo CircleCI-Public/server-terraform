@@ -133,3 +133,9 @@ variable "nomad_sa_access" {
   default     = "allAuthenticatedUsers"
   description = "Who can use the Nomad ServiceAccount, e.g. for managing SSH keys on Nomad clients. Can be `user:{emailid}` for a single user, `group:{emailid}` for a Google group, or `allAuthenticatedUsers` to allow all authenticated users"
 }
+
+variable "enable_mtls" {
+  type        = bool
+  default     = true
+  description = "MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
+}

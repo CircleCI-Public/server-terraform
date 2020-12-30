@@ -240,7 +240,7 @@ resource "aws_iam_policy" "vm-service-ec2" {
           }
         }
       ]
-    } 
+    }
   EOF
 }
 

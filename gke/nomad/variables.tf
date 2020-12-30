@@ -49,3 +49,8 @@ variable "network_name" {
   description = "Name of the GCP network to attach to nomad"
 }
 
+variable "enable_mtls" {
+  type        = bool
+  default     = true
+  description = "MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
+}
