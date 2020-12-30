@@ -119,7 +119,7 @@ resource "aws_instance" "bastion" {
     # Kubernetes Tooling
     curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.20.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/bin/
     curl -LO https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv3.8.8/kustomize_v3.8.8_linux_amd64.tar.gz && tar xzf ./kustomize_v3.8.8_linux_amd64.tar.gz && sudo mv ./kustomize /usr/bin/
-    curl -LO https://github.com/replicatedhq/kots/releases/download/v1.25.2/kots_linux_amd64.tar.gz && tar xzf kots_linux_amd64.tar.gz && sudo mv ./kots /usr/bin/kubectl-kots
+    curl -LO https://github.com/replicatedhq/kots/releases/download/v1.26.0/kots_linux_amd64.tar.gz && tar xzf kots_linux_amd64.tar.gz && sudo mv ./kots /usr/bin/kubectl-kots
     curl -LO https://github.com/replicatedhq/troubleshoot/releases/download/v0.9.54/preflight_linux_amd64.tar.gz && tar xzf preflight_linux_amd64.tar.gz && sudo mv ./preflight /usr/bin/kubectl-preflight
   EOF
 
