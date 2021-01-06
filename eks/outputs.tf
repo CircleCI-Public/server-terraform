@@ -31,3 +31,13 @@ output "nomad_server_key" {
 output "nomad_tls_ca" {
   value = module.nomad.nomad_tls_ca
 }
+
+locals {
+  bastion_connect_command = var.bastion_key == "" ? "mssh ubuntu@${aws_instance.bastion[0.0].id}" : "ssh ubuntu@${aws_instance.bastion[0.0].public_ip}"
+}
+
+output "bastion_access_information" {
+  value       = var.enable_bastion ? "To connect to your bastion run '${local.bastion_connect_command}'" : "bastion has been disabled"
+  description = "Bastion host access information"
+}
+

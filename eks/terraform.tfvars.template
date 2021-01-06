@@ -2,13 +2,20 @@ basename         = ""        # Prefix added to cluster resources
 aws_region       = ""        # Region to create cluster IE us-east-1
 
 enable_bastion   = true      # Enable a bastion host for the eks cluster
-bastion_key      = ""        # cat the public ssh key to use for the bastion host.
+# If you want to use a self-managed SSH key to access the bastion, add the
+# public key of the key pair here. If you want to have AWS manage this for
+# you by using EC2 Instance connect, leave as is.
+bastion_key = ""
+# The role you use to setup the cluster and is added temporarily to the bastion
+# See README.md for details
+additional_bastion_role_arn = ""
+additional_bastion_tags = {} # any tags you want to add to your bastion host
 
 # The CIDR ranges that are allowed to access the Kubernetes cluster.
 # Developers, this is typically the public IP address of your home/office network
 # IE ["1.2.3.4/32"]
-# The default is ["0.0.0.0/0"], which implements no IP restrictions
-# allowed_cidr_blocks = [""]
+# The default is an empty list, disabling access completely. If you don't want to restrict access at all, you can set "0.0.0.0/0" to allow access from all IPs
+# allowed_cidr_blocks = []
 
 force_destroy    = false    # Forces destroy of the S3 data bucket on `terraform destroy`.  Useful as true for development purposes.  Data in bucket will be unrecoverable   
 
@@ -20,9 +27,14 @@ k8s_administrators  = []    # add any AWS users here who should also have access
 #       userarn  = "<user ARN>"
 #       username = "<username>"
 #   }
+# This only takes effect if you use a public endpoint instead of a bastion host
 
 nomad_count   = 1
-nomad_ssh_key = null  # Set to valid SSH public key to enable SSH access to nomad clients
+# Set to valid SSH public key to enable SSH access to nomad clients from the
+# internet or if you don't want to use EC2 Instance connect from the bastion
+# host but a specific key. You'll need to copy that key to the bastion yourself
+# in this case.
+nomad_ssh_key = null
 
 # Cluster node details - uncomment to manage node type and numbers. Below are the default values so if these are fine no need to uncomment
 # instance_type      = "m4.xlarge"

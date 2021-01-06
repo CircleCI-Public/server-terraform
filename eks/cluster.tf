@@ -19,27 +19,21 @@ provider "kubernetes" {
 }
 
 module "eks-cluster" {
-  version                         = "13.0.0"
-  source                          = "terraform-aws-modules/eks/aws"
-  cluster_name                    = local.cluster_name
-  cluster_version                 = local.k8s_version
-  cluster_endpoint_private_access = var.enable_bastion ? true : false
-  cluster_endpoint_public_access  = true
-  vpc_id                          = module.vpc.vpc_id
-  subnets                         = module.vpc.private_subnets
-  cluster_enabled_log_types       = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
-  wait_for_cluster_cmd            = "for i in `seq 1 60`; do curl -k -s $ENDPOINT/healthz >/dev/null && exit 0 || true; sleep 5; done; echo TIMEOUT && exit 1"
-  map_roles = var.enable_bastion ? concat(
-    var.k8s_roles,
-    [
-      {
-        rolearn  = aws_iam_role.bastion_role[0].arn
-        username = "bastion"
-        groups   = ["system:masters"]
-      }
-    ]
-  ) : []
-  map_users = var.k8s_administrators
+  version                               = "13.2.1"
+  source                                = "terraform-aws-modules/eks/aws"
+  cluster_name                          = local.cluster_name
+  cluster_version                       = local.k8s_version
+  cluster_endpoint_private_access       = var.enable_bastion
+  cluster_endpoint_public_access        = var.enable_bastion ? false : true
+  cluster_endpoint_public_access_cidrs  = var.allowed_cidr_blocks
+  cluster_endpoint_private_access_cidrs = var.enable_bastion ? ["${aws_instance.bastion[0].private_ip}/32"] : null
+  vpc_id                                = module.vpc.vpc_id
+  subnets                               = module.vpc.private_subnets
+  cluster_enabled_log_types             = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  wait_for_cluster_cmd                  = var.enable_bastion ? "exit 0" : "for i in `seq 1 60`; do curl -k -s $ENDPOINT/healthz >/dev/null && exit 0 || true; sleep 5; done; echo TIMEOUT && exit 1" # No public endpoint when using a bastion, hence simply exiting
+  manage_aws_auth                       = var.enable_bastion ? false : true
+  map_roles                             = var.enable_bastion ? [] : var.k8s_roles
+  map_users                             = var.k8s_administrators
 
   node_groups = {
     circleci-server = {
@@ -58,6 +52,8 @@ module "eks-cluster" {
     circleci                = "true"
     Terraform               = "true"
     Name                    = "${var.basename}-circleci-eks_cluster"
+    team                    = "server"
+    ManagedBy               = "Robin Sturmeit"
   }
 }
 

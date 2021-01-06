@@ -21,6 +21,21 @@ variable "enable_bastion" {
   default = true
 }
 
+variable "bastion_key" {
+  default     = ""
+  description = "The bastion is using EC2 Instance Connect by default. Supply a key if you want to manage SSH keys yourself"
+}
+
+variable "additional_bastion_role_arn" {
+  default     = ""
+  description = "This should be set to the role you are using for setting up your cluster"
+}
+
+variable "additional_bastion_tags" {
+  default     = {}
+  description = "Additional tags to add to your bastion host"
+}
+
 variable "k8s_administrators" {
   default = []
 }
@@ -31,10 +46,6 @@ variable "k8s_roles" {
 
 variable "force_destroy" {
   default = false
-}
-
-variable "bastion_key" {
-  default = ""
 }
 
 variable "aws_vpc_cidr_block" {
@@ -50,11 +61,11 @@ variable "aws_vpc_private_cidr_blocks" {
 }
 
 variable "allowed_cidr_blocks" {
-  default = ["0.0.0.0/0"]
+  default = []
 }
 
 variable "allowed_ipv6_cidr_blocks" {
-  default = ["::/0"]
+  default = []
 }
 
 variable "sg_enabled" {

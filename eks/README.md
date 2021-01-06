@@ -19,7 +19,8 @@ Additionally you will require the following permissions and access in order to
 configure the CircleCI Server application:
 
 * ID and secret for a Github OAuth application.
-* An AWS [keypair][aws-keypair-docs]
+* An AWS role with administrator permissions
+* optional - an AWS [keypair][aws-keypair-docs]
 * optional - certbot with Route53 `pip install certbot_dns_route53`
 
 ## Setup
@@ -38,36 +39,53 @@ configure the CircleCI Server application:
 2. Run `aws configure` to authenticate against AWS.  Alternativly you may set
    AWS_ACCESS_KEY, AWS_DEFAULT_REGION and AWS_SECRET_KEY environment variables.
 3. Create a S3 bucket for terraform state: `aws s3 mb s3://${BASENAME}-terraform-state`
-4. If you will be using a bastion, you will also need an SSH key. 
-    * Generate an SSH key using a tool like ssh-keygen.  
-     ex: `ssh-keygen -f ./circleci-bastion -t rsa -b 4096`
-     This key will be used in the `bastion_key` terraform variable. 
-5. Navigate to `./eks`
-6. Modify the `terraform.tfvars.template` file and save as `terraform.tfvars`
-7. Modify the `remote_state.tf.template` file using the same values from
+4. If you will be using a bastion (the default setting), you need to decide how you
+   want to handle authentication with the bastion host. You can either manage SSH
+   keys yourself or use [EC2 Instance Connect](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Connect-using-EC2-Instance-Connect.html) (recommended).
+    * For EC2 Instance Connect:
+        * You do not need to do anything special here
+    * If you manage SSH keys yourself:
+        * Generate an SSH key using a tool like ssh-keygen.
+         ex: `ssh-keygen -f ./circleci-bastion -t rsa -b 4096`
+         This key will be used in the `bastion_key` terraform variable.
+5. Create a role that has sufficient permissions to create all the resources in
+   this terraform. Ensure that you can assume the role with your local
+   credentials and add EC2 to the trust policy of the role. The `arn` of this
+   role will be used for the `additional_bastion_role_arn` terraform variable.
+6. Navigate to `./eks`
+7. Modify the `terraform.tfvars.template` file and save as `terraform.tfvars`
+8. Modify the `remote_state.tf.template` file using the same values from
    `terraform.tfvars` and save as `remote_state.tf`
-8. Run command: `terraform init`. This will initialize terraform, downloading
+9. Run command: `terraform init`. This will initialize terraform, downloading
    any dependency providers, and creating a state object in a predefined s3
 bucket.
-9. Run command: `terraform plan`. This will compare the remote state to the
+10. Run command: `terraform plan`. This will compare the remote state to the
    definitions in the local terraform and create a plan for additions, changes
 and removals.
-10. Once the plan has been verified, run command: `terraform apply`. When
+11. Once the plan has been verified, run command: `terraform apply`. When
     prompted, confirm the deployment. Deployment time can vary but has
 typically taken approximately ten minutes.  The output will include some data
-values.  Take note of `cluster_name`, `subnet`, `vm_service_security_group`, 
-`access-key-id` and one of  `secret-access-key` or `secret-access-key-encrypted`.
+values.  Take note of `cluster_name`, `subnet`, `vm_service_security_group`.
 We'll need those values later.
-11. Once deployment is complete, add the new EKS cluster to your local
-    Kubernetes configuration via aws-cli by running the following command: `aws
-eks update-kubeconfig --name $BASENAME-cci-cluster` Should you use a
-bastion host, you can skip this step.
-12. Verify that the credentials were added by running the following command:
-    `kubectl config get-contexts` This should return a list of contexts with an
-asterix beside the active context.  In case you are using a bastion host, you
-need to connect to the bastion host first. Terraform will have provided you
-with the IP after `terraform apply`: `ssh ubuntu@<bastion IP>`. After
-connecting to the bastion host you can run the kubectl command above.
+12. Once deployment is complete,
+    * if you have a bastion:
+        * Connect to your bastion host with the command given in the terraform output
+        * On the bastion, run some `kubectl` command to verify that you can access
+          the cluster, e.g. `kubectl config get-contexts`.  This should return a
+          list of contexts with an asterisk beside the active context. `kubectl` is
+          aliased with `k` and `kubectl` autocompletion is enabled for your
+          convenience.
+        * You can now remove EC2 from the trust policy of the role you used for setting
+          up the cluster. It was only needed to allow the bastion host to configure
+          the EKS cluster for bastion host access. Keep the role around, though, in case
+          you need to make changes to your setup at a later stage.
+    * if you don't have a bastion:
+        * add the new EKS cluster to your local Kubernetes configuration via aws-cli by
+          running the following command:
+          `aws eks update-kubeconfig --name $BASENAME-cci-cluster`
+        * Verify that you can interact with the cluster, e.g. by running
+          `kubectl config get-contexts`. This should return a list of contexts with an
+          asterix beside the active context - which should point to your EKS cluster.
 
 ## Generate Certificate
 

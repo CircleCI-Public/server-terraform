@@ -28,6 +28,9 @@ echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
 apt-get update && apt-get -y upgrade
+if [ "$CLOUD_PROVIDER" == "AWS" -a ${nomad_ssh} == "true" ]; then
+    apt-get install -y ec2-instance-connect
+fi
 
 echo "--------------------------------------"
 echo "        Installing NTP"

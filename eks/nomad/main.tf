@@ -51,6 +51,7 @@ module "asg" {
       client_tls_cert = var.enable_mtls ? module.nomad_tls[0].nomad_client_cert : ""
       client_tls_key  = var.enable_mtls ? module.nomad_tls[0].nomad_client_key : ""
       tls_ca          = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""
+      nomad_ssh       = local.ssh_enabled
     }
   ))
 
@@ -77,6 +78,11 @@ module "asg" {
     {
       key                 = "Environment"
       value               = "circleci"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "nomadclient"
+      value               = "true"
       propagate_at_launch = true
     }
   ]
