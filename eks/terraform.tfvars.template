@@ -28,4 +28,4 @@ nomad_ssh_key = null  # Set to valid SSH public key to enable SSH access to noma
 # instance_type      = "m4.xlarge"
 # max_capacity       = 5
 # min_capacity       = 4
-# desired_capacity   = 4
+# desired_capacity   = 4   # Changes to this value are not respected by terraform and must be done manually through the console per: https://github.com/terraform-aws-modules/terraform-aws-eks/issues/835

@@ -124,7 +124,7 @@ variable "min_capacity" {
 variable "desired_capacity" {
   type        = number
   default     = 4
-  description = "The desired number of worker nodes in the cluster"
+  description = "The desired number of worker nodes in the cluster.  Changes to this value are not respected by terraform per: https://github.com/terraform-aws-modules/terraform-aws-eks/issues/835"
 }
 
 variable "enable_mtls" {
