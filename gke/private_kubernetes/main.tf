@@ -120,7 +120,7 @@ resource "google_container_node_pool" "node_pool" {
 
   node_config {
     machine_type    = var.nodes_machine_spec
-    service_account = google_service_account.k8s_service_account.email
+    service_account = google_service_account.cluster_node.email
     oauth_scopes    = ["cloud-platform"]
 
     tags   = local.all_node_tags
