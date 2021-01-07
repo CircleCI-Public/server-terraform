@@ -7,6 +7,6 @@ resource "aws_s3_bucket" "data_bucket" {
     Environment   = "circleci"
     circleci      = true
     Name          = "${var.basename}-circleci-data"
-    force_destroy = true
+    force_destroy = var.force_destroy
   }
 }
