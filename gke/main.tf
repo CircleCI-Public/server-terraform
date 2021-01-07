@@ -55,6 +55,9 @@ module "kube_private_cluster" {
 
 resource "google_storage_bucket" "data_bucket" {
   name = "${var.basename}-data"
+
+  force_destroy = var.force_destroy
+
   labels = {
     circleci = true
   }
