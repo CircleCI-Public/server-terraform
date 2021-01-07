@@ -103,7 +103,7 @@ client {
 }
 EOT
 
-if [ -z $client_tls_cert ];
+if [ -n $client_tls_cert ];
 then cat <<EOT >> /etc/nomad/config.hcl
 tls {
     http = false
