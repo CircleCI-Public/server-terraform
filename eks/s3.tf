@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "data_bucket" {
     allowed_origins = ["*"]
     max_age_seconds = 3600
   }
-  
+
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
