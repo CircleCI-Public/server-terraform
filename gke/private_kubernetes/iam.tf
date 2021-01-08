@@ -4,26 +4,6 @@ resource "google_service_account" "cluster_node" {
   description  = "${var.unique_name} service account for CircleCI Server cluster nodes"
 }
 
-resource "random_string" "role_suffix" {
-  length  = 8
-  special = false
-}
-
-locals {
-  # NB: The random suffix added to the role is important to avoid role name
-  # collisions caused by the slow soft-delete behaviour of roles in GCP. Learn
-  # more here:
-  # https://cloud.google.com/iam/docs/creating-custom-roles#deleting_a_custom_role
-  role_name = "${var.unique_name}_blob_signer_${random_string.role_suffix.result}"
-}
-
-resource "google_project_iam_custom_role" "blob_signer" {
-  # '-' characters are forbidden in role names
-  role_id     = replace(local.role_name, "-", "_")
-  title       = "Blob signer for ${var.unique_name}"
-  permissions = ["iam.serviceAccounts.signBlob"]
-}
-
 # GKE Minimal node permissions as per
 # https://cloud.google.com/kubernetes-engine/docs/how-to/hardening-your-cluster#use_least_privilege_sa 
 resource "google_project_iam_member" "metrics_viewer" {
@@ -46,6 +26,22 @@ resource "google_project_iam_member" "log_writer" {
 # being. Details of Workload Identity here:
 # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
 
+resource "random_string" "role_suffix" {
+  length  = 8
+  special = false
+}
+
+locals {
+  # NB: The random suffix added to the role is important to avoid role name
+  # collisions caused by the slow soft-delete behaviour of roles in GCP. Learn
+  # more here:
+  # https://cloud.google.com/iam/docs/creating-custom-roles#deleting_a_custom_role
+  role_names = {
+    object_storage = "${var.unique_name}_object_storage_${random_string.role_suffix.result}"
+    external_dns   = "${var.unique_name}_external_dns_${random_string.role_suffix.result}"
+  }
+}
+
 # DNS permissions for external-dns
 resource "google_project_iam_member" "dns_admin" {
   # TODO: Narrow this down
@@ -61,13 +57,32 @@ resource "google_project_iam_member" "compute_admin" {
 }
 
 # Object storage for many many services
-resource "google_project_iam_member" "storage_admin" {
-  # TODO: Narrow this down
-  role   = "roles/storage.admin"
-  member = "serviceAccount:${google_service_account.cluster_node.email}"
+resource "google_project_iam_custom_role" "object_storage" {
+  # '-' characters are forbidden in role names
+  role_id = replace(local.role_names.object_storage, "-", "_")
+  title   = "Blob signer for ${var.unique_name}"
+  permissions = [
+    "iam.serviceAccounts.signBlob",
+    "storage.buckets.get",
+    "storage.buckets.list",
+    "storage.objects.create",
+    "storage.objects.get",
+    "storage.objects.list",
+    "storage.objects.update"
+  ]
 }
 
-resource "google_project_iam_member" "blobsigner" {
-  role   = google_project_iam_custom_role.blob_signer.id
+resource "google_project_iam_member" "object_storage" {
+  role   = google_project_iam_custom_role.object_storage.id
   member = "serviceAccount:${google_service_account.cluster_node.email}"
+  condition {
+    title       = "DataBucketOnly"
+    description = "Restrict access to data bucket only"
+    expression  = <<-EOF
+      (
+        resource.type != 'storage.googleapis.com/Bucket' &&
+        resource.type != 'storage.googleapis.com/Object'
+      ) || resource.name.startsWith('projects/_/buckets/${var.unique_name}-data')
+    EOF
+  }
 }
