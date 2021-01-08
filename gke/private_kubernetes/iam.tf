@@ -72,7 +72,7 @@ resource "google_project_iam_custom_role" "object_storage" {
     # Object read-write credentials
     "storage.objects.create",
     "storage.objects.get",
-    "storage.objects.delete,
+    "storage.objects.delete",
     "storage.objects.list",
     "storage.objects.update"
   ]
@@ -85,8 +85,7 @@ resource "google_project_iam_member" "object_storage" {
     title       = "Data Bucket Only"
     description = "Restrict access to data bucket only"
     expression  = <<-EOF
-      (
-        resource.type != 'storage.googleapis.com/Bucket' &&
+      ( resource.type != 'storage.googleapis.com/Bucket' &&
         resource.type != 'storage.googleapis.com/Object'
       ) || resource.name.startsWith('projects/_/buckets/${var.unique_name}-data')
     EOF
