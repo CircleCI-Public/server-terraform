@@ -32,14 +32,20 @@ variable "vpc_zone_identifier" {
 
 variable "ssh_allowed_cidr_blocks" {
   type        = list(string)
-  default     = ["0.0.0.0/0"]
-  description = "List of allowed source IP addresses that can access Nomad clients via SSH. Has no effict if `ssh_key` not set."
+  default     = []
+  description = "List of allowed source IP addresses that can access Nomad clients via SSH. Has no effect if `ssh_key` not set."
 }
 
 variable "ssh_key" {
   type        = string
   default     = null
   description = "SSH key to authenticate access to Nomad clients. If not set, SSH is disabled"
+}
+
+variable "public_ssh_port" {
+  type        = bool
+  default     = false
+  description = "Determines whether port 22 is open to the IPs defined by ssh_allowed_cidr_blocks"
 }
 
 variable "enable_mtls" {

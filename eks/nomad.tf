@@ -10,6 +10,7 @@ module "nomad" {
   sg_enabled              = var.sg_enabled
   ssh_allowed_cidr_blocks = var.allowed_cidr_blocks
   ssh_key                 = var.nomad_ssh_key
+  public_ssh_port         = var.nomad_public_ssh_port
   vpc_id                  = module.vpc.vpc_id
   vpc_zone_identifier     = module.vpc.public_subnets
 }

@@ -33,8 +33,12 @@ nomad_count   = 1
 # Set to valid SSH public key to enable SSH access to nomad clients from the
 # internet or if you don't want to use EC2 Instance connect from the bastion
 # host but a specific key. You'll need to copy that key to the bastion yourself
-# in this case.
-nomad_ssh_key = null
+# in this case. Leave as "ec2InstanceConnect" if you want to use EC2 Instance
+# Connect or set to null to disable SSH access to Nomad clients altogether
+nomad_ssh_key = "ec2InstanceConnect"
+# open port 22 for ssh access from the internet from the IPs whitelisted in
+# allowed_cidr_blocks above
+nomad_public_ssh_port = false
 
 # Cluster node details - uncomment to manage node type and numbers. Below are the default values so if these are fine no need to uncomment
 # instance_type      = "m4.xlarge"

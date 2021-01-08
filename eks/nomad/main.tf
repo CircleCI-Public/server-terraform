@@ -1,9 +1,10 @@
 locals {
-  ssh_enabled = var.ssh_key != null
+  ssh_enabled          = var.ssh_key != null
+  ssh_instance_connect = var.ssh_key == "ec2InstanceConnect"
 }
 
 resource "aws_key_pair" "ssh_key" {
-  count      = local.ssh_enabled ? 1 : 0
+  count      = local.ssh_enabled && !local.ssh_instance_connect ? 1 : 0
   key_name   = "${var.basename}-circleci-nomad-ssh-key"
   public_key = var.ssh_key
   tags = {
@@ -51,7 +52,7 @@ module "asg" {
       client_tls_cert = var.enable_mtls ? module.nomad_tls[0].nomad_client_cert : ""
       client_tls_key  = var.enable_mtls ? module.nomad_tls[0].nomad_client_key : ""
       tls_ca          = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""
-      nomad_ssh       = local.ssh_enabled
+      nomad_ssh       = local.ssh_instance_connect
     }
   ))
 
@@ -121,7 +122,7 @@ resource "aws_security_group" "nomad_sg" {
 # We are allowing port 22 for operators
 # to debug nomad clients
 resource "aws_security_group" "ssh_sg" {
-  count       = local.ssh_enabled ? 1 : 0
+  count       = var.public_ssh_port ? 1 : 0
   name        = "${var.basename}-circleci-nomad_ssh"
   description = "SG for CircleCI Server nomad SSH access"
   vpc_id      = var.vpc_id

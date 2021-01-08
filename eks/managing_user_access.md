@@ -58,8 +58,18 @@ using your private key and using the ubuntu user for 60 seconds. After 60
 seconds, the key will be removed from the bastion host automatically.
 
 As `mssh` doesn't support the `-L` flag for port-forwarding, you probably want
-to alias the command for pushing your ssh key and use `ssh` for
-port-forwarding.
+to alias the command above for pushing your ssh key and use `ssh` for
+port-forwarding. You will use port-forwarding via the bastion for accessing
+the kots admin console like so:
+```
+ssh -i <path to your rsa key> ubuntu@<bastion host IP> -- -f kubectl kots admin-console -n <your cluster namespace>; \
+ssh -i <path to your rsa key> ubuntu@<bastion host IP> -- -NnL 8800:localhost:8800; \
+ssh -i <path to your rsa key> ubuntu@<bastion host IP> -- killall kubectl-kots
+```
+The first command connects the bastion to kots admin console. The second
+command forwards the port to the admin console to your local machine. As soon
+as you CTRL+C out of this command, the third command will close the connection
+between the bastion and kots admin console.
 
 ## Adding Cluster Administrators when using a public endpoint Should you use a
 public endpoint, you can register cluster admins via appending their IPs and
@@ -309,8 +319,9 @@ the bastion host first and on the bastion host, you run the same command again
 `mssh ubuntu@<instance id of the Nomad client>`.
 
 Alternatively, you can provide your own SSH key for the Nomad clients, using
-the `nomad-ssh-key` terraform variable. Keep in mind that this will open port
-22 on the public IP of the Nomad clients.
+the `nomad-ssh-key` terraform variable. If you don't set the
+`nomad_public_ssh_port` variable to `true`, you will need to copy the private
+key to the bastion host yourself.
 
 
 Sources and further reading:

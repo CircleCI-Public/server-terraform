@@ -110,8 +110,14 @@ variable "nomad_count" {
 
 variable "nomad_ssh_key" {
   type        = string
-  default     = null
-  description = "SSH key to authenticate access to Nomad clients. If not set SSH access is disabled"
+  default     = "ec2InstanceConnect"
+  description = "SSH key to authenticate access to Nomad clients. If not set SSH access is disabled. If set to ec2InstanceConnect, Nomad clients will use ec2InstanceConnect"
+}
+
+variable "nomad_public_ssh_port" {
+  type        = bool
+  default     = false
+  description = "Determines whether port 22 on the Nomad clients is open to incoming traffic from the internet, filtered by allowed_cidr_blocks"
 }
 
 variable "instance_type" {
