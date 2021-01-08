@@ -60,13 +60,19 @@ resource "google_project_iam_member" "compute_admin" {
 resource "google_project_iam_custom_role" "object_storage" {
   # '-' characters are forbidden in role names
   role_id = replace(local.role_names.object_storage, "-", "_")
-  title   = "Blob signer for ${var.unique_name}"
+  title   = "Object storage permissions for CircleCI Server ${var.unique_name}"
   permissions = [
+    # Needed for signing urls https://github.com/circleci/circle-storage/blob/master/README.md#gcp
     "iam.serviceAccounts.signBlob",
+    
+    # Bucket read-only credentials
     "storage.buckets.get",
     "storage.buckets.list",
+
+    # Object read-write credentials
     "storage.objects.create",
     "storage.objects.get",
+    "storage.objects.delete,
     "storage.objects.list",
     "storage.objects.update"
   ]
@@ -76,7 +82,7 @@ resource "google_project_iam_member" "object_storage" {
   role   = google_project_iam_custom_role.object_storage.id
   member = "serviceAccount:${google_service_account.cluster_node.email}"
   condition {
-    title       = "DataBucketOnly"
+    title       = "Data Bucket Only"
     description = "Restrict access to data bucket only"
     expression  = <<-EOF
       (
