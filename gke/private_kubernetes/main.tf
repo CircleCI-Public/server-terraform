@@ -37,66 +37,6 @@ data "google_compute_zones" "zones_available" {
   status     = "UP"
 }
 
-### SERVICE ACCOUNT ###
-resource "google_service_account" "k8s_service_account" {
-  account_id   = "${var.unique_name}-k8s-sa"
-  display_name = "${var.unique_name}-k8s-sa"
-  description  = "${var.unique_name} service account for CircleCI Server cluster component"
-}
-resource "google_project_iam_member" "k8s_member_compute_admin" {
-  depends_on = [google_service_account.k8s_service_account]
-  role       = "roles/compute.admin"
-  member     = "serviceAccount:${google_service_account.k8s_service_account.email}"
-}
-resource "google_project_iam_member" "k8s_member_storage" {
-  depends_on = [google_service_account.k8s_service_account]
-  role       = "roles/storage.admin"
-  member     = "serviceAccount:${google_service_account.k8s_service_account.email}"
-}
-resource "google_project_iam_member" "k8s_member_logging" {
-  depends_on = [google_service_account.k8s_service_account]
-  role       = "roles/logging.admin"
-  member     = "serviceAccount:${google_service_account.k8s_service_account.email}"
-}
-resource "google_project_iam_member" "k8s_member_monitoring" {
-  depends_on = [google_service_account.k8s_service_account]
-  role       = "roles/monitoring.admin"
-  member     = "serviceAccount:${google_service_account.k8s_service_account.email}"
-}
-resource "google_project_iam_member" "k8s_member_service_controller" {
-  depends_on = [google_service_account.k8s_service_account]
-  role       = "roles/servicemanagement.serviceController"
-  member     = "serviceAccount:${google_service_account.k8s_service_account.email}"
-}
-resource "google_project_iam_member" "k8s_member_service_management" {
-  depends_on = [google_service_account.k8s_service_account]
-  role       = "roles/servicemanagement.admin"
-  member     = "serviceAccount:${google_service_account.k8s_service_account.email}"
-}
-resource "google_project_iam_member" "k8s_memeber_service_dns" {
-  depends_on = [google_service_account.k8s_service_account]
-  role       = "roles/dns.admin"
-  member     = "serviceAccount:${google_service_account.k8s_service_account.email}"
-}
-resource "google_project_iam_member" "k8s_admin" {
-  depends_on = [google_service_account.k8s_service_account]
-  role       = "roles/container.admin"
-  member     = "serviceAccount:${google_service_account.k8s_service_account.email}"
-}
-
-
-resource "google_project_iam_custom_role" "k8s_blob_signer_role" {
-  role_id     = replace("${var.unique_name}-blob-signer", "-", "_")
-  title       = "Blob signer for ${var.unique_name}"
-  permissions = ["iam.serviceAccounts.signBlob"]
-}
-resource "google_project_iam_member" "k8s_memeber_blob_signer" {
-  depends_on = [google_service_account.k8s_service_account, google_project_iam_custom_role.k8s_blob_signer_role]
-  role       = google_project_iam_custom_role.k8s_blob_signer_role.id
-  member     = "serviceAccount:${google_service_account.k8s_service_account.email}"
-}
-
-
 ### GKE VERSION ###
 data "google_container_engine_versions" "gke" {
   provider = google
@@ -138,6 +78,7 @@ resource "google_container_node_pool" "node_pool" {
 locals {
   private_endpoint = var.enable_bastion ? true : var.private_endpoint
 }
+
 resource "google_container_cluster" "circleci_cluster" {
   depends_on  = [google_project_service.container_service]
   name        = "${var.unique_name}-k8s-cluster"
