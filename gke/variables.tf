@@ -104,6 +104,12 @@ variable "private_k8s_endpoint" {
   description = "By default, the Kubernetes endpoint is only accessible via the bastion host. Set to false if you want access via the public internet. You can use IP whitelisting using `allowed_cidr_blocks` to tighten access for both cases."
 }
 
+variable "preemptible_k8s_nodes" {
+  type        = bool
+  default     = false
+  description = "Use preemptible nodes for cluster. Keeps cost low for development or proof of concept cluster"
+}
+
 variable "private_vms" {
   type        = bool
   default     = true

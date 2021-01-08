@@ -37,6 +37,7 @@ module "kube_private_cluster" {
   initial_nodes      = var.initial_nodes
   node_auto_repair   = var.node_auto_repair
   node_auto_upgrade  = var.node_auto_upgrade
+  preemptible_nodes   = var.preemptible_k8s_nodes
 
   # Network configuration
   allowed_external_cidr_blocks   = var.allowed_cidr_blocks
