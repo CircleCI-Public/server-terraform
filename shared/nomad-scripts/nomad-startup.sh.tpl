@@ -103,13 +103,12 @@ client {
 }
 EOT
 
-if [[ -n $client_tls_cert ]];
-then cat <<EOT >> /etc/nomad/config.hcl
+if [ "${client_tls_cert}" ]; then
+cat <<EOT >> /etc/nomad/config.hcl
 tls {
-    http = false
+http = false
     rpc  = true
-
-    # This verifies the CN ([role].[region].nomad) in the certificate,
+     # This verifies the CN ([role].[region].nomad) in the certificate,
     # not the hostname or DNS name of the of the remote party.
     # https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
     verify_server_hostname = true
