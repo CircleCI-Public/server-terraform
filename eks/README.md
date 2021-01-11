@@ -19,7 +19,6 @@ Additionally you will require the following permissions and access in order to
 configure the CircleCI Server application:
 
 * ID and secret for a Github OAuth application.
-* An AWS [keypair][aws-keypair-docs]
 * optional - certbot with Route53 `pip install certbot_dns_route53`
 
 ## Setup
