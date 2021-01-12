@@ -30,10 +30,16 @@ variable "vpc_id" {
 variable "vpc_zone_identifier" {
 }
 
+variable "private_clients" {
+  type        = bool
+  default     = false
+  description = "Determine whether to assign public IPv4 addresses to the Nomad clients or not. Make sure that this setting matches the settings for the subnets passed in via `vpc_zone_identifier`"
+}
+
 variable "ssh_allowed_cidr_blocks" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
-  description = "List of allowed source IP addresses that can access Nomad clients via SSH. Has no effict if `ssh_key` not set."
+  description = "List of allowed source IP addresses that can access Nomad clients via SSH. Has no effect if `ssh_key` not set."
 }
 
 variable "ssh_key" {
@@ -45,5 +51,5 @@ variable "ssh_key" {
 variable "enable_mtls" {
   type        = bool
   default     = true
-  description = "MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
+  description = "mTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
 }

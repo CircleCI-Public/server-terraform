@@ -103,6 +103,12 @@ variable "nomad_ssh_key" {
   description = "SSH key to authenticate access to Nomad clients. If not set SSH access is disabled"
 }
 
+variable "private_nomad_clients" {
+  type        = bool
+  default     = false
+  description = "Set this to true to have Nomad clients deployed into a private subnet without public IPv4 addresses"
+}
+
 variable "instance_type" {
   type        = string
   default     = "m4.xlarge"
@@ -111,19 +117,19 @@ variable "instance_type" {
 
 variable "max_capacity" {
   type        = number
-  default     = 5
+  default     = 7
   description = "The maximun number of worker nodes in the cluster"
 }
 
 variable "min_capacity" {
   type        = number
-  default     = 4
+  default     = 5
   description = "The minimum number of worker nodes in the cluster"
 }
 
 variable "desired_capacity" {
   type        = number
-  default     = 4
+  default     = 5
   description = "The desired number of worker nodes in the cluster.  Changes to this value are not respected by terraform per: https://github.com/terraform-aws-modules/terraform-aws-eks/issues/835"
 }
 

@@ -11,5 +11,6 @@ module "nomad" {
   ssh_allowed_cidr_blocks = var.allowed_cidr_blocks
   ssh_key                 = var.nomad_ssh_key
   vpc_id                  = module.vpc.vpc_id
-  vpc_zone_identifier     = module.vpc.public_subnets
+  vpc_zone_identifier     = var.private_nomad_clients ? module.vpc.private_subnets : module.vpc.public_subnets
+  private_clients         = var.private_nomad_clients
 }
