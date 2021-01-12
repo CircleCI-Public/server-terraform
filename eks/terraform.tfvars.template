@@ -23,11 +23,11 @@ k8s_administrators  = []    # add any AWS users here who should also have access
 
 nomad_count   = 1
 nomad_ssh_key = null  # Set to valid SSH public key to enable SSH access to nomad clients
-private_nomad_clients = false
 # Setting `private_nomad_clients` to true will cause Nomad clients to be deployed into private subnets and no public IPv4 addresses will be assigned to them
 # If you set this to true, the following limitations will apply:
 # * "Rerun job with SSH" functionality will be broken
-# * You will need a VPN or jump host to SSH into the Nomad client if you have set an SSH key above. SSH access will still be limited by `allowed_cidr_blocks`, so include the IP address of your VPN gateway or jump host.
+# * If `nomad_ssh_key` is set, you can still SSH into the nomad client machines from within the VPC.  Access will still be limited by `allowed_cidr_blocks`.  This configuration is beyond the scope of this project.
+private_nomad_clients = false
 
 # Cluster node details - uncomment to manage node type and numbers. Below are the default values so if these are fine no need to uncomment
 # instance_type      = "m4.xlarge"
