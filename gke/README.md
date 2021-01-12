@@ -43,7 +43,7 @@ curl https://kots.io/install | bash
 1. Install any missing CLI tools listed above. Ensure access to listed
    services.
 2. Clone `server-terraform` repository to your machine.
-	`git clone git@github.com:circleci/server-terraform.git`
+	`git clone git@github.com:CircleCI-Public/server-terraform.git`
 3. Assume going forward that all paths specified are relative to the root of
    the `server-terraform` repo.
 
