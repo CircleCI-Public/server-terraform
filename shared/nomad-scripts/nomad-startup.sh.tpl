@@ -56,6 +56,21 @@ service docker restart
 sleep 5
 
 echo "--------------------------------------"
+echo " Populating /etc/circleci/public-ipv4"
+echo "--------------------------------------"
+if [ $CLOUD_PROVIDER == "AWS" ]; then
+    export aws_instance_metadata_url="http://169.254.169.254"
+    export PUBLIC_IP="$(curl $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
+    export PRIVATE_IP="$(curl $aws_instance_metadata_url/latest/meta-data/local-ipv4)"
+    if ! (echo $PUBLIC_IP | grep -qP "^[\d.]+$"); then
+        echo "Setting the IPv4 address below in /etc/circleci/public-ipv4."
+        echo "This address will be used in builds with \"Rebuild with SSH\"."
+        mkdir -p /etc/circleci
+        echo $PRIVATE_IP | tee /etc/circleci/public-ipv4
+    fi
+fi
+
+echo "--------------------------------------"
 echo "         Installing nomad"
 echo "--------------------------------------"
 apt-get install -y zip
