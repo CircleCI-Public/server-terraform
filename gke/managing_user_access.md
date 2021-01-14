@@ -1,28 +1,9 @@
 # Managing Access to your Kubernetes cluster
 The following document assumes you have used the terraform scripts found in this repository to create a Kubernetes cluster for your CircleCI server installation. Below we go through our recommended approach to providing and managing user access.
 
-
-## Overview
-
-We recommend making only the bastion host accessible from the public internet. Thus, you can remove most risk of unauthorized access by simply stopping your bastion host while not in use. This will also give you two layers of access control:
-* Who can connect to the bastion host
-* What can a user do on the bastion host
-
-## Managing bastion host SSH access
-
-The bastion host has OS Login enabled which allows you to manage SSH access to the bastion using the IAM controls in GCP. Users with `roles/owner`, `roles/editor` or `roles/compute.instanceAdmin` permissions will automatically have administrator permissions, i.e. they may perform `sudo` commands on the bastion.  You can grant other users within the project access with the `roles/compute.osLogin` permission or sudo access with the `roles/compute.osAdminLogin` permission. Users should also have the `roles/iam.serviceAccountUser` role on the service account as this is the account the bastion host itself uses to authenticate against other services, e.g. the Kubernetes cluster. You can attach conditions to the role to ensure that users can impersonate the Service Account only on the bastion host.
-
-This approach has the advantages that you don't need to manage SSH keys manually and that deactivating an IAM user will also prevent them from connecting to the bastion host. For this to work, a user needs to use Google's `glcoud` tool. Assuming a user has initialized gcloud (`gcloud init`), they can simply connect to the bastion using
-
-`gcloud compute ssh <bastion-host-name> --project <project-name> --region <region-name>`
-
-The `--project` and `--region` flags can be omitted if `gcloud` there were default values configured during initialization that can be used.
-
 ## Adding Users with Limited Resource Access
 You may not wish for each user to have access to all cluster resources. To finely tune user access we make use of kubernetes' role based access control ([RBAC]).
 In the following example we will create a role that will have limited access to a `develop` namespace and then map it to an IAM user. You will need to be a cluster administrator as detailed above to proceed with the following steps.
-
-On the bastion host, make sure that your `kubectl` config is up-to-date and that you have all the necessary permissions.
 
 1. First, we'll create a `role` that may only read pod data in the `develop` namespace.
 - create a file called `read-role.yaml` and add the following:
@@ -65,8 +46,7 @@ roleRef:
 - and then apply the role-binding to your cluster:
 `kubectl apply -f read-role-binding.yaml`
 
-
-Now your user will be able to access the cluster from the bastion but will only be able to view pod resources in the `develop` namespace.
+Now your user will be able to access the cluster but will only be able to view pod resources in the `develop` namespace.
 
 For more details on managing permissions, you may read Google's [RBAC] documentation.
 

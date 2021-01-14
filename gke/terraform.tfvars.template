@@ -14,25 +14,26 @@ node_auto_upgrade = true
 initial_nodes     = 1
 
 enable_nat                     = true
-enable_bastion                 = true
+enable_bastion                 = false # [DEPRECATED - will be removed in the next release]
 enable_istio                   = false
 enable_intranode_communication = false
 enable_dashboard               = false
-private_k8s_endpoint           = true
-private_vms                    = true
+# WARNING: Modifying `private_k8s_endpoint` after the cluster has been stood up
+# will DESTROY AND RECREATE the cluster, causing LOSS OF DATA
+private_k8s_endpoint           = false
+private_vms                    = false
 
 # The CIDR ranges that are allowed to access those components of your
-# installation that should be accessible via the public internet. By default
-# this is only the bastion host. Developers, this is typically the public IP
-# address of your home/office network IE [ "1.2.3.4/32" ]. By default, access is
-# only available through the bastion host.
+# installation that should be accessible via the public internet.
+# Developers, this is typically the public IP address of your home/office
+# network IE [ "1.2.3.4/32" ].
 allowed_cidr_blocks = []
 
 nomad_count   = 1
 
 # Set to true to allow SSH access to Nomad clients via the public internet.
 # Use `gcloud compute ssh` to manage keys
-nomad_ssh_enabled = false
+nomad_ssh_enabled = true
 # Who can use the Nomad ServiceAccount, e.g. for managing SSH keys on Nomad
 # clients. Can be `user:{emailid}` for a single user, `group:{emailid}` for a
 # Google group, or `allAuthenticatedUsers` to allow all authenticated users

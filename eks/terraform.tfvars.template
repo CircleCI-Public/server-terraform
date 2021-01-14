@@ -1,8 +1,14 @@
 basename         = ""        # Prefix added to cluster resources
 aws_region       = ""        # Region to create cluster IE us-east-1
 
-enable_bastion   = true      # Enable a bastion host for the eks cluster
+enable_bastion   = false      # Enable a bastion host for the eks cluster [DEPRECATED - will be removed in the next release]
 bastion_key      = ""        # cat the public ssh key to use for the bastion host.
+
+# If you disable the public endpoint, ensure that the machine running the terraform can access the private endpoint, e.g.
+# by using a bastion host or a VPN connection into the VPC.
+# Otherwise setting up the EKS cluster will fail. Disabling access to both endpoints will result in an inoperable cluster
+enable_k8s_public_endpoint  = true  # Enable authenticated access to the k8s API from the public internet
+enable_k8s_private_endpoint = true  # Enable authenticated access to the k8s API from within the VPC
 
 # The CIDR ranges that are allowed to access the Kubernetes cluster.
 # Developers, this is typically the public IP address of your home/office network

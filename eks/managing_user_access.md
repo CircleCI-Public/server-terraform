@@ -22,6 +22,8 @@ k8s_administrators = [
 }
 ```
 
+Note: For this to work, the machine running the terraform will need access to the K8s API. If you only enable the private k8s endpoint and your machine cannot access your VPN, terraform will be unable to apply the user mapping to the cluster.
+
 
 ### Updating the Cluster admin list
 If you wish to add/remove admin users from your existing cluster, you only need to update the values in your `terraform.tfvars` and run `terrafrom apply`.

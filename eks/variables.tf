@@ -18,7 +18,19 @@ variable "aws_region" {
 }
 
 variable "enable_bastion" {
-  default = true
+  default = false
+}
+
+variable "enable_k8s_private_endpoint" {
+  type        = bool
+  default     = true
+  description = "Determines whether the k8s API endpoint is reachable within the VPC"
+}
+
+variable "enable_k8s_public_endpoint" {
+  type        = bool
+  default     = true
+  description = "Determines whether the k8s API endpoint is reachable from the public internet"
 }
 
 variable "k8s_administrators" {

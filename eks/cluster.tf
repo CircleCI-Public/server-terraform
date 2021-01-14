@@ -23,8 +23,8 @@ module "eks-cluster" {
   source                          = "terraform-aws-modules/eks/aws"
   cluster_name                    = local.cluster_name
   cluster_version                 = local.k8s_version
-  cluster_endpoint_private_access = var.enable_bastion ? true : false
-  cluster_endpoint_public_access  = true
+  cluster_endpoint_private_access = var.enable_k8s_private_endpoint
+  cluster_endpoint_public_access  = var.enable_k8s_public_endpoint
   vpc_id                          = module.vpc.vpc_id
   subnets                         = module.vpc.private_subnets
   cluster_enabled_log_types       = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
