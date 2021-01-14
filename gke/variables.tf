@@ -75,7 +75,7 @@ variable "enable_nat" {
 
 variable "enable_bastion" {
   type        = bool
-  default     = true
+  default     = false
   description = "Include a bastion/jump server in deployment. You can restrict the range of IPs that can connect to the bastion using `allowed_cidr_blocks`"
 }
 
@@ -105,14 +105,14 @@ variable "enable_dashboard" {
 
 variable "private_k8s_endpoint" {
   type        = bool
-  default     = true
-  description = "By default, the Kubernetes endpoint is only accessible via the bastion host. Set to false if you want access via the public internet. You can use IP whitelisting using `allowed_cidr_blocks` to tighten access for both cases."
+  default     = false
+  description = "Setting this to true will disable access to the k8s API via the public internet. You will need a bastion or VPN to operate the k8s cluster"
 }
 
 variable "private_vms" {
   type        = bool
-  default     = true
-  description = "By default, the VMs for the remote docker and machine executors are only accessible via the bastion host. Set to false if you want access via the public internet, in which case you will need to whitelist IPs using `allowed_cidr_blocks`"
+  default     = false
+  description = "Set to true to isolate VMs for `machine` and `remote_docker` executors from the public internet"
 }
 
 
@@ -129,8 +129,8 @@ variable "nomad_count" {
 
 variable "nomad_ssh_enabled" {
   type        = bool
-  default     = false
-  description = "Enables SSH to Nomad clients. If enabled, use `gcloud compute ssh` to manage SSH keys. If you use a bastion host and a private endpoint, you can still connect to Nomad clients with this value set to `false` via the bastion host using their private IPs"
+  default     = true
+  description = "Set to true this creates a firewall rule that allows TCP access on port 22 for the IPs whitelisted in `allowed_cidr_blocks` for SSH access. When set to false, SSH access is still possible by using a VPN or bastion host."
 }
 
 variable "nomad_sa_access" {
@@ -142,5 +142,5 @@ variable "nomad_sa_access" {
 variable "enable_mtls" {
   type        = bool
   default     = true
-  description = "MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
+  description = "mTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
 }

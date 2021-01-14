@@ -49,7 +49,7 @@ curl https://kots.io/install | bash
 
 ## Deploy GKE Infrastructure with Terraform
 
-This assumes the default configuration with a private cluster behind a bastion host.
+This assumes the default configuration using the public k8s endpoint
 
 1. Configure Google Cloud credentials. You can do this in one of two ways:
     * Set up [user default application credentials]  via `gcloud auth
@@ -80,21 +80,11 @@ and removals.
 10. Once the plan has been verified, run command: `terraform apply` And when
     prompted, confirm the deployment. Deployment time can vary but has
 typically taken approximately ten minutes.
-11. Once deployment is complete, Terraform will display the name of the bastion host and the name and IP of the cluster. You can now connect to your bastion host:
-
-`gcloud compute ssh <bastion-host-name> --project <project-name> --region <region-name>`
-
-The `--project` and `--region` flags can be omitted if `gcloud` the default values configured during initialization can be used. If you have previously used service account credentials, switch back to use your user account credentials before connecting to the bastion: `gcloud auth login`.
-
-You will need to connect to the bastion whenever you need to access the cluster or some of its components.
-
-12. On the bastion, initialize gcloud: `gcloud init` – please make sure that you are using your own credentials and not the bastion host's Service Account. The Service Account doesn't have any relevant permissions and will prevent you from working effectively on the cluster.
-
-13. Add the new GKE cluster to the Kubernetes configuration via gcloud by running the following command:
+11. Add the new GKE cluster to the Kubernetes configuration via gcloud by running the following command:
 ```
 gcloud container clusters get-credentials [CLUSTER NAME]
 ```
-14. Verify that the credentials were added by running the following command:
+12. Verify that the credentials were added by running the following command:
     `kubectl config get-contexts` This should return a list of contexts with an
 asterisk beside the active context.
 
@@ -152,6 +142,9 @@ The leading `--` says "pass the following arguments down to the underlying
 `ssh` command" when you run `gcloud compute ssh....`. The `-A` tells `ssh` to
 forward creds to the next machine for you so that you don't have to copy a key
 around.
+
+Alternatively, you may set up a VPN connection into your VPC to access resources
+using their internal IPs.
 
 <!-- Links -->
 [terraform]: https://releases.hashicorp.com/terraform/0.14.2/
