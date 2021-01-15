@@ -70,7 +70,7 @@ resource "google_compute_instance_template" "nomad_template" {
   }
 
   disk {
-    source_image = "ubuntu-os-cloud/ubuntu-1604-lts"
+    source_image = var.source_image
     disk_size_gb = 500
     boot         = true
     auto_delete  = true

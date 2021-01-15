@@ -2,6 +2,7 @@ module "nomad" {
   source = "./nomad"
 
   basename                = var.basename
+  source_image            = var.nomad_source_image
   enable_mtls             = var.enable_mtls
   network_name            = google_compute_network.circleci_net.name
   nomad_count             = var.nomad_count

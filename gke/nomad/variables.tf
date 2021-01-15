@@ -54,3 +54,8 @@ variable "enable_mtls" {
   default     = true
   description = "MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
 }
+
+variable "source_image" {
+  type        = string
+  description = "Base operating system image "
+}
