@@ -20,8 +20,7 @@ variable "nomad_count" {
 }
 
 variable "ami_id" {
-  default     = "ami-0cfee17793b08a293"
-  description = "Default Ubuntu ami for us-east-1"
+  description = "AMI used as the base operating system."
 }
 
 variable "vpc_id" {
