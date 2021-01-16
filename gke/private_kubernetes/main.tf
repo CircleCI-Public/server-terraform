@@ -119,6 +119,7 @@ resource "google_container_node_pool" "node_pool" {
   initial_node_count = var.initial_nodes
 
   node_config {
+    preemptible     = var.preemptible_nodes
     machine_type    = var.nodes_machine_spec
     service_account = google_service_account.k8s_service_account.email
     oauth_scopes    = ["cloud-platform"]

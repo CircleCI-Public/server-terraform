@@ -109,6 +109,13 @@ variable "private_k8s_endpoint" {
   description = "Setting this to true will disable access to the k8s API via the public internet. You will need a bastion or VPN to operate the k8s cluster"
 }
 
+
+variable "preemptible_k8s_nodes" {
+  type        = bool
+  default     = false
+  description = "Use preemptible nodes for cluster. Keeps cost low for development or proof of concept cluster"
+}
+
 variable "private_vms" {
   type        = bool
   default     = false

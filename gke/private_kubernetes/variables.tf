@@ -129,3 +129,9 @@ variable "private_vms" {
 variable "privileged_bastion" {
   type = bool
 }
+
+variable "preemptible_nodes" {
+  type        = bool
+  default     = false
+  description = "Use preemptible nodes for cluster. Keeps cost low for development or proof of concept cluster"
+}
