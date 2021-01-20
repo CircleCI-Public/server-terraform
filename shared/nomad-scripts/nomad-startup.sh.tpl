@@ -75,7 +75,7 @@ echo "--------------------------------------"
 echo "         Installing nomad"
 echo "--------------------------------------"
 apt-get install -y zip
-curl -o nomad.zip https://releases.hashicorp.com/nomad/0.11.3/nomad_0.11.3_linux_amd64.zip
+curl -o nomad.zip https://releases.hashicorp.com/nomad/0.11.8/nomad_0.11.8_linux_amd64.zip
 unzip nomad.zip
 mv nomad /usr/bin
 
