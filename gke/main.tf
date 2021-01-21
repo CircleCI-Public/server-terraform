@@ -29,6 +29,7 @@ module "kube_private_cluster" {
   node_tags = []
 
   # Node pool configuration
+  preemptible_nodes  = var.preemptible_k8s_nodes
   nodes_machine_spec = var.node_spec
   node_min           = var.node_min
   node_max           = var.node_max
