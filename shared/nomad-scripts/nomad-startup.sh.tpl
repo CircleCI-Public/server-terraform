@@ -42,7 +42,8 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 apt-get install -y "linux-image-$UNAME"
 apt-get update
-apt-get -y install docker-ce=5:18.09.1~3-0~ubuntu-xenial
+apt-get -y install docker-ce=5:19.03.13~3-0~ubuntu-focal \
+                   docker-ce-cli=5:19.03.13~3-0~ubuntu-focal
 
 # force docker to use userns-remap to mitigate CVE 2019-5736
 apt-get -y install jq
@@ -74,7 +75,7 @@ echo "--------------------------------------"
 echo "         Installing nomad"
 echo "--------------------------------------"
 apt-get install -y zip
-curl -o nomad.zip https://releases.hashicorp.com/nomad/0.11.3/nomad_0.11.3_linux_amd64.zip
+curl -o nomad.zip https://releases.hashicorp.com/nomad/0.11.8/nomad_0.11.8_linux_amd64.zip
 unzip nomad.zip
 mv nomad /usr/bin
 

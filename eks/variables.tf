@@ -150,3 +150,9 @@ variable "enable_mtls" {
   default     = true
   description = "MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
 }
+
+variable "nomad_ami_id" {
+  type        = string
+  default     = ""
+  description = "Base AMI used for the Nomad client "
+}

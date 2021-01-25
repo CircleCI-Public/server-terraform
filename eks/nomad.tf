@@ -1,7 +1,7 @@
 module "nomad" {
   source = "./nomad"
 
-  ami_id                  = var.ubuntu_ami[var.aws_region]
+  ami_id                  = var.nomad_ami_id != "" ? var.nomad_ami_id : data.aws_ami.ubuntu-20_04-focal.id
   aws_subnet_cidr_block   = module.vpc.vpc_cidr_block
   basename                = var.basename
   enable_mtls             = var.enable_mtls

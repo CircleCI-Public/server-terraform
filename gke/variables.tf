@@ -151,3 +151,9 @@ variable "enable_mtls" {
   default     = true
   description = "mTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
 }
+
+variable "nomad_source_image" {
+  type        = string
+  default     = "ubuntu-os-cloud/ubuntu-2004-lts"
+  description = "The base OS image used by the Nomad clients."
+}
