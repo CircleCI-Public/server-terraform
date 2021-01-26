@@ -49,6 +49,8 @@ module "asg" {
     {
       basename        = var.basename
       cloud_provider  = "AWS"
+      vpc_cidr        = var.vpc_cidr
+      vm_subnet_cidr  = var.vm_subnet_cidr
       client_tls_cert = var.enable_mtls ? module.nomad_tls[0].nomad_client_cert : ""
       client_tls_key  = var.enable_mtls ? module.nomad_tls[0].nomad_client_key : ""
       tls_ca          = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""

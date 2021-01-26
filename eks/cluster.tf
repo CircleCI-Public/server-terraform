@@ -26,7 +26,7 @@ module "eks-cluster" {
   cluster_endpoint_private_access = var.enable_k8s_private_endpoint
   cluster_endpoint_public_access  = var.enable_k8s_public_endpoint
   vpc_id                          = module.vpc.vpc_id
-  subnets                         = module.vpc.private_subnets
+  subnets                         = local.cluster_subnets
   cluster_enabled_log_types       = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   wait_for_cluster_cmd            = "for i in `seq 1 60`; do curl -k -s $ENDPOINT/healthz >/dev/null && exit 0 || true; sleep 5; done; echo TIMEOUT && exit 1"
   map_roles = var.enable_bastion ? concat(

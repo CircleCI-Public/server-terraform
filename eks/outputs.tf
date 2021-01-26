@@ -7,7 +7,7 @@ output "region" {
 }
 
 output "subnet" {
-  value = module.vpc.private_subnets[0]
+  value = local.vm_subnet
 }
 
 output "bastion_public_ip" {

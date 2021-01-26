@@ -55,10 +55,20 @@ variable "aws_vpc_cidr_block" {
 
 variable "aws_vpc_public_cidr_blocks" {
   default = ["10.0.0.0/19", "10.0.32.0/19", "10.0.64.0/19"]
+
+  validation {
+    condition     = length(var.aws_vpc_public_cidr_blocks) >= 3
+    error_message = "You must supply at least three distinct CIDR blocks for public subnets."
+  }
 }
 
 variable "aws_vpc_private_cidr_blocks" {
-  default = ["10.0.96.0/19", "10.0.128.0/19", "10.0.160.0/19"]
+  default = ["10.0.96.0/20", "10.0.112.0/20", "10.0.128.0/20", "10.0.144.0/20", "10.0.160.0/20", "10.0.176.0/20"]
+
+  validation {
+    condition     = length(var.aws_vpc_private_cidr_blocks) >= 6
+    error_message = "You must supply at least six distinct CIDR blocks for private subnets."
+  }
 }
 
 variable "allowed_cidr_blocks" {
@@ -135,13 +145,13 @@ variable "max_capacity" {
 
 variable "min_capacity" {
   type        = number
-  default     = 5
+  default     = 6
   description = "The minimum number of worker nodes in the cluster"
 }
 
 variable "desired_capacity" {
   type        = number
-  default     = 5
+  default     = 6
   description = "The desired number of worker nodes in the cluster.  Changes to this value are not respected by terraform per: https://github.com/terraform-aws-modules/terraform-aws-eks/issues/835"
 }
 
@@ -155,4 +165,10 @@ variable "nomad_ami_id" {
   type        = string
   default     = ""
   description = "Base AMI used for the Nomad client "
+}
+
+locals {
+  vm_subnet       = module.vpc.private_subnets[length(module.vpc.private_subnets) - 1]
+  nomad_subnets   = var.private_nomad_clients ? slice(module.vpc.private_subnets, length(module.vpc.private_subnets) % 2 == 0 ? (length(module.vpc.private_subnets) / 2) - 1 : floor(length(module.vpc.private_subnets) / 2), length(module.vpc.private_subnets) - 1) : module.vpc.public_subnets
+  cluster_subnets = var.private_nomad_clients ? slice(module.vpc.private_subnets, 0, length(module.vpc.private_subnets) % 2 == 0 ? (length(module.vpc.private_subnets) / 2) - 1 : floor(length(module.vpc.private_subnets) / 2)) : slice(module.vpc.private_subnets, 0, length(module.vpc.private_subnets) - 1)
 }

@@ -29,6 +29,16 @@ variable "vpc_id" {
 variable "vpc_zone_identifier" {
 }
 
+variable "vpc_cidr" {
+  type        = string
+  description = "The CIDR block of the VPC to prevent access from jobs"
+}
+
+variable "vm_subnet_cidr" {
+  type        = string
+  description = "The CIDR block of the VM subnet to enable jobs to run on external VMs"
+}
+
 variable "private_clients" {
   type        = bool
   default     = false

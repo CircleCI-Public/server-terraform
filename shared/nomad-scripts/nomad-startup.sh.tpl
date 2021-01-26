@@ -246,4 +246,14 @@ if [ "$CLOUD_PROVIDER" == "GCP" ]; then
     # We probably want to ditch the assumption here that the cluster will live at 10.0.0.0/8 and replace it with a variable
     /sbin/iptables --wait --insert $docker_chain 5 -i docker+ --destination "10.0.0.0/8" --jump DROP
     /sbin/iptables --wait --insert $docker_chain 6 -i br+ --destination "10.0.0.0/8" --jump DROP
+else
+    /sbin/iptables --wait --insert $docker_chain -i docker+ --destination "169.254.0.0/16" --jump DROP
+    /sbin/iptables --wait --insert $docker_chain -i br-+ --destination "169.254.0.0/16" --jump DROP
+    /sbin/iptables --wait --insert $docker_chain -i docker+ --destination "${vpc_cidr}" --jump DROP
+    /sbin/iptables --wait --insert $docker_chain -i br+ --destination "${vpc_cidr}" --jump DROP
+    dns_server=$(echo ${vpc_cidr} | sed 's/\.[0-9]\{1,3\}\/[0-9]\{1,2\}$/.2\/32/')
+    /sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination "$dns_server" -p tcp --dport 53 --jump RETURN
+    /sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination "$dns_server" -p udp --dport 53 --jump RETURN
+    /sbin/iptables --wait --insert $docker_chain -i docker+ --destination "${vm_subnet_cidr}" --jump RETURN
+    /sbin/iptables --wait --insert $docker_chain -i br+ --destination "${vm_subnet_cidr}" --jump RETURN
 fi
