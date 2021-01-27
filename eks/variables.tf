@@ -145,13 +145,13 @@ variable "max_capacity" {
 
 variable "min_capacity" {
   type        = number
-  default     = 6
+  default     = 5
   description = "The minimum number of worker nodes in the cluster"
 }
 
 variable "desired_capacity" {
   type        = number
-  default     = 6
+  default     = 5
   description = "The desired number of worker nodes in the cluster.  Changes to this value are not respected by terraform per: https://github.com/terraform-aws-modules/terraform-aws-eks/issues/835"
 }
 

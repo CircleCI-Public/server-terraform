@@ -43,12 +43,11 @@ module "eks-cluster" {
 
   node_groups = {
     circleci-server = {
-      version                       = local.k8s_version
-      instance_type                 = var.instance_type
-      max_capacity                  = var.max_capacity
-      min_capacity                  = var.min_capacity
-      desired_capacity              = var.desired_capacity
-      additional_security_group_ids = [aws_security_group.eks_nomad_sg[0].id]
+      version          = local.k8s_version
+      instance_type    = var.instance_type
+      max_capacity     = var.max_capacity
+      min_capacity     = var.min_capacity
+      desired_capacity = var.desired_capacity
     }
   }
 
@@ -283,6 +282,56 @@ resource "aws_iam_policy" "external_dns" {
 resource "aws_iam_role_policy_attachment" "external_dns_route53_access" {
   role       = module.eks-cluster.worker_iam_role_name
   policy_arn = aws_iam_policy.external_dns.arn
+}
+
+resource "aws_network_acl" "vm_subnet_acl" {
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = [local.vm_subnet]
+
+  ingress {
+    protocol   = "-1"
+    rule_no    = 9999
+    from_port  = 0
+    to_port    = 0
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+  }
+
+  egress {
+    protocol   = "tcp"
+    rule_no    = 998
+    action     = "allow"
+    cidr_block = module.vpc.vpc_cidr_block
+    from_port  = 32768
+    to_port    = 61000
+  }
+
+  egress {
+    protocol   = "udp"
+    rule_no    = 999
+    action     = "deny"
+    cidr_block = module.vpc.vpc_cidr_block
+    from_port  = 0
+    to_port    = 65535
+  }
+
+  egress {
+    protocol   = "tcp"
+    rule_no    = 1000
+    action     = "deny"
+    cidr_block = module.vpc.vpc_cidr_block
+    from_port  = 0
+    to_port    = 65535
+  }
+
+  egress {
+    protocol   = "-1"
+    rule_no    = 9999
+    from_port  = 0
+    to_port    = 0
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+  }
 }
 
 resource "aws_security_group" "eks_nomad_sg" {
