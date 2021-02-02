@@ -60,6 +60,22 @@ resource "google_compute_firewall" "allow_vm_machine_ports" {
   source_ranges = ["0.0.0.0/0"]
 }
 
+resource "google_compute_firewall" "allow_rerun_with_ssh" {
+  name        = "allow-rerun-with-ssh-ports-${var.unique_name}"
+  description = "${var.unique_name} firewall rule for CircleCI Server cluster component"
+  network     = var.network_uri
+  priority    = 900
+
+  allow {
+    protocol = "tcp"
+    ports    = ["64535-65535"]
+  }
+
+  target_tags = ["docker-machine", "nomad"]
+
+  source_ranges = var.ssh_jobs_allowed_cidr_blocks
+}
+
 resource "google_compute_firewall" "allow_bastion" {
   count       = var.enable_bastion ? 1 : 0
   name        = "allow-connections-to-${var.unique_name}-bastion"

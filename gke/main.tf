@@ -41,6 +41,7 @@ module "kube_private_cluster" {
 
   # Network configuration
   allowed_external_cidr_blocks   = var.allowed_cidr_blocks
+  ssh_jobs_allowed_cidr_blocks   = var.ssh_jobs_allowed_cidr_blocks
   enable_nat                     = var.enable_nat
   enable_bastion                 = var.enable_bastion
   privileged_bastion             = var.privileged_bastion
