@@ -122,11 +122,16 @@ variable "private_vms" {
   description = "Set to true to isolate VMs for `machine` and `remote_docker` executors from the public internet"
 }
 
-
 variable "allowed_cidr_blocks" {
   type        = list(string)
   default     = []
   description = "This configures the allowable source IP blocks, depending on your configuration to your bastion host and/or Kubernetes cluster and/or Nomad clients and/or VMs"
+}
+
+variable "ssh_jobs_allowed_cidr_blocks" {
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+  description = "This configures the allowable source IP blocks that may ssh into jobs using the 'rerun job with SSH' functionality."
 }
 
 variable "nomad_count" {

@@ -3,6 +3,12 @@ variable "allowed_external_cidr_blocks" {
   type = list(any)
 }
 
+variable "ssh_jobs_allowed_cidr_blocks" {
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+  description = "This configures the allowable source IP blocks that may ssh into jobs using the 'rerun job with SSH' functionality."
+}
+
 variable "unique_name" {
   type = string
 }
