@@ -24,6 +24,13 @@ fi
 INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
 
+echo "----------------------------------------"
+echo "        Tuning kernel parameters"
+echo "----------------------------------------"
+echo 'mq-deadline' > /sys/block/nvme0n1/queue/scheduler
+echo 'GRUB_CMDLINE_LINUX_DEFAULT="console=tty1 console=ttyS0 nvme_core.io_timeout=4294967295 elevator=mq-deadline"' > /etc/default/grub.d/99-circleci-use-io-scheduler-for-nvme.cfg
+update-grub
+
 echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
