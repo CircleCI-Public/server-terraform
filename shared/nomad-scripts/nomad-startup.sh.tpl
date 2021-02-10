@@ -24,6 +24,16 @@ fi
 INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
 
+echo "----------------------------------------"
+echo "        Tuning kernel parameters"
+echo "----------------------------------------"
+if [ -f /sys/block/nvme0n1/queue/scheduler ] && grep -q 'mq-deadline' /sys/block/nvme0n1/queue/scheduler
+then
+    echo 'mq-deadline' > /sys/block/nvme0n1/queue/scheduler
+    echo 'ACTION=="add|change", KERNEL=="nvme0n1", ATTR{queue/scheduler}="mq-deadline"' > /etc/udev/rules.d/99-circleci-io-scheduler.rules
+    update-grub
+fi
+
 echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
