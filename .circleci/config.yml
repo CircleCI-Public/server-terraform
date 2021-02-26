@@ -10,14 +10,8 @@ workflows:
       - shellcheck/check
       - format
       - validate:
-          name: EKS
-          tf_path: eks
-          requires:
-            - format
-            - shellcheck/check
-      - validate:
-          name: GKE
-          tf_path: gke
+          name: Nomad AWS basic
+          tf_path: nomad-aws/examples/basic
           requires:
             - format
             - shellcheck/check
