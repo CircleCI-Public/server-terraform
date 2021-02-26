@@ -1,4 +1,4 @@
-variable "basename" {
+variable "nomad_server_endpoint" {
   type        = string
-  description = "Name of deployment to be used as a base for naming resources."
+  description = "Domain and port of RPC service of Nomad control plane (e.g example.com:4647)"
 }
