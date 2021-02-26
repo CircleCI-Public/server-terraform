@@ -1,6 +1,0 @@
-terraform {
-  backend "gcs" {
-    bucket = ""        # Note that this is just the bucket ID, not the full gs:// URI
-    prefix = ""
-  }
-}
