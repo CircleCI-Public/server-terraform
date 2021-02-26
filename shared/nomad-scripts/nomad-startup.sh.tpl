@@ -3,10 +3,6 @@
 # One of 'AWS' or 'GCP'. Value passed into template
 export CLOUD_PROVIDER=${cloud_provider}
 
-# Prefix identifier used across all of Server install. Value pased into
-# template
-export BASE_NAME=${basename}
-
 PRIVATE_IP="$(hostname --ip-address)"
 export PRIVATE_IP
 
@@ -14,13 +10,6 @@ export DEBIAN_FRONTEND=noninteractive
 UNAME="$(uname -r)"
 export UNAME
 
-# In GCP, start up scripts are run outside of cloud-init. This means we
-# must wait on cloud init to finish before querying it. If we're running
-# on AWS, this script is part of the cloud-init 'config' stage, so we
-# can already query `local_hosname` without delay.
-if [ "$CLOUD_PROVIDER" == "GCP" ]; then
-    cloud-init status --wait
-fi
 INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
 
@@ -69,16 +58,14 @@ sleep 5
 echo "--------------------------------------"
 echo " Populating /etc/circleci/public-ipv4"
 echo "--------------------------------------"
-if [ $CLOUD_PROVIDER == "AWS" ]; then
-    export aws_instance_metadata_url="http://169.254.169.254"
-    export PUBLIC_IP="$(curl $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
-    export PRIVATE_IP="$(curl $aws_instance_metadata_url/latest/meta-data/local-ipv4)"
-    if ! (echo $PUBLIC_IP | grep -qP "^[\d.]+$"); then
-        echo "Setting the IPv4 address below in /etc/circleci/public-ipv4."
-        echo "This address will be used in builds with \"Rebuild with SSH\"."
-        mkdir -p /etc/circleci
-        echo $PRIVATE_IP | tee /etc/circleci/public-ipv4
-    fi
+export aws_instance_metadata_url="http://169.254.169.254"
+export PUBLIC_IP="$(curl $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
+export PRIVATE_IP="$(curl $aws_instance_metadata_url/latest/meta-data/local-ipv4)"
+if ! (echo $PUBLIC_IP | grep -qP "^[\d.]+$"); then
+    echo "Setting the IPv4 address below in /etc/circleci/public-ipv4."
+    echo "This address will be used in builds with \"Rebuild with SSH\"."
+    mkdir -p /etc/circleci
+    echo $PRIVATE_IP | tee /etc/circleci/public-ipv4
 fi
 
 echo "--------------------------------------"
@@ -122,7 +109,7 @@ client {
     enabled = true
     # Expecting to have DNS record for nomad server(s)
     server_join = {
-        retry_join = ["nomad.$${BASE_NAME}.circleci.internal:4647"]
+        retry_join = ["${nomad_server_endpoint}"]
     }
     node_class = "linux-64bit"
     options = {"driver.raw_exec.enable" = "1"}
@@ -160,21 +147,6 @@ ExecStart=/usr/bin/nomad agent -config /etc/nomad/config.hcl
 WantedBy=multi-user.target
 EOT
 
-cat <<EOT > /configure-nomad.sh
-#!/bin/bash
-for i in {1..6}; do
-  if [ ! -f /etc/nomad/config.hcl ]; then
-    echo "config.hcl file not found, waiting for nomad to create it..."
-    sleep 5
-  else
-    break
-  fi
-done
-sed -i "s/    servers =.*/    servers = [\"\$${nomad_server}:4647\"]/g" /etc/nomad/config.hcl
-sed -i "s/    retry_join =.*/    retry_join = [\"\$${nomad_server}:4647\"]/g" /etc/nomad/config.hcl
-service nomad restart
-EOT
-chmod +x /configure-nomad.sh
 echo "--------------------------------------"
 echo "   Creating ci-privileged network"
 echo "--------------------------------------"
@@ -183,7 +155,7 @@ docker network create --label keep --driver=bridge --opt com.docker.network.brid
 echo "--------------------------------------"
 echo "      Starting Nomad service"
 echo "--------------------------------------"
-service nomad restart
+systemctl enable --now nomad
 
 echo "--------------------------------------"
 echo "  Set Up Docker Garbage Collection"
@@ -206,13 +178,10 @@ chmod 0644 /etc/systemd/system/docker-gc.service
 cat <<EOT > /etc/docker-gc-start.rc
 #!/bin/bash
 set -euo pipefail
-
 timeout 1m docker pull circleci/docker-gc:1.0
 docker rm -f docker-gc || true
-
 # Will return exit 0 if volume already exists
 docker volume create docker-gc --label=keep
-
 # --net=host is used to allow the container to talk to the local statsd agent
 docker run \
   --rm \
@@ -227,33 +196,24 @@ docker run \
   "circleci/docker-gc:1.0" \
   -threshold "1000 KB"
 EOT
-chown root:root /etc/docker-gc-start.rc
-chmod 0755 /etc/docker-gc-start.rc
-
-cat <<EOT > /usr/local/sbin/start-units.sh
-#!/bin/bash
-
-systemctl enable docker-gc.service
-systemctl start docker-gc.service
-EOT
-chown root:root /usr/local/sbin/start-units.sh
-chmod 0755 /usr/local/sbin/start-units.sh
+chmod 0700 /etc/docker-gc-start.rc
 
 echo "--------------------------------------"
 echo "  Start Docker Garbage Collection"
 echo "--------------------------------------"
-/usr/local/sbin/start-units.sh
+systemctl enable --now docker-gc
 
 echo "--------------------------------------"
 echo "  Securing Docker network interfaces"
 echo "--------------------------------------"
 docker_chain="DOCKER-USER"
-if [ "$CLOUD_PROVIDER" == "GCP" ]; then
-    /sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination 169.254.169.254/32 -p tcp --dport 53 --jump RETURN # Allow DNS queries
-    /sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination 169.254.169.254/32 -p udp --dport 53 --jump RETURN # Allow DNS queries
-    /sbin/iptables --wait --insert $docker_chain 3 -i docker+ --destination "169.254.0.0/16" --jump DROP
-    /sbin/iptables --wait --insert $docker_chain 4 -i br-+ --destination "169.254.0.0/16" --jump DROP
-    # We probably want to ditch the assumption here that the cluster will live at 10.0.0.0/8 and replace it with a variable
-    /sbin/iptables --wait --insert $docker_chain 5 -i docker+ --destination "10.0.0.0/8" --jump DROP
-    /sbin/iptables --wait --insert $docker_chain 6 -i br+ --destination "10.0.0.0/8" --jump DROP
-fi
+# Blocking meta-data endpoint access
+/sbin/iptables --wait --insert $docker_chain -i docker+ --destination "169.254.0.0/16" --jump DROP
+/sbin/iptables --wait --insert $docker_chain -i br-+ --destination "169.254.0.0/16" --jump DROP
+# Blocking internal cluster resources
+%{ for cidr_block in blocked_cidrs ~}
+/sbin/iptables --wait --insert $docker_chain -i docker+ --destination "${cidr_block}" --jump DROP
+/sbin/iptables --wait --insert $docker_chain -i br+ --destination "${cidr_block}" --jump DROP
+%{ endfor ~}
+/sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination "${dns_server}" -p tcp --dport 53 --jump RETURN
+/sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination "${dns_server}" -p udp --dport 53 --jump RETURN

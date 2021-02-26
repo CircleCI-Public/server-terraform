@@ -22,7 +22,7 @@ resource "tls_self_signed_cert" "nomad_ca" {
   private_key_pem = tls_private_key.nomad_ca.private_key_pem
 
   subject {
-    common_name         = "Nomad ${var.basename} CA"
+    common_name         = "Nomad CircleCi CA"
     organization        = "CircleCI"
     organizational_unit = "Server"
     street_address      = ["201 Spear St", "#1200"]
@@ -51,7 +51,7 @@ resource "tls_cert_request" "nomad_client" {
   private_key_pem = tls_private_key.nomad_client.private_key_pem
 
   subject {
-    common_name  = "nomad.${var.basename}.circleci.internal"
+    common_name  = var.nomad_server_endpoint
     organization = "nomad:client"
   }
 
@@ -91,7 +91,7 @@ resource "tls_cert_request" "nomad_server" {
   private_key_pem = tls_private_key.nomad_server.private_key_pem
 
   subject {
-    common_name  = "nomad.${var.basename}.circleci.internal"
+    common_name  = var.nomad_server_endpoint
     organization = "nomad:client"
   }
 
