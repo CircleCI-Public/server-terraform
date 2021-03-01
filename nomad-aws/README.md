@@ -3,6 +3,60 @@
 This is a simple Terraform module to create Nomad clients for your CircleCI
 server application in AWS.
 
+## Usage
+
+A basic example is as simple as this:
+
+```Terraform
+terraform {
+  required_version = ">= 0.14.0"
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = ">=3.0.0"
+    }
+  }
+}
+
+provider "aws" {
+  # Your region of choice here
+  region = "us-west-1"
+}
+
+module "nomad_clients" {
+  # We strongly recommend pinning the version using ref=<<release tag>> as is done here
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git?//nomad-aws?ref=3.0.0-RC7"
+
+  # Number of nomad clients to run
+  nodes = 4
+
+  region = "<< Region you want to run nomad clients in >>"
+  subnet = "<< ID of subnet you want to run nomad clients in >>"
+  vpc_id = "<< ID of VPC you want to run nomad client in >>"
+
+  server_endpoint = "<< hostname:port of nomad server >>"
+
+  dns_server = "<< ip address of your VPC DNS server >>"
+  blocked_cidrs = [
+    "<< cidr blocks you’d like to block access to e.g 10.0.1.0/24 >>"
+  ]
+}
+
+output "nomad_server_cert" {
+  value = module.nomad_clients.nomad_server_cert
+}
+
+output "nomad_server_key" {
+  value = module.nomad_clients.nomad_server_key
+}
+
+output "nomad_ca" {
+  value = module.nomad_clients.nomad_tls_ca
+}
+```
+
+There are more examples in the `examples` directory.
+
 ## Requirements
 
 | Name | Version |
