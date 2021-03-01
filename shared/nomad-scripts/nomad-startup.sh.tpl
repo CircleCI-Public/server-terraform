@@ -10,6 +10,14 @@ export DEBIAN_FRONTEND=noninteractive
 UNAME="$(uname -r)"
 export UNAME
 
+# In GCP, start up scripts are run outside of cloud-init. This means we
+# must wait on cloud init to finish before querying it. If we're running
+# on AWS, this script is part of the cloud-init 'config' stage, so we
+# can already query `local_hosname` without delay.
+if [ "$CLOUD_PROVIDER" == "GCP" ]; then
+    cloud-init status --wait
+fi
+
 INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
 
@@ -58,14 +66,16 @@ sleep 5
 echo "--------------------------------------"
 echo " Populating /etc/circleci/public-ipv4"
 echo "--------------------------------------"
-export aws_instance_metadata_url="http://169.254.169.254"
-export PUBLIC_IP="$(curl $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
-export PRIVATE_IP="$(curl $aws_instance_metadata_url/latest/meta-data/local-ipv4)"
-if ! (echo $PUBLIC_IP | grep -qP "^[\d.]+$"); then
-    echo "Setting the IPv4 address below in /etc/circleci/public-ipv4."
-    echo "This address will be used in builds with \"Rebuild with SSH\"."
-    mkdir -p /etc/circleci
-    echo $PRIVATE_IP | tee /etc/circleci/public-ipv4
+if [ $CLOUD_PROVIDER == "AWS" ]; then
+    export aws_instance_metadata_url="http://169.254.169.254"
+    export PUBLIC_IP="$(curl $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
+    export PRIVATE_IP="$(curl $aws_instance_metadata_url/latest/meta-data/local-ipv4)"
+    if ! (echo $PUBLIC_IP | grep -qP "^[\d.]+$"); then
+        echo "Setting the IPv4 address below in /etc/circleci/public-ipv4."
+        echo "This address will be used in builds with \"Rebuild with SSH\"."
+        mkdir -p /etc/circleci
+        echo $PRIVATE_IP | tee /etc/circleci/public-ipv4
+    fi
 fi
 
 echo "--------------------------------------"
@@ -207,13 +217,21 @@ echo "--------------------------------------"
 echo "  Securing Docker network interfaces"
 echo "--------------------------------------"
 docker_chain="DOCKER-USER"
+if [ "$CLOUD_PROVIDER" == "GCP" ]; then
+  # On GCP the link local address for metadata also serves DNS
+  /sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination 169.254.169.254/32 -p tcp --dport 53 --jump RETURN
+  /sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination 169.254.169.254/32 -p udp --dport 53 --jump RETURN
+else
+  /sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination "${dns_server}" -p tcp --dport 53 --jump RETURN
+  /sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination "${dns_server}" -p udp --dport 53 --jump RETURN
+fi
+
 # Blocking meta-data endpoint access
 /sbin/iptables --wait --insert $docker_chain -i docker+ --destination "169.254.0.0/16" --jump DROP
 /sbin/iptables --wait --insert $docker_chain -i br-+ --destination "169.254.0.0/16" --jump DROP
+
 # Blocking internal cluster resources
 %{ for cidr_block in blocked_cidrs ~}
 /sbin/iptables --wait --insert $docker_chain -i docker+ --destination "${cidr_block}" --jump DROP
 /sbin/iptables --wait --insert $docker_chain -i br+ --destination "${cidr_block}" --jump DROP
 %{ endfor ~}
-/sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination "${dns_server}" -p tcp --dport 53 --jump RETURN
-/sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination "${dns_server}" -p udp --dport 53 --jump RETURN
