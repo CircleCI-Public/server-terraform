@@ -47,9 +47,8 @@ resource "aws_instance" "nomad_client" {
   vpc_security_group_ids = length(var.security_group_id) != 0 ? var.security_group_id : local.nomad_security_groups
   key_name               = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
   user_data = templatefile(
-    "${path.module}/../shared/nomad-scripts/nomad-startup.sh.tpl",
+    "${path.module}/template/nomad-startup.sh.tpl",
     {
-      cloud_provider        = "AWS"
       nomad_server_endpoint = var.server_endpoint
       client_tls_cert       = var.enable_mtls ? module.nomad_tls[0].nomad_client_cert : ""
       client_tls_key        = var.enable_mtls ? module.nomad_tls[0].nomad_client_key : ""

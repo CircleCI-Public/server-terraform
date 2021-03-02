@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# One of 'AWS' or 'GCP'. Value passed into template
-export CLOUD_PROVIDER=${cloud_provider}
-
 PRIVATE_IP="$(hostname --ip-address)"
 export PRIVATE_IP
 
