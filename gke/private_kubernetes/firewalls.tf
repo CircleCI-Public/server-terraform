@@ -32,7 +32,7 @@ resource "google_compute_firewall" "allow_all_internal_network" {
 # health checks and internal network(s)
 #
 resource "google_compute_firewall" "allowed_external_cidr_blocks" {
-  count       = var.enable_bastion ? 0 : 1
+  count       = 1
   name        = "allowed-external-cidr-blocks-${var.unique_name}"
   description = "${var.unique_name} firewall rule for CircleCI Server cluster component"
   network     = var.network_uri
