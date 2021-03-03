@@ -137,7 +137,7 @@ resource "google_container_node_pool" "node_pool" {
 
 ### GKE CLUSTER ###
 locals {
-  private_endpoint = var.enable_bastion ? true : var.private_endpoint
+  private_endpoint = var.private_endpoint
 }
 resource "google_container_cluster" "circleci_cluster" {
   depends_on  = [google_project_service.container_service]
