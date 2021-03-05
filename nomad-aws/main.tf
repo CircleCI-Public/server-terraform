@@ -39,6 +39,26 @@ locals {
   ))
 }
 
+data "cloudinit_config" "nomad_user_data" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    content_type = "text/x-shellscript"
+    content = templatefile(
+      "${path.module}/template/nomad-startup.sh.tpl",
+      {
+        nomad_server_endpoint = var.server_endpoint
+        client_tls_cert       = var.enable_mtls ? module.nomad_tls[0].nomad_client_cert : ""
+        client_tls_key        = var.enable_mtls ? module.nomad_tls[0].nomad_client_key : ""
+        tls_ca                = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""
+        blocked_cidrs         = var.blocked_cidrs
+        dns_server            = var.dns_server
+      }
+    )
+  }
+}
+
 resource "aws_instance" "nomad_client" {
   count                  = var.nodes
   ami                    = data.aws_ami.ubuntu_focal.id
@@ -46,17 +66,7 @@ resource "aws_instance" "nomad_client" {
   subnet_id              = var.subnet
   vpc_security_group_ids = length(var.security_group_id) != 0 ? var.security_group_id : local.nomad_security_groups
   key_name               = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
-  user_data = templatefile(
-    "${path.module}/template/nomad-startup.sh.tpl",
-    {
-      nomad_server_endpoint = var.server_endpoint
-      client_tls_cert       = var.enable_mtls ? module.nomad_tls[0].nomad_client_cert : ""
-      client_tls_key        = var.enable_mtls ? module.nomad_tls[0].nomad_client_key : ""
-      tls_ca                = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""
-      blocked_cidrs         = var.blocked_cidrs
-      dns_server            = var.dns_server
-    }
-  )
+  user_data_base64       = data.cloudinit_config.nomad_user_data.rendered
 
   root_block_device {
     volume_type = "gp3"
