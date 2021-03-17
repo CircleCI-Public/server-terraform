@@ -1,7 +1,3 @@
-provider "aws" {
-  region = var.region
-}
-
 resource "random_string" "key_suffix" {
   length  = 8
   special = false
@@ -25,7 +21,7 @@ data "aws_ami" "ubuntu_focal" {
 }
 
 module "nomad_tls" {
-  source                = "../shared/modules/tls"
+  source                = "../tls"
   nomad_server_endpoint = var.server_endpoint
   count                 = var.enable_mtls ? 1 : 0
 }
