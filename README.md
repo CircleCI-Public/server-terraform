@@ -17,21 +17,21 @@ consume the AWS Nomad client module as follows:
 ```terraform
 module "my-aws-nomad-clients" {
   # Pin release to 3.0.0-RC7 (for example) and use /nomad-aws subdirectory
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=3.0.0-RC7"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//shared/modules/nomad-aws?ref=3.0.0-RC7"
   
   # Other variables here... 
 }
 ```
 
 > Note the use of `ref=3.0.0-RC7` to select a specific git tag and
-> `//nomad-aws` to select the `nomad-aws` module.
+> `//shared/modules/nomad-aws` to select the `nomad-aws` module.
 
 [generic git repository]: https://www.terraform.io/docs/language/modules/sources.html#generic-git-repository
 
 ## Compatibility
 
 The modules in this repository are meant to be used with [terraform
-v0.14.2](https://releases.hashicorp.com/terraform/0.14.2/)
+v0.14.2](https://releases.hashicorp.com/terraform/0.14.2/) and above.
 
 ## How to contribute
 

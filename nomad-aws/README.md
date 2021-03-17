@@ -1,7 +1,6 @@
 # AWS Nomad Clients
 
-This is a simple Terraform module to create Nomad clients for your CircleCI
-server application in AWS.
+This Terraform module creates Nomad clients for your CircleCI server application in AWS. This directory is for documentation and example root modules; the module itself is in the `/shared/modules/nomad-aws` directory.
 
 ## Usage
 
@@ -13,7 +12,7 @@ terraform {
   required_providers {
     aws = {
       source = "hashicorp/aws"
-      version = ">=3.0.0"
+      version = ">=3.0"
     }
   }
 }
@@ -25,7 +24,7 @@ provider "aws" {
 
 module "nomad_clients" {
   # We strongly recommend pinning the version using ref=<<release tag>> as is done here
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git?//nomad-aws?ref=3.0.0-RC7"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git?//shared/modules/nomad-aws?ref=3.0.0-RC7"
 
   # Number of nomad clients to run
   nodes = 4
@@ -56,12 +55,6 @@ output "nomad_ca" {
 ```
 
 There are more examples in the `examples` directory.
-
-## Requirements
-
-| Name | Version |
-|------|---------|
-| aws | ~> 3.0 |
 
 ## Inputs
 

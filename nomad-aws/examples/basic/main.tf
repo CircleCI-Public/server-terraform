@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">=3.0.0"
+      version = ">=3.0"
     }
   }
 }
@@ -28,7 +28,7 @@ module "vpc" {
 }
 
 module "nomad-aws" {
-  source = "../.."
+  source = "../../../shared/modules/nomad-aws"
 
   # Number of nomad clients to run
   nodes = 4
