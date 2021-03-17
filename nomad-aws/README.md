@@ -73,6 +73,7 @@ There are more examples in the `examples` directory.
 | enable\_mtls | MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended. | `bool` | `true` | no |
 | instance\_type | AWS Node type for instance. Must be amd64 linux type | `string` | `"t3a.2xlarge"` | no |
 | nodes | Number of nomad client to create | `number` | n/a | yes |
+| volume\_type | The EBS volume type of the nomad nodes. If gp2 is not available in your desired region, switch to gp2 | `string` | gp3 | no |
 | region | AWS Region | `string` | n/a | yes |
 | security\_group\_id | ID for the security group for Nomad clients.<br>See security documentation for recommendations. | `list(string)` | `[]` | no |
 | server\_endpoint | Domain and port of RPC service of Nomad control plane (e.g example.com:4647) | `string` | n/a | yes |
