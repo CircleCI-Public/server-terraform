@@ -69,7 +69,7 @@ resource "aws_instance" "nomad_client" {
   user_data_base64       = data.cloudinit_config.nomad_user_data.rendered
 
   root_block_device {
-    volume_type = "gp3"
+    volume_type = var.volume_type
     volume_size = "100"
   }
 
