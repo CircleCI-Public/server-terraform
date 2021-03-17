@@ -43,7 +43,7 @@ variable "nodes" {
 
 variable "volume_type" {
   type        = string
-  description = "The EBS volume type of the node"
+  description = "The EBS volume type of the node. If gp3 is not available in your desired region, switch to gp2"
   default     = "gp3"
 }
 
