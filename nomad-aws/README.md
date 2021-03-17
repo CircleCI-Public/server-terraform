@@ -29,7 +29,6 @@ module "nomad_clients" {
   # Number of nomad clients to run
   nodes = 4
 
-  region = "<< Region you want to run nomad clients in >>"
   subnet = "<< ID of subnet you want to run nomad clients in >>"
   vpc_id = "<< ID of VPC you want to run nomad client in >>"
 

@@ -1,8 +1,3 @@
-variable "region" {
-  type        = string
-  description = "AWS Region"
-}
-
 variable "subnet" {
   type        = string
   description = "Subnet ID"
