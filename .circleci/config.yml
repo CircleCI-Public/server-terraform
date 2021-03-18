@@ -15,6 +15,12 @@ workflows:
           requires:
             - format
             - shellcheck/check
+      - validate:
+          name: Nomad GCP basic
+          tf_path: nomad-gcp/examples/basic
+          requires:
+           - format
+           - shellcheck/check
 
 executors:
   default:
