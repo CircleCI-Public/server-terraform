@@ -6,7 +6,7 @@ modules that are helpful in hosting CircleCI server 3.0.
 ## Contents
 
 - [AWS Nomad Clients](./nomad-aws/README.md)
-- [GCP Nomad Clients](./nomad-gcp/README.md) (coming soon)
+- [GCP Nomad Clients](./nomad-gcp/README.md)
 
 ## Usage
 
