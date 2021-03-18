@@ -31,7 +31,7 @@ module "my-aws-nomad-clients" {
 ## Compatibility
 
 The modules in this repository are meant to be used with [terraform
-v0.14.2](https://releases.hashicorp.com/terraform/0.14.2/)
+v0.14.2](https://releases.hashicorp.com/terraform/0.14.2/) and above.
 
 ## How to contribute
 

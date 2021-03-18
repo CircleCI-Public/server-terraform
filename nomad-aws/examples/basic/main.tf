@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 0.14.2"
+  required_version = "~>0.14.2"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">=3.0.0"
+      version = "~>3.0"
     }
   }
 }
@@ -33,7 +33,6 @@ module "nomad-aws" {
   # Number of nomad clients to run
   nodes = 4
 
-  region = "us-east-1"
   subnet = module.vpc.public_subnets[0]
   vpc_id = module.vpc.vpc_id
 
