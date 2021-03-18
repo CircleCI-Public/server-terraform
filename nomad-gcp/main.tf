@@ -1,0 +1,136 @@
+module "tls" {
+  source = "./../shared/modules/tls"
+
+  nomad_server_endpoint = var.server_endpoint
+  count                 = var.unsafe_disable_mtls ? 0 : 1
+}
+
+resource "google_compute_autoscaler" "nomad" {
+  name   = "nomad"
+  zone   = var.zone
+  target = google_compute_instance_group_manager.nomad.id
+
+  autoscaling_policy {
+    max_replicas = var.max_replicas
+    min_replicas = var.min_replicas
+    mode         = var.autoscaling_mode
+
+    # Wait 60s * 2 = 2 minutes for initialization before measuring CPU
+    # utilization for autoscaling actions. This is the approximate boot
+    # time of new nomad nodes as measured on a n2d-standard-8 VM.
+    cooldown_period = 120
+
+    cpu_utilization {
+      target = var.target_cpu_utilization
+    }
+
+    dynamic "scaling_schedules" {
+      for_each = var.autoscaling_schedules
+      content {
+        name                  = scaling_schedules.value["name"]
+        min_required_replicas = scaling_schedules.value["min_required_replicas"]
+        schedule              = scaling_schedules.value["schedule"]
+        time_zone             = scaling_schedules.value["time_zone"]
+        duration_sec          = scaling_schedules.value["duration_sec"]
+        disabled              = scaling_schedules.value["disabled"]
+        description           = scaling_schedules.value["description"]
+      }
+    }
+  }
+}
+
+resource "google_compute_instance_template" "nomad" {
+  name_prefix    = "nomad"
+  machine_type   = var.machine_type
+  can_ip_forward = false
+
+  tags = ["nomad", "circleci-server"]
+
+  disk {
+    source_image = data.google_compute_image.ubuntu_2004.self_link
+    disk_type    = var.disk_type
+    disk_size_gb = var.disk_size_gb
+    boot         = true
+    auto_delete  = true
+  }
+
+  metadata_startup_script = templatefile(
+    "${path.module}/templates/nomad-startup.sh.tpl",
+    {
+      nomad_server_endpoint = var.server_endpoint
+      blocked_cidrs         = var.blocked_cidrs
+      client_tls_cert       = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_cert
+      client_tls_key        = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_key
+      tls_ca                = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_tls_ca
+    }
+  )
+
+  network_interface {
+    network = var.network
+
+    dynamic "access_config" {
+      # Content doesn't matter. We want a length 1 if true and 0 if false.
+      for_each = var.assign_public_ip ? [0] : []
+      content {
+        # Empty content because empty access_config {} block
+        # results in an ephemeral public IP.
+      }
+    }
+  }
+
+  shielded_instance_config {
+    enable_secure_boot = true
+  }
+
+  scheduling {
+    # Automatic restart and preemptible are mutually exclusive for
+    # some reason
+    automatic_restart = var.preemptible ? false : true
+    preemptible       = var.preemptible
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "google_compute_target_pool" "nomad" {
+  name   = "nomad"
+  region = var.region
+}
+
+resource "google_compute_instance_group_manager" "nomad" {
+  name = "nomad"
+  zone = var.zone
+
+  version {
+    instance_template = google_compute_instance_template.nomad.id
+    name              = "primary"
+  }
+
+  target_pools       = [google_compute_target_pool.nomad.id]
+  base_instance_name = "nomad"
+}
+
+data "google_compute_image" "ubuntu_2004" {
+  family  = "ubuntu-2004-lts"
+  project = "ubuntu-os-cloud"
+}
+
+
+resource "google_compute_firewall" "default" {
+  name    = "allow-retry-with-ssh-circleci-server"
+  network = var.network
+
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["64535-65535"]
+  }
+
+  source_ranges = var.retry_with_ssh_allowed_cidr_blocks
+  target_tags   = ["nomad", "circleci-server"]
+}
