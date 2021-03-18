@@ -22,7 +22,7 @@ resource "tls_self_signed_cert" "nomad_ca" {
   private_key_pem = tls_private_key.nomad_ca.private_key_pem
 
   subject {
-    common_name         = "Nomad CircleCi CA"
+    common_name         = "Nomad CircleCI CA"
     organization        = "CircleCI"
     organizational_unit = "Server"
     street_address      = ["201 Spear St", "#1200"]
