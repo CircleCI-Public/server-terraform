@@ -1,0 +1,116 @@
+variable "zone" {
+  type        = string
+  description = "GCP compute zone to deploy nomad clients into (e.g us-east1-a)"
+}
+
+variable "region" {
+  type        = string
+  description = "GCP region to deploy nomad clients into (e.g us-east1)"
+}
+
+variable "network" {
+  type        = string
+  default     = "default"
+  description = "Network to deploy nomad clients into"
+}
+
+variable "unsafe_disable_mtls" {
+  type        = bool
+  default     = false
+  description = "Disables mTLS between nomad client and servers. Compromises the authenticity and confidentiality of client-server communication. Should not be set to true in any production setting"
+}
+
+variable "retry_with_ssh_allowed_cidr_blocks" {
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+  description = "List of source IP CIDR blocks that can use the 'retry with SSH' feature of CircleCI jobs"
+}
+
+variable "server_endpoint" {
+  type        = string
+  description = "Hostname:port of nomad control plane"
+}
+
+variable "blocked_cidrs" {
+  type        = list(string)
+  default     = []
+  description = "List of CIDR blocks to block access to from inside nomad jobs"
+}
+
+variable "min_replicas" {
+  type        = number
+  default     = 1
+  description = "Minimum number of nomad clients when scaled down"
+}
+
+variable "max_replicas" {
+  type        = number
+  default     = 4
+  description = "Max number of nomad clients when scaled up"
+}
+
+variable "autoscaling_mode" {
+  type        = string
+  default     = "ONLY_UP"
+  description = <<-EOF
+    Autoscaler mode. Can be
+    - "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules
+    - "OFF": Autoscaler will never scale up or down
+    - "ONLY_UP": Autoscaler will only scale up (default)
+    Warning: jobs may be interrupted on scale down. Only select "ON" if
+    interruptions are acceptible for your use case.
+  EOF
+}
+
+variable "autoscaling_schedules" {
+  type = list(object({
+    name                  = string
+    min_required_replicas = number
+    schedule              = string
+    time_zone             = string
+    duration_sec          = number
+    disabled              = bool
+    description           = string
+  }))
+  default     = []
+  description = <<-EOF
+    Autoscaler scaling schedules. Accepts the same arguments are documented
+    upstream here: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_autoscaler#scaling_schedules
+  EOF
+}
+
+variable "target_cpu_utilization" {
+  type        = number
+  default     = 0.5
+  description = "Target CPU utilization to trigger autoscaling"
+}
+
+variable "machine_type" {
+  type        = string
+  default     = "n2d-standard-8" # AMD Rome | 8vCPU | 32GiB
+  description = "Instance type for nomad clients"
+}
+
+variable "assign_public_ip" {
+  type        = bool
+  default     = true
+  description = "Assign public IP"
+}
+
+variable "preemptible" {
+  type        = bool
+  default     = false
+  description = "Whether or not to use preemptible nodes"
+}
+
+variable "disk_type" {
+  type        = string
+  default     = "pd-ssd"
+  description = "Root disk type. Can be 'pd-standard', 'pd-ssd', 'pd-balanced' or 'local-ssd'"
+}
+
+variable "disk_size_gb" {
+  type        = number
+  default     = 300
+  description = "Root disk size in GB"
+}
