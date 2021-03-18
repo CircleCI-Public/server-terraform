@@ -1,7 +1,3 @@
-provider "aws" {
-  region = var.region
-}
-
 resource "random_string" "key_suffix" {
   length  = 8
   special = false

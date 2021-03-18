@@ -9,11 +9,11 @@ A basic example is as simple as this:
 
 ```Terraform
 terraform {
-  required_version = ">= 0.14.0"
+  required_version = "~>0.14.2"
   required_providers {
     aws = {
       source = "hashicorp/aws"
-      version = ">=3.0.0"
+      version = "~>3.0"
     }
   }
 }
@@ -30,7 +30,6 @@ module "nomad_clients" {
   # Number of nomad clients to run
   nodes = 4
 
-  region = "<< Region you want to run nomad clients in >>"
   subnet = "<< ID of subnet you want to run nomad clients in >>"
   vpc_id = "<< ID of VPC you want to run nomad client in >>"
 
@@ -56,12 +55,6 @@ output "nomad_ca" {
 ```
 
 There are more examples in the `examples` directory.
-
-## Requirements
-
-| Name | Version |
-|------|---------|
-| aws | ~> 3.0 |
 
 ## Inputs
 
