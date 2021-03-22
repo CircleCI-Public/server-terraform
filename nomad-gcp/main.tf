@@ -66,7 +66,8 @@ resource "google_compute_instance_template" "nomad" {
   )
 
   network_interface {
-    network = var.network
+    network    = var.subnetwork != "" ? null : var.network
+    subnetwork = var.subnetwork != "" ? var.subnetwork : null
 
     dynamic "access_config" {
       # Content doesn't matter. We want a length 1 if true and 0 if false.

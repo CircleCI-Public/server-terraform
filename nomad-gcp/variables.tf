@@ -14,6 +14,12 @@ variable "network" {
   description = "Network to deploy nomad clients into"
 }
 
+variable "subnetwork" {
+  type        = string
+  default     = ""
+  description = "Subnetwork to deploy nomad clients into. NB. This is required if using custom subnets"
+}
+
 variable "unsafe_disable_mtls" {
   type        = bool
   default     = false

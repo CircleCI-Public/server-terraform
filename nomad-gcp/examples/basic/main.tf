@@ -1,16 +1,16 @@
 variable "project" {
   type    = string
-  default = "nsmith-dev"
+  default = "example-project"
 }
 
 variable "region" {
   type    = string
-  default = "us-central1"
+  default = "us-west1"
 }
 
 variable "zone" {
   type    = string
-  default = "us-central1-c"
+  default = "us-west1-a"
 }
 
 variable "network" {
@@ -18,9 +18,14 @@ variable "network" {
   default = "default"
 }
 
+variable "subnetwork" {
+  type    = string
+  default = "default"
+}
+
 variable "server_endpoint" {
   type    = string
-  default = "nomad.ns.sphereci.com:4647"
+  default = "nomad.example.com.com:4647"
 }
 
 provider "google-beta" {
@@ -35,16 +40,13 @@ module "nomad" {
   zone            = var.zone
   region          = var.region
   network         = var.network
+  subnetwork      = var.subnetwork
   server_endpoint = var.server_endpoint
 
   unsafe_disable_mtls    = false
   assign_public_ip       = true
   preemptible            = true
   target_cpu_utilization = 0.50
-
-  blocked_cidrs = [
-    "8.8.8.8/32",
-  ]
 }
 
 output "module" {
