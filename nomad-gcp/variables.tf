@@ -120,3 +120,9 @@ variable "disk_size_gb" {
   default     = 300
   description = "Root disk size in GB"
 }
+
+variable "name" {
+  type        = string
+  default     = "nomad"
+  description = "VM instance name for nomad client"
+}

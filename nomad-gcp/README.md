@@ -73,6 +73,7 @@ There are more examples in the `examples` directory.
 | machine\_type | Instance type for nomad clients | `string` | `"n2d-standard-8"` | no |
 | max\_replicas | Max number of nomad clients when scaled up | `number` | `4` | no |
 | min\_replicas | Minimum number of nomad clients when scaled down | `number` | `1` | no |
+| name | VM instance name for nomad client | `string` | `"nomad"` | no |
 | network | Network to deploy nomad clients into | `string` | `"default"` | no |
 | preemptible | Whether or not to use preemptible nodes | `bool` | `false` | no |
 | region | GCP region to deploy nomad clients into (e.g us-east1) | `string` | n/a | yes |
