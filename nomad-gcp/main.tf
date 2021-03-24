@@ -6,7 +6,7 @@ module "tls" {
 }
 
 resource "google_compute_autoscaler" "nomad" {
-  name   = "nomad"
+  name   = var.name
   zone   = var.zone
   target = google_compute_instance_group_manager.nomad.id
 
@@ -96,12 +96,12 @@ resource "google_compute_instance_template" "nomad" {
 }
 
 resource "google_compute_target_pool" "nomad" {
-  name   = "nomad"
+  name   = var.name
   region = var.region
 }
 
 resource "google_compute_instance_group_manager" "nomad" {
-  name = "nomad"
+  name = var.name
   zone = var.zone
 
   version {
@@ -120,7 +120,7 @@ data "google_compute_image" "ubuntu_2004" {
 
 
 resource "google_compute_firewall" "default" {
-  name    = "allow-retry-with-ssh-circleci-server"
+  name    = "allow-retry-with-ssh-circleci-server-${var.name}"
   network = var.network
 
   allow {
