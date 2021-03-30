@@ -19,6 +19,12 @@ resource "google_project_iam_member" "k8s_bastion_compute_admin" {
   member     = "serviceAccount:${google_service_account.k8s_bastion_service_account.email}"
 }
 
+resource "google_project_iam_member" "k8s_bastion_dns_admin" {
+  count      = var.privileged_bastion ? 1 : 0
+  depends_on = [google_service_account.k8s_bastion_service_account]
+  role       = "roles/dns.admin"
+  member     = "serviceAccount:${google_service_account.k8s_bastion_service_account.email}"
+}
 
 resource "google_compute_instance" "bastion" {
   count                     = var.enable_bastion ? 1 : 0
