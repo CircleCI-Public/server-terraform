@@ -126,8 +126,10 @@ resource "google_container_node_pool" "node_pool" {
 
     tags   = local.all_node_tags
     labels = local.all_labels
+    workload_metadata_config {
+      node_metadata = "GKE_METADATA_SERVER"
+    }
   }
-
   management {
     auto_repair  = var.node_auto_repair
     auto_upgrade = var.node_auto_upgrade
@@ -198,5 +200,8 @@ resource "google_container_cluster" "circleci_cluster" {
   # field as this is almost never the desired outcome.
   lifecycle {
     ignore_changes = [description, ]
+  }
+  workload_identity_config {
+    identity_namespace = "${var.project_id}.svc.id.goog"
   }
 }
