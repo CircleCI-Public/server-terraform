@@ -29,10 +29,10 @@ module "nomad_tls" {
 locals {
   # Creates the Nomad Security Group(SG) list for the Instances.
   # Will include SSH SG if var.ssh_key is not null.
-  nomad_security_groups = compact(list(
+  nomad_security_groups = compact([
     aws_security_group.nomad_sg.id,
     var.ssh_key != null ? aws_security_group.ssh_sg[0].id : "",
-  ))
+  ])
 }
 
 data "cloudinit_config" "nomad_user_data" {
