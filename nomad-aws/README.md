@@ -9,7 +9,7 @@ A basic example is as simple as this:
 
 ```Terraform
 terraform {
-  required_version = "~>0.14.2"
+  required_version = "~>0.15.4"
   required_providers {
     aws = {
       source = "hashicorp/aws"
