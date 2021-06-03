@@ -11,7 +11,7 @@ output "nomad_client_cert" {
 }
 
 output "nomad_client_key" {
-  value = tls_private_key.nomad_client.private_key_pem
+  value     = tls_private_key.nomad_client.private_key_pem
   sensitive = true
 }
 
