@@ -1,15 +1,11 @@
+data "aws_vpc" "current" {
+  id = var.vpc_id
+}
+
 resource "aws_security_group" "nomad_sg" {
   name        = "${var.basename}-nomad_sg"
   description = "SG for CircleCI Server nomad server/client"
   vpc_id      = var.vpc_id
-
-  ingress {
-    description = "Nomad RPC Communication"
-    from_port   = 4647
-    to_port     = 4647
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   ingress {
     description = "Allow CircleCI Retry with SSH Access"
