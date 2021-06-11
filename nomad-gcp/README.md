@@ -70,7 +70,7 @@ There are more examples in the `examples` directory.
 | blocked\_cidrs | List of CIDR blocks to block access to from inside nomad jobs | `list(string)` | `[]` | no |
 | disk\_size\_gb | Root disk size in GB | `number` | `300` | no |
 | disk\_type | Root disk type. Can be 'pd-standard', 'pd-ssd', 'pd-balanced' or 'local-ssd' | `string` | `"pd-ssd"` | no |
-| machine\_type | Instance type for nomad clients | `string` | `"n2d-standard-8"` | no |
+| machine\_type | Instance type for nomad clients.  The machine type must be large enough to fit the [resource classes](https://circleci.com/docs/2.0/executor-types/#available-docker-resource-classes) required.  Choosing smaller instance types is an opportunity for cost savings. | `string` | `"n2d-standard-8"` | no |
 | max\_replicas | Max number of nomad clients when scaled up | `number` | `4` | no |
 | min\_replicas | Minimum number of nomad clients when scaled down | `number` | `1` | no |
 | name | VM instance name for nomad client | `string` | `"nomad"` | no |
