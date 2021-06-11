@@ -1,7 +1,3 @@
-data "aws_vpc" "current" {
-  id = var.vpc_id
-}
-
 resource "aws_security_group" "nomad_sg" {
   name        = "${var.basename}-nomad_sg"
   description = "SG for CircleCI Server nomad server/client"
