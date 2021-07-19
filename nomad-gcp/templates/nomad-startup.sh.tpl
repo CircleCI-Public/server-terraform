@@ -204,8 +204,8 @@ system_update
 add_docker_repo
 
 install ntp
-install docker-ce=5:19.03.13~3-0~ubuntu-focal 
-install docker-ce-cli=5:19.03.13~3-0~ubuntu-focal
+install docker-ce=5:20.10.7~3-0~ubuntu-focal
+install docker-ce-cli=5:20.10.7~3-0~ubuntu-focal
 install jq
 
 enabled_docker_userns
