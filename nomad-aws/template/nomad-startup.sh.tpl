@@ -182,7 +182,7 @@ chmod 0644 /etc/systemd/system/docker-gc.service
 cat <<EOT > /etc/docker-gc-start.rc
 #!/bin/bash
 set -euo pipefail
-timeout 1m docker pull circleci/docker-gc:1.0
+timeout 1m docker pull circleci/docker-gc:2.0
 docker rm -f docker-gc || true
 # Will return exit 0 if volume already exists
 docker volume create docker-gc --label=keep
@@ -197,8 +197,10 @@ docker run \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   --volume /var/lib/docker:/var/lib/docker:ro \
   --volume docker-gc:/state \
-  "circleci/docker-gc:1.0" \
-  -threshold "1000 KB"
+  --network=ci-privileged \
+  --network-alias=docker-gc.internal.circleci.com \
+  "circleci/docker-gc:2.0" \
+  -threshold-percent 50
 EOT
 chmod 0700 /etc/docker-gc-start.rc
 

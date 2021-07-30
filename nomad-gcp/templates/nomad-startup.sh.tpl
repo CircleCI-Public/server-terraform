@@ -37,19 +37,19 @@ add_docker_repo() {
 	add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 	install "linux-image-$(uname -r)"
 	apt-get update
-	
+
 }
 
 enabled_docker_userns() {
 	# Enabled user namespacing in Docker (root in container != root on host)
-	# Mitigates CVE 2019-5736 
+	# Mitigates CVE 2019-5736
 	[ -f /etc/docker/daemon.json ] || echo '{}' > /etc/docker/daemon.json
 	tmp=$(mktemp)
 	cp /etc/docker/daemon.json /etc/docker/daemon.json.orig
 	jq '.["userns-remap"]="default"' /etc/docker/daemon.json > "$tmp" && mv "$tmp" /etc/docker/daemon.json
 	echo 'export no_proxy="true"' >> /etc/default/docker
-	
-	systemctl restart docker 
+
+	systemctl restart docker
 }
 
 configure_circleci() {
@@ -61,7 +61,7 @@ configure_circleci() {
 		mkdir -p /etc/circleci
 		echo $private_ip | tee /etc/circleci/public-ipv4
 	fi
-	
+
 }
 
 install_nomad() {
@@ -71,11 +71,11 @@ install_nomad() {
 	unzip nomad.zip
 	mv nomad /usr/bin
 }
-	   
+
 configure_nomad() {
 	log "Installing TLS Certificates"
 	mkdir -p /etc/nomad/ssl
-    chmod 0700 /etc/nomad/ssl
+	chmod 0700 /etc/nomad/ssl
 	cat <<-EOT > /etc/nomad/ssl/cert.pem
 	${client_tls_cert}
 	EOT
@@ -144,7 +144,7 @@ configure_nomad() {
 	[Install]
 	WantedBy=multi-user.target
 	EOT
-	
+
 	log "Starting up nomad" 
 	systemctl enable --now nomad
 }
@@ -176,7 +176,7 @@ setup_docker_gc() {
 	cat <<-EOT > /etc/docker-gc-start.rc
 	#!/bin/bash
 	set -euo pipefail
-	timeout 1m docker pull circleci/docker-gc:1.0
+	timeout 1m docker pull circleci/docker-gc:2.0
 	docker rm -f docker-gc || true
 	# Will return exit 0 if volume already exists
 	docker volume create docker-gc --label=keep
@@ -191,8 +191,10 @@ setup_docker_gc() {
 	  --volume /var/run/docker.sock:/var/run/docker.sock \
 	  --volume /var/lib/docker:/var/lib/docker:ro \
 	  --volume docker-gc:/state \
-	  "circleci/docker-gc:1.0" \
-	  -threshold "1000 KB"
+	  --network=ci-privileged \
+	  --network-alias=docker-gc.internal.circleci.com \
+	  "circleci/docker-gc:2.0" \
+	  -threshold-percent 50
 	EOT
 	chmod 0700 /etc/docker-gc-start.rc
 
