@@ -72,8 +72,8 @@ variable "vpc_id" {
 }
 
 variable "instance_tags" {
-  type        = map(string)
-  default     = {
+  type = map(string)
+  default = {
     "vendor" = "circleci"
   }
 }
