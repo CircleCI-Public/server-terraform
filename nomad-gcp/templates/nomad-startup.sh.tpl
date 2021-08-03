@@ -67,7 +67,7 @@ configure_circleci() {
 install_nomad() {
 	log "Installing Nomad"
 	install zip
-	curl -o nomad.zip https://releases.hashicorp.com/nomad/0.11.8/nomad_0.11.8_linux_amd64.zip
+	curl -o nomad.zip https://releases.hashicorp.com/nomad/1.1.2/nomad_1.1.2_linux_amd64.zip
 	unzip nomad.zip
 	mv nomad /usr/bin
 }
