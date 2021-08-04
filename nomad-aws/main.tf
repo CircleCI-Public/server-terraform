@@ -55,22 +55,46 @@ data "cloudinit_config" "nomad_user_data" {
   }
 }
 
-resource "aws_instance" "nomad_client" {
-  count                  = var.nodes
-  ami                    = data.aws_ami.ubuntu_focal.id
-  instance_type          = var.instance_type
-  subnet_id              = var.subnet
-  vpc_security_group_ids = length(var.security_group_id) != 0 ? var.security_group_id : local.nomad_security_groups
-  key_name               = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
-  user_data_base64       = data.cloudinit_config.nomad_user_data.rendered
+resource "aws_launch_configuration" "nomad_client_lc" {
+  instance_type = var.instance_type
+  image_id      = data.aws_ami.ubuntu_focal.id
+  key_name      = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
 
   root_block_device {
     volume_type = var.volume_type
     volume_size = "100"
   }
 
-  tags = {
-    Name = "${var.basename}-nomad-client-${count.index}"
-    team = "server"
+  security_groups = length(var.security_group_id) != 0 ? var.security_group_id : local.nomad_security_groups
+
+  user_data_base64 = data.cloudinit_config.nomad_user_data.rendered
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_autoscaling_group" "clients_asg" {
+  name                 = "${var.basename}_circleci_nomad_clients_asg"
+  vpc_zone_identifier  = [var.subnet]
+  launch_configuration = aws_launch_configuration.nomad_client_lc.name
+  max_size             = var.nodes
+  min_size             = 0
+  desired_capacity     = var.nodes
+  force_delete         = true
+
+  tag {
+    key                 = "Name"
+    value               = "${var.basename}-nomad-client"
+    propagate_at_launch = "true"
+  }
+
+  dynamic "tag" {
+    for_each = var.instance_tags
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
   }
 }

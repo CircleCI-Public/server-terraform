@@ -70,3 +70,10 @@ variable "vpc_id" {
   type        = string
   description = "VPC ID of VPC used for Nomad resources"
 }
+
+variable "instance_tags" {
+  type = map(string)
+  default = {
+    "vendor" = "circleci"
+  }
+}
