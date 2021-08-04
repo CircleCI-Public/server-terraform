@@ -1,5 +1,5 @@
 variable "subnet" {
-  type        = string
+  type        = list(string)
   description = "Subnet ID"
 }
 

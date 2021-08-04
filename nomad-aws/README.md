@@ -77,7 +77,7 @@ There are more examples in the `examples` directory.
 | security\_group\_id | ID for the security group for Nomad clients.<br>See security documentation for recommendations. | `list(string)` | `[]` | no |
 | server\_endpoint | Domain and port of RPC service of Nomad control plane which is called "Nomad Load Balancer" in KOTs admin (e.g 127.0.0.1:4647) | `string` | n/a | yes |
 | ssh\_key | SSH Public key to access nomad nodes | `string` | `null` | no |
-| subnet | Subnet ID | `string` | n/a | yes |
+| subnet | Subnet IDs | `list(string)` | N/A | yes |
 | vpc\_id | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |
 
 ## Outputs
