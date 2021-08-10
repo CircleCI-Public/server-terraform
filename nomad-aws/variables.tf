@@ -1,6 +1,13 @@
 variable "subnet" {
-  type        = list(string)
+  type        = string
   description = "Subnet ID"
+  default     = ""
+}
+
+variable "subnets" {
+  type        = list(string)
+  description = "Subnet IDs"
+  default     = [""]
 }
 
 variable "security_group_id" {
