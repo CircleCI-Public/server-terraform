@@ -13,3 +13,7 @@ output "nomad_server_key" {
 output "nomad_tls_ca" {
   value = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""
 }
+
+output "nomad_sg_id" {
+  value = aws_security_group.nomad_sg.id
+}
