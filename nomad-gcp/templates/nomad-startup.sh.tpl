@@ -100,10 +100,16 @@ configure_nomad() {
 	}
 	client {
 	  enabled = true
-	  # Expecting to have DNS record for nomad server(s)
+	EOT
+	# Expecting to have DNS record for nomad server(s)
+	if [ "${add_server_join}" ]; then
+	cat <<-EOT >> /etc/nomad/config.hcl
 	  server_join = {
 	    retry_join = ["${nomad_server_endpoint}"]
 	  }
+	EOT
+	fi
+	cat <<-EOT >> /etc/nomad/config.hcl
 	  node_class = "linux-64bit"
 	  options = {"driver.raw_exec.enable" = "1"}
 	}

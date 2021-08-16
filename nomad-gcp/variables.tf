@@ -126,3 +126,9 @@ variable "name" {
   default     = "nomad"
   description = "VM instance name for nomad client"
 }
+
+variable "add_server_join" {
+  type        = bool
+  default     = true
+  description = "Includes the 'server_join' block when setting up nomad clients. Should be disabled when the nomad server endpoint is not immediately known (eg, for dedicated nomad clients)."
+}

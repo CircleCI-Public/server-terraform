@@ -57,6 +57,7 @@ resource "google_compute_instance_template" "nomad" {
   metadata_startup_script = templatefile(
     "${path.module}/templates/nomad-startup.sh.tpl",
     {
+      add_server_join       = var.add_server_join ? var.add_server_join : ""
       nomad_server_endpoint = var.server_endpoint
       blocked_cidrs         = var.blocked_cidrs
       client_tls_cert       = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_cert
