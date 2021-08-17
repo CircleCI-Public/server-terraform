@@ -76,7 +76,7 @@ resource "aws_launch_configuration" "nomad_client_lc" {
 
 resource "aws_autoscaling_group" "clients_asg" {
   name                 = "${var.basename}_circleci_nomad_clients_asg"
-  vpc_zone_identifier  = [var.subnet]
+  vpc_zone_identifier  = var.subnet != "" ? [var.subnet] : var.subnets
   launch_configuration = aws_launch_configuration.nomad_client_lc.name
   max_size             = var.nodes
   min_size             = 0
