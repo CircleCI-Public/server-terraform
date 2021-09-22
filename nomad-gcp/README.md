@@ -16,7 +16,7 @@ provider "google-beta" {
 
 module "nomad" {
   # We strongly recommend pinning the version using ref=<<release tag>> as is done here
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git?//nomad-aws?ref=3.0.0"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=3.1.0"
 
   zone            = "us-east1-a"
   region          = "us-east1"
