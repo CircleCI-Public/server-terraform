@@ -52,7 +52,7 @@ variable "volume_type" {
 variable "instance_type" {
   type        = string
   description = "AWS Node type for instance. Must be amd64 linux type"
-  default     = "t3a.2xlarge"
+  default     = "t3.2xlarge"
 }
 
 variable "ssh_key" {
