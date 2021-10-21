@@ -93,7 +93,7 @@ variable "target_cpu_utilization" {
 
 variable "machine_type" {
   type        = string
-  default     = "n2d-standard-8" # AMD Rome | 8vCPU | 32GiB
+  default     = "n2-standard-8" # Intel | 8vCPU | 32GiB
   description = "Instance type for nomad clients"
 }
 
