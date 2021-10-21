@@ -51,7 +51,7 @@ variable "volume_type" {
 
 variable "instance_type" {
   type        = string
-  description = "AWS Node type for instance. Must be amd64 linux type"
+  description = "AWS Node type for instance. Must be Intel linux type"
   default     = "t3.2xlarge"
 }
 
