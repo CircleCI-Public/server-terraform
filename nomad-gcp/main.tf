@@ -123,7 +123,7 @@ data "google_compute_image" "ubuntu_2004" {
 resource "google_compute_firewall" "default" {
   name    = "allow-retry-with-ssh-circleci-server-${var.name}"
   network = var.network
-  project = var.host_project != "" ? var.host_project : null
+  project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
   allow {
     protocol = "icmp"

@@ -14,12 +14,6 @@ variable "network" {
   description = "Network to deploy nomad clients into"
 }
 
-variable "host_project" {
-  type        = string
-  default     = ""
-  description = "If using a shared vpc, the id of the host project"
-}
-
 variable "subnetwork" {
   type        = string
   default     = ""
