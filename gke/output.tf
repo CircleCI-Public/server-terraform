@@ -11,7 +11,7 @@ output "nomad_server_cert" {
 }
 
 output "nomad_server_key" {
-  value = nonsensitive(module.nomad.nomad_server_key)
+  value = module.nomad.nomad_server_key
 }
 
 output "nomad_tls_ca" {

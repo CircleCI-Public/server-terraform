@@ -141,3 +141,9 @@ variable "preemptible_nodes" {
   default     = false
   description = "Use preemptible nodes for cluster. Keeps cost low for development or proof of concept cluster"
 }
+
+variable "gke_release_channel" {
+  type = string
+  default = "REGULAR"
+  description = "The GKE release channel to subscribe to. Should be one of RAPID/REGULAR/STABLE"
+}

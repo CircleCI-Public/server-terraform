@@ -109,7 +109,7 @@ resource "google_container_node_pool" "node_pool" {
   location = var.location
   cluster  = google_container_cluster.circleci_cluster.name
 
-  version = data.google_container_engine_versions.gke.release_channel_default_version["REGULAR"]
+  version = data.google_container_engine_versions.gke.release_channel_default_version[var.gke_release_channel]
 
   autoscaling {
     min_node_count = var.node_min
@@ -134,6 +134,13 @@ resource "google_container_node_pool" "node_pool" {
     auto_repair  = var.node_auto_repair
     auto_upgrade = var.node_auto_upgrade
   }
+
+  timeouts {
+    create = "90m"
+    update = "120m"
+    delete = "60m"
+  }
+
 }
 
 
@@ -148,7 +155,7 @@ resource "google_container_cluster" "circleci_cluster" {
   location    = var.location
   provider    = google-beta
 
-  min_master_version = data.google_container_engine_versions.gke.release_channel_default_version["REGULAR"]
+  min_master_version = data.google_container_engine_versions.gke.release_channel_default_version[var.gke_release_channel]
 
   network = var.network_uri
   # subnetwork               = var.subnet_uri
