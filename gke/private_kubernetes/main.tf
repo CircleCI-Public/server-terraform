@@ -137,7 +137,7 @@ resource "google_container_node_pool" "node_pool" {
 
   timeouts {
     create = "90m"
-    update = "120m"
+    update = "90m"
     delete = "60m"
   }
 
