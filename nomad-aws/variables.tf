@@ -84,3 +84,9 @@ variable "instance_tags" {
     "vendor" = "circleci"
   }
 }
+
+variable "nomad_auto_scaler" {
+  type        = bool
+  default     = false
+  description = "If true, terraform will create user access keys to be used by nomad autoscaler."
+}
