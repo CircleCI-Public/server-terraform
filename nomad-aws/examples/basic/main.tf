@@ -51,5 +51,5 @@ module "nomad-aws" {
     module.vpc.private_subnets[0]
   ]
 
-  nomad_auto_scaler = true
+  nomad_auto_scaler = false
 }
