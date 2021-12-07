@@ -78,8 +78,8 @@ resource "aws_autoscaling_group" "clients_asg" {
   name                 = "${var.basename}_circleci_nomad_clients_asg"
   vpc_zone_identifier  = var.subnet != "" ? [var.subnet] : var.subnets
   launch_configuration = aws_launch_configuration.nomad_client_lc.name
-  max_size             = var.nodes
-  min_size             = 0
+  max_size             = var.max_nodes
+  min_size             = var.nomad_auto_scaler ? 1 : 0 # When using nomad-autoscaler, the min nodes can't be less than 1. For more info: https://github.com/hashicorp/nomad-autoscaler/issues/530
   desired_capacity     = var.nodes
   force_delete         = true
 
