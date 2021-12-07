@@ -27,9 +27,5 @@ output "nomad_asg_user_secret_key" {
 }
 
 output "nomad_asg_name" {
-  value = var.nomad_auto_scaler ? aws_autoscaling_group.clients_asg[0].name : ""
-}
-
-output "nomad_asg_region" {
-  value = var.nomad_auto_scaler ? aws_autoscaling_group.clients_asg[0].region : ""
+  value = aws_autoscaling_group.clients_asg.name
 }
