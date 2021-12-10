@@ -55,6 +55,12 @@ variable "max_replicas" {
   description = "Max number of nomad clients when scaled up"
 }
 
+variable "nomad_auto_scaler" {
+  type        = bool
+  default     = false
+  description = "If true, terraform will create a service account to be used by nomad autoscaler."
+}
+
 variable "autoscaling_mode" {
   type        = string
   default     = "ONLY_UP"
