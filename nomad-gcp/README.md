@@ -74,7 +74,8 @@ There are more examples in the `examples` directory.
 | max\_replicas | Max number of nomad clients when scaled up | `number` | `4` | no |
 | min\_replicas | Minimum number of nomad clients when scaled down | `number` | `1` | no |
 | name | VM instance name for nomad client | `string` | `"nomad"` | no |
-| network | Network to deploy nomad clients into | `string` | `"default"` | no |
+| network | Network to deploy nomad clients into. If you are using a shared vpc, provide the network endpoint rather than the name | `string` | `"default"` | no |
+| subnetwork | Subnetwork to deploy nomad clients into. NB. This is required if using custom subnets or a shared vpc. If you are using a shared vpc, provide the subnetwork endpoint rather than the name | `string` | `""` | for custom subnets and shared vpcs |
 | preemptible | Whether or not to use preemptible nodes | `bool` | `false` | no |
 | region | GCP region to deploy nomad clients into (e.g us-east1) | `string` | n/a | yes |
 | retry\_with\_ssh\_allowed\_cidr\_blocks | List of source IP CIDR blocks that can use the 'retry with SSH' feature of CircleCI jobs | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |

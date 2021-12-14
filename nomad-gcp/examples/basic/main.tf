@@ -16,11 +16,15 @@ variable "zone" {
 variable "network" {
   type    = string
   default = "default"
+  # if you are using a shared vpc, provide the network endpoint rather than the name. eg:
+  # default = "https://www.googleapis.com/compute/v1/projects/<your-project>/global/networks/default"
 }
 
 variable "subnetwork" {
   type    = string
   default = "default"
+  # if you are using a shared vpc, provide the network endpoint rather than the name. eg:
+  # default = "https://www.googleapis.com/compute/v1/projects/<your-project>/regions/<your-region>/subnetworks/default"
 }
 
 variable "server_endpoint" {
