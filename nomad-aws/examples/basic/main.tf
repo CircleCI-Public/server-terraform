@@ -1,5 +1,5 @@
 terraform {
-  required_version = "~>0.15.2"
+  required_version = ">=0.15.2"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -50,4 +50,6 @@ module "nomad-aws" {
     # access is running there.
     module.vpc.private_subnets[0]
   ]
+
+  nomad_auto_scaler = false
 }

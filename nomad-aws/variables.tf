@@ -40,7 +40,13 @@ variable "dns_server" {
 
 variable "nodes" {
   type        = number
-  description = "Number of nomad client to create"
+  description = "Number of nomad clients to create"
+}
+
+variable "max_nodes" {
+  type        = number
+  default     = 5
+  description = "Maximum number of nomad clients to create. Must be greater than or equal to nodes"
 }
 
 variable "volume_type" {
@@ -83,4 +89,10 @@ variable "instance_tags" {
   default = {
     "vendor" = "circleci"
   }
+}
+
+variable "nomad_auto_scaler" {
+  type        = bool
+  default     = false
+  description = "If true, terraform will create user access keys to be used by nomad autoscaler."
 }
