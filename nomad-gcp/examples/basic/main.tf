@@ -51,6 +51,12 @@ module "nomad" {
   assign_public_ip       = true
   preemptible            = true
   target_cpu_utilization = 0.50
+
+  # Autoscaling for Managed Instance Group
+  autoscaling_mode  = "ON"
+  nomad_auto_scaler = false # If true, will generate a service account to be used by nomad-autoscaler. The is output in the file nomad-as-key.json
+  max_replicas      = 4     # Max and Min replica values should match the values intended to be used by nomad autoscaler in CircleCI Server
+  min_replicas      = 1
 }
 
 output "module" {
