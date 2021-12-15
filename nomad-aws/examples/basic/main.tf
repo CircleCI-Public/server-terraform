@@ -51,5 +51,6 @@ module "nomad-aws" {
     module.vpc.private_subnets[0]
   ]
 
-  nomad_auto_scaler = false
+  nomad_auto_scaler = false # If true, terraform will generate an IAM user to be used by nomad-autoscaler in CircleCI Server. The keys will be available in terraform's output
+  max_nodes         = 5     # the max number of clients to scale to. Must be greater than our equal to the nodes set above.
 }
