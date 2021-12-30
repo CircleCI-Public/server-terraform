@@ -75,7 +75,6 @@ There are more examples in the `examples` directory.
 | nodes | Number of nomad client to create | `number` | n/a | yes |
 | nomad_auto_scaler | If true, terraform will generate an IAM user to be used by nomad-autoscaler in CircleCI Server. The keys will be available in terraform's output | `bool` | false | no |
 | volume\_type | The EBS volume type of the nomad nodes. If gp3 is not available in your desired region, switch to gp2 | `string` | `gp3` | no |
-| region | AWS Region | `string` | n/a | yes |
 | security\_group\_id | ID for the security group for Nomad clients.<br>See security documentation for recommendations. | `list(string)` | `[]` | no |
 | server\_endpoint | Domain and port of RPC service of Nomad control plane which is called "Nomad Load Balancer" in KOTs admin (e.g 127.0.0.1:4647) | `string` | n/a | yes |
 | ssh\_key | SSH Public key to access nomad nodes | `string` | `null` | no |
