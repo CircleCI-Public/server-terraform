@@ -29,3 +29,7 @@ output "nomad_asg_user_secret_key" {
 output "nomad_asg_name" {
   value = aws_autoscaling_group.clients_asg.name
 }
+
+output "nomad_asg_arn" {
+  value = aws_autoscaling_group.clients_asg.arn
+}
