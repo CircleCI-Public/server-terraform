@@ -19,11 +19,11 @@ output "nomad_sg_id" {
 }
 
 output "nomad_asg_user_access_key" {
-  value = var.nomad_auto_scaler ? aws_iam_access_key.nomad_asg_user[0].id : ""
+  value = length(var.enable_irsa) == 0 ? aws_iam_access_key.nomad_asg_user[0].id : ""
 }
 
 output "nomad_asg_user_secret_key" {
-  value = var.nomad_auto_scaler ? aws_iam_access_key.nomad_asg_user[0].secret : ""
+  value = length(var.enable_irsa) == 0 ? aws_iam_access_key.nomad_asg_user[0].secret : ""
 }
 
 output "nomad_asg_name" {
@@ -32,4 +32,8 @@ output "nomad_asg_name" {
 
 output "nomad_asg_arn" {
   value = aws_autoscaling_group.clients_asg.arn
+}
+
+output "nomad_role" {
+  value = length(var.enable_irsa) > 0 ? aws_iam_role.nomad_role[0].arn : ""
 }

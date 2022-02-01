@@ -91,8 +91,20 @@ variable "instance_tags" {
   }
 }
 
-variable "nomad_auto_scaler" {
-  type        = bool
-  default     = false
-  description = "If true, terraform will create user access keys to be used by nomad autoscaler."
+# Check for IRSA Role (more details)  - https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html
+#   enable_irsa  = {
+#                  oidc_principal_id  = "arn:aws:iam::ACCOUNT_ID:oidc-provider/oidc.eks.REGION.amazonaws.com/id/OIDC_ID"
+#                  oidc_eks_variable  = "oidc.eks.REGION.amazonaws.com/id/OIDC_ID:sub"
+#                  k8s_service_account = "system:serviceaccount:NAMESPACE:nomad-autoscaler"
+#                  }
+
+variable "enable_irsa" {
+  type        = map(any)
+  default     = {}
+  description = "If passed a valid OIDC MAP, terraform will create K8s Service Account Role to be used by nomad autoscaler."
+}
+
+
+locals {
+  tags = merge ({ "environment" = var.basename}, var.instance_tags)
 }
