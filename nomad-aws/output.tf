@@ -27,11 +27,11 @@ output "nomad_asg_user_secret_key" {
 }
 
 output "nomad_asg_name" {
-  value = var.nomad_auto_scaler ? aws_autoscaling_group.clients_asg.name : ""
+  value = aws_autoscaling_group.clients_asg.name
 }
 
 output "nomad_asg_arn" {
-  value = var.nomad_auto_scaler ? aws_autoscaling_group.clients_asg.arn : ""
+  value = aws_autoscaling_group.clients_asg.arn
 }
 
 output "nomad_role" {
