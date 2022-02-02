@@ -19,17 +19,21 @@ output "nomad_sg_id" {
 }
 
 output "nomad_asg_user_access_key" {
-  value = var.nomad_auto_scaler ? aws_iam_access_key.nomad_asg_user[0].id : ""
+  value = local.autoscaler_type == "user" ? aws_iam_access_key.nomad_asg_user[0].id : ""
 }
 
 output "nomad_asg_user_secret_key" {
-  value = var.nomad_auto_scaler ? aws_iam_access_key.nomad_asg_user[0].secret : ""
+  value = local.autoscaler_type == "user" ? aws_iam_access_key.nomad_asg_user[0].secret : ""
 }
 
 output "nomad_asg_name" {
-  value = aws_autoscaling_group.clients_asg.name
+  value = var.nomad_auto_scaler ? aws_autoscaling_group.clients_asg.name : ""
 }
 
 output "nomad_asg_arn" {
-  value = aws_autoscaling_group.clients_asg.arn
+  value = var.nomad_auto_scaler ? aws_autoscaling_group.clients_asg.arn : ""
+}
+
+output "nomad_role" {
+  value = local.autoscaler_type == "role" ? aws_iam_role.nomad_role[0].arn : ""
 }
