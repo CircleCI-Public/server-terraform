@@ -97,6 +97,11 @@ variable "instance_tags" {
 #                  oidc_eks_variable  = "oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>:sub"
 #                  k8s_service_account = "system:serviceaccount:<NAMESPACE>:nomad-autoscaler"
 #                  }
+variable "nomad_auto_scaler" {
+  type        = bool
+  default     = false
+  description = "If set to true, A Nomad User or A Role will be created based on enable_irsa variable values"
+}
 
 variable "enable_irsa" {
   type        = map(any)
@@ -107,4 +112,10 @@ variable "enable_irsa" {
 
 locals {
   tags = merge ({ "environment" = var.basename}, var.instance_tags)
+
+  # If nomad_auto_scaler is true and enable_irsa is empty - set autoscaler_type=user
+  # If nomad_auto_scaler is true and enable_irsa is not empty - set autoscaler_type=role
+  # Else ""
+  autoscaler_type = var.nomad_auto_scaler && length(var.enable_irsa) == 0 ? "user" : var.nomad_auto_scaler && length(var.enable_irsa) > 0 ? "role" : ""
+
 }
