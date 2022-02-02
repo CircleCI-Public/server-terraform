@@ -1,6 +1,6 @@
 # Only create a nomad aws user if oidc_arn is empty map {}
 data "template_file" "nomad_asg_policy" {
-
+  count = var.nomad_auto_scaler ? 1 : 0
   template = file("${path.module}/template/nomad_asg_policy.tpl")
 
   vars = {
@@ -25,7 +25,7 @@ resource "aws_iam_user_policy" "nomad_asg_user" {
 
   name   = "${var.basename}-nomad-asg-user-policy"
   user   = aws_iam_user.nomad_asg_user[0].name
-  policy = data.template_file.nomad_asg_policy.rendered
+  policy = data.template_file.nomad_asg_policy[0].rendered
 }
 
 
@@ -50,7 +50,7 @@ resource "aws_iam_role" "nomad_role" {
 
   inline_policy {
                 name      = "${var.basename}-circleci-nomad-autoscaler-role-policy"
-                policy    = data.template_file.nomad_asg_policy.rendered
+                policy    = data.template_file.nomad_asg_policy[0].rendered
   }
   tags                    = local.tags
 }
