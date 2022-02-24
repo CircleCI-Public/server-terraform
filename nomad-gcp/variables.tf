@@ -138,3 +138,9 @@ variable "add_server_join" {
   default     = true
   description = "Includes the 'server_join' block when setting up nomad clients. Should be disabled when the nomad server endpoint is not immediately known (eg, for dedicated nomad clients)."
 }
+
+variable "enable_workload_identity" {
+  type        = bool
+  default     = false
+  description = "If true, Workload Identity will be used rather than static credentials'"
+}
