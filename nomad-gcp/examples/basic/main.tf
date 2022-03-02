@@ -63,6 +63,12 @@ variable "enable_workload_identity" {
   description = "If true, Workload Identity will be used rather than static credentials'"
 }
 
+variable "machine_type" {
+  type = string
+  default = "n2-standard-8"
+}
+
+
 provider "google-beta" {
   project = var.project
   region  = var.region
@@ -78,6 +84,7 @@ module "nomad" {
   network         = var.network
   subnetwork      = var.subnetwork
   server_endpoint = var.server_endpoint
+  machine_type    = var.machine_type
 
   unsafe_disable_mtls    = false
   assign_public_ip       = true
