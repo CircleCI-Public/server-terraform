@@ -17,6 +17,12 @@ resource "google_project_iam_member" "nomad_as_compute_autoscalers_get" {
   member = "serviceAccount:${google_service_account.nomad_as_service_account[0].email}"
 }
 
+resource "google_project_iam_member" "nomad_as_work_identity" {
+  count  = var.nomad_auto_scaler && var.enable_workload_identity ? 1 : 0
+  role   = "roles/iam.workloadIdentityUser"
+  member = "serviceAccount:${google_service_account.nomad_as_service_account[0].email}"
+}
+
 resource "google_service_account_key" "nomad-as-key" {
   count              = var.nomad_auto_scaler && !var.enable_workload_identity ? 1 : 0
   service_account_id = google_service_account.nomad_as_service_account[0].name

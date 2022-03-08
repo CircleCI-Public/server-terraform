@@ -59,6 +59,7 @@ There are more examples in the `examples` directory.
 | [google_compute_instance_group_manager](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_instance_group_manager) |
 | [google_compute_instance_template](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_instance_template) |
 | [google_compute_target_pool](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_target_pool) |
+| [google_workload_identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) |
 
 ## Inputs
 
@@ -84,6 +85,7 @@ There are more examples in the `examples` directory.
 | target\_cpu\_utilization | Target CPU utilization to trigger autoscaling | `number` | `0.5` | no |
 | unsafe\_disable\_mtls | Disables mTLS between nomad client and servers. Compromises the authenticity and confidentiality of client-server communication. Should not be set to true in any production setting | `bool` | `false` | no |
 | zone | GCP compute zone to deploy nomad clients into (e.g us-east1-a) | `string` | n/a | yes |
+| enable_workload_identity | Enable nomad service account as gcp workload identity | `bool` | `false` | no |
 
 ## Outputs
 

@@ -76,6 +76,7 @@ provider "google-beta" {
 }
 
 module "nomad" {
+  # we are using latest code for gcp nomad client here
   source = "./../../"
 
   name            = var.name
@@ -96,7 +97,7 @@ module "nomad" {
   nomad_auto_scaler = var.nomad_auto_scaler # If true, will generate a service account to be used by nomad-autoscaler. The is output in the file nomad-as-key.json
   max_replicas      = var.max_replicas      # Max and Min replica values should match the values intended to be used by nomad autoscaler in CircleCI Server
   min_replicas      = var.min_replicas
-  enable_workload_identity = var.enable_workload_identity
+  enable_workload_identity = var.enable_workload_identity     # If using GCP work identities rather than static keys in CircleCI Server
 
 }
 

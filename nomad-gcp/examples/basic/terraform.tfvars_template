@@ -1,0 +1,11 @@
+name              = "nomad"
+project           = "project123"
+region            = "asia-south1"
+zone              = "asia-south1-b"
+network           = "default"
+subnetwork        = "default"
+min_replicas      = 1
+nomad_auto_scaler = true
+server_endpoint   = "nomad.exmaple.com:4647"
+enable_workload_identity = true
+machine_type      = "n2-standard-8"
