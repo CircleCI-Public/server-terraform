@@ -64,7 +64,7 @@ variable "enable_workload_identity" {
 }
 
 variable "machine_type" {
-  type = string
+  type    = string
   default = "n2-standard-8"
 }
 
@@ -93,11 +93,11 @@ module "nomad" {
   target_cpu_utilization = 0.50
 
   # Autoscaling for Managed Instance Group
-  autoscaling_mode  = "ON"
-  nomad_auto_scaler = var.nomad_auto_scaler # If true, will generate a service account to be used by nomad-autoscaler. The is output in the file nomad-as-key.json
-  max_replicas      = var.max_replicas      # Max and Min replica values should match the values intended to be used by nomad autoscaler in CircleCI Server
-  min_replicas      = var.min_replicas
-  enable_workload_identity = var.enable_workload_identity     # If using GCP work identities rather than static keys in CircleCI Server
+  autoscaling_mode         = "ON"
+  nomad_auto_scaler        = var.nomad_auto_scaler # If true, will generate a service account to be used by nomad-autoscaler. The is output in the file nomad-as-key.json
+  max_replicas             = var.max_replicas      # Max and Min replica values should match the values intended to be used by nomad autoscaler in CircleCI Server
+  min_replicas             = var.min_replicas
+  enable_workload_identity = var.enable_workload_identity # If using GCP work identities rather than static keys in CircleCI Server
 
 }
 
