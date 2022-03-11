@@ -9,3 +9,4 @@ nomad_auto_scaler           = true
 server_endpoint             = "nomad.exmaple.com:4647"
 enable_workload_identity    = true
 machine_type                = "n2-standard-8"
+k8s_namespace               = "circleci-server" # Yes, if enable_workload_identity is true
