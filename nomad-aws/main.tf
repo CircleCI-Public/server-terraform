@@ -55,10 +55,18 @@ data "cloudinit_config" "nomad_user_data" {
   }
 }
 
+resource "aws_iam_instance_profile" "nomad_client_profile" {
+  count = var.role_name != null ? 1 : 0
+  name  = "circleci-nomad-clients-instance-profile"
+  role  = var.role_name
+}
+
 resource "aws_launch_configuration" "nomad_client_lc" {
   instance_type = var.instance_type
   image_id      = data.aws_ami.ubuntu_focal.id
   key_name      = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
+
+  iam_instance_profile = var.role_name != null ? aws_iam_instance_profile.nomad_client_profile[0].name : null
 
   root_block_device {
     volume_type = var.volume_type
