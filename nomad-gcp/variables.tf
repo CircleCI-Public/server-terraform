@@ -142,5 +142,16 @@ variable "add_server_join" {
 variable "enable_workload_identity" {
   type        = bool
   default     = false
-  description = "If true, Workload Identity will be used rather than static credentials'"
+  description = "If true, Workload Identity will be used rather than static credentials"
+}
+
+variable "k8s_namespace" {
+  type        = string
+  default     = "circleci-server"
+  description = "If enable_workload_identity is true, provide application k8s namespace"
+}
+
+variable "project" {
+  type        = string
+  description = "GCP Project"
 }
