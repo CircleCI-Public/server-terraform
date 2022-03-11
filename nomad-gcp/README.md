@@ -86,6 +86,8 @@ There are more examples in the `examples` directory.
 | unsafe\_disable\_mtls | Disables mTLS between nomad client and servers. Compromises the authenticity and confidentiality of client-server communication. Should not be set to true in any production setting | `bool` | `false` | no |
 | zone | GCP compute zone to deploy nomad clients into (e.g us-east1-a) | `string` | n/a | yes |
 | enable_workload_identity | Enable nomad service account as gcp workload identity | `bool` | `false` | no |
+| project | GCP Project ID | `string` | n/a | Yes, if enable_workload_identity is true |
+| k8s_namespace | k8s namespace where application is installed | `string` | `circleci-server` | Yes, if enable_workload_identity is true |
 
 ## Outputs
 
