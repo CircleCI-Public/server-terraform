@@ -153,5 +153,6 @@ variable "k8s_namespace" {
 
 variable "project" {
   type        = string
+  default     = "project-id"
   description = "GCP Project ID"
 }
