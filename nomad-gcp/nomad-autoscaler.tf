@@ -28,7 +28,7 @@ resource "google_service_account_iam_binding" "nomad_as_work_identity_k8s" {
   service_account_id = google_service_account.nomad_as_service_account[0].name
   role               = "roles/iam.workloadIdentityUser"
   members = [
-    "serviceAccount:${var.project}.svc.id.goog[${var.k8s_namespace}/nomad-autoscaler]",
+    "serviceAccount:${data.google_project.project.project_id}.svc.id.goog[${var.k8s_namespace}/nomad-autoscaler]",
   ]
 }
 
