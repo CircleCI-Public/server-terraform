@@ -51,7 +51,8 @@ module "nomad" {
 
   # Autoscaling for Managed Instance Group
   nomad_auto_scaler        = true       # If true, will generate a service account to be used by nomad-autoscaler. The is output in the file nomad-as-key.json if enable_workload_identity is false
-  enable_workload_identity = true       # If using GCP work identities rather than static keys in CircleCI Server
+  enable_workload_identity = false       # If using GCP work identities rather than static keys in CircleCI Server
+  k8s_namespace            = "circleci-server"            # If enable_workload_identity is true, provide k8s_namespace else leave as is
 }
 
 output "module" {
