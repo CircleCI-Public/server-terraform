@@ -68,7 +68,6 @@ variable "machine_type" {
   default = "n2-standard-8"
 }
 
-
 provider "google-beta" {
   project = var.project
   region  = var.region
@@ -98,7 +97,6 @@ module "nomad" {
   max_replicas             = var.max_replicas      # Max and Min replica values should match the values intended to be used by nomad autoscaler in CircleCI Server
   min_replicas             = var.min_replicas
   enable_workload_identity = var.enable_workload_identity # If using GCP work identities rather than static keys in CircleCI Server
-
 }
 
 output "module" {

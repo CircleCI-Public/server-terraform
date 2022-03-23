@@ -150,9 +150,3 @@ variable "k8s_namespace" {
   default     = "circleci-server"
   description = "If enable_workload_identity is true, provide application k8s namespace"
 }
-
-variable "project" {
-  type        = string
-  default     = "project-id"
-  description = "GCP Project ID"
-}
