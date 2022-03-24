@@ -117,7 +117,7 @@ variable "enable_irsa" {
 
 
 locals {
-  tags = merge ({ "environment" = var.basename}, var.instance_tags)
+  tags = merge({ "environment" = var.basename }, var.instance_tags)
 
   # If nomad_auto_scaler is true and enable_irsa is empty - set autoscaler_type=user
   # If nomad_auto_scaler is true and enable_irsa is not empty - set autoscaler_type=role

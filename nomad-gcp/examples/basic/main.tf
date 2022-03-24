@@ -63,11 +63,16 @@ variable "enable_workload_identity" {
   description = "If true, Workload Identity will be used rather than static credentials'"
 }
 
+variable "k8s_namespace" {
+  type        = string
+  default     = "circleci-server"
+  description = "If enable_workload_identity is true, provide application k8s namespace"
+}
+
 variable "machine_type" {
   type    = string
   default = "n2-standard-8"
 }
-
 
 provider "google-beta" {
   project = var.project
@@ -98,7 +103,7 @@ module "nomad" {
   max_replicas             = var.max_replicas      # Max and Min replica values should match the values intended to be used by nomad autoscaler in CircleCI Server
   min_replicas             = var.min_replicas
   enable_workload_identity = var.enable_workload_identity # If using GCP work identities rather than static keys in CircleCI Server
-
+  k8s_namespace            = var.k8s_namespace            # If enable_workload_identity is true, provide k8s_namespace else leave as is
 }
 
 output "module" {
