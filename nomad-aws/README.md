@@ -25,7 +25,7 @@ provider "aws" {
 
 module "nomad_clients" {
   # We strongly recommend pinning the version using ref=<<release tag>> as is done here
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=3.2.0"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=3.4.0"
 
   # Number of nomad clients to run
   nodes = 4
@@ -44,18 +44,15 @@ module "nomad_clients" {
     "vendor" = "circleci"
     "team"   = "sre"
   }
+  nomad_auto_scaler = false # If true, terraform will generate an IAM user to be used by nomad-autoscaler in CircleCI Server.
+
+  # enable_irsa input will allow K8s service account to use IAM roles, you have to replace REGION, ACCOUNT_ID, OIDC_ID and K8S_NAMESPACE with appropriate value
+  # for more info, visit - https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html
+  enable_irsa = {}
 }
 
-output "nomad_server_cert" {
-  value = module.nomad_clients.nomad_server_cert
-}
-
-output "nomad_server_key" {
-  value = module.nomad_clients.nomad_server_key
-}
-
-output "nomad_ca" {
-  value = module.nomad_clients.nomad_tls_ca
+output "nomad" {
+  value = module.nomad_clients
 }
 ```
 

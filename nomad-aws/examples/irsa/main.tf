@@ -32,7 +32,7 @@ module "nomad-aws" {
   source = "../.."
 
   # prefix to add in AWS resources name
-  basename  = "cci"
+  basename = "cci"
 
   # Number of nomad clients to run
   nodes = 4
