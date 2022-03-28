@@ -13,7 +13,8 @@ provider "aws" {
 }
 
 # An example VPC for demonstration. This might already exist if you deployed
-# server in a preexisting VPC and want your nomad clients to run there.
+# server in a preexisting VPC and want your nomad clients to run there,
+# In that case, you should make the appropriate changes in this file.
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
@@ -29,6 +30,9 @@ module "vpc" {
 
 module "nomad-aws" {
   source = "../.."
+
+  # prefix to add in AWS resources name
+  basename  = "cci"
 
   # Number of nomad clients to run
   nodes = 4
@@ -51,8 +55,16 @@ module "nomad-aws" {
     module.vpc.private_subnets[0]
   ]
 
-  nomad_auto_scaler = false # If true, terraform will generate an IAM user to be used by nomad-autoscaler in CircleCI Server. The keys will be available in terraform's output
-  max_nodes         = 5     # the max number of clients to scale to. Must be greater than our equal to the nodes set above.
+  nomad_auto_scaler = true # If true, terraform will generate an IAM user to be used by nomad-autoscaler in CircleCI Server.
+  max_nodes         = 5    # the max number of clients to scale to. Must be greater than our equal to the nodes set above.
+
+  # enable_irsa input will allow K8s service account to use IAM roles, you have to replace REGION, ACCOUNT_ID, OIDC_ID and K8S_NAMESPACE with appropriate value
+  # for more info, visit - https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html
+  enable_irsa = {
+    oidc_principal_id   = "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>"
+    oidc_eks_variable   = "oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>:sub"
+    k8s_service_account = "system:serviceaccount:<K8S_NAMESPACE>:nomad-autoscaler"
+  }
 }
 
 output "nomad_module" {

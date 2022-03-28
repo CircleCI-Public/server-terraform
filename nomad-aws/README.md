@@ -59,7 +59,10 @@ output "nomad_ca" {
 }
 ```
 
-There are more examples in the `examples` directory.
+There are more examples in the [examples](./examples/) directory.
+- [Basic example](./examples/basic/main.tf)
+- [IRSA example](./examples/irsa/main.tf)
+
 
 ## Inputs
 
@@ -82,6 +85,7 @@ There are more examples in the `examples` directory.
 | subnet | Subnet ID | `string` | `""` | yes* |
 | subnets | Subnet IDs | `list(string)` | `[""]` | yes* |
 | vpc\_id | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |
+| enable_irsa | Enable IAM Roles for K8s service account | `map` | `{}` | no |
 
 * Note: `subnet` or `subnets` is required, but not both. The use of `subnet` will supersede `subnets`.
 
