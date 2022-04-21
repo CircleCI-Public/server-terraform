@@ -33,6 +33,16 @@ variable "blocked_cidrs" {
     EOF
 }
 
+variable "docker_network_cidrs" {
+  type        = string
+  description = <<-EOF
+    List of CIDR blocks to be used in docker networks when running job on nomad client.
+    These CIDR block should not be the same as your infrastruture CIDR block.
+    i.e - "10.10.0.0/16" or "172.32.0.0/16"
+    EOF
+  default = "10.10.0.0/16"
+}
+
 variable "dns_server" {
   type        = string
   description = "If the IP address of your VPC DNS server is within one of the blocked CIDR blocks you can create an exemption by entering the IP address for it here"

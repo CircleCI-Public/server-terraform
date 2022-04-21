@@ -49,6 +49,7 @@ data "cloudinit_config" "nomad_user_data" {
         client_tls_key        = var.enable_mtls ? module.nomad_tls[0].nomad_client_key : ""
         tls_ca                = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""
         blocked_cidrs         = var.blocked_cidrs
+        docker_network_cidrs  = var.docker_network_cidrs
         dns_server            = var.dns_server
       }
     )
