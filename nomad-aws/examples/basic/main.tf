@@ -45,9 +45,9 @@ module "nomad-aws" {
   dns_server = "10.0.0.2"
 
   blocked_cidrs = [
-    # Block access to private subnet. You may which to do this if you
-    # Kubernetes cluster is some other resource you don't want your CI jobs to
-    # access is running there.
+    # Block access to private subnet. You may wish to do this if your
+    # Kubernetes cluster (or some other resources you don't want your CI jobs to
+    # access) is running there.
     module.vpc.private_subnets[0]
   ]
 
