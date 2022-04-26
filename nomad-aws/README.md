@@ -56,6 +56,57 @@ output "nomad" {
 }
 ```
 
+Use latest codebase:
+
+```Terraform
+terraform {
+  required_version = ">= 0.15.4"
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+      version = "~>3.0"
+    }
+  }
+}
+
+provider "aws" {
+  # Your region of choice here
+  region = "us-west-1"
+}
+
+module "nomad_clients" {
+  # We strongly recommend pinning the version using ref=<<release tag>> as is done here
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=3.4.0"
+
+  # Number of nomad clients to run
+  nodes = 4
+
+  subnet = "<< ID of subnet you want to run nomad clients in >>"
+  vpc_id = "<< ID of VPC you want to run nomad client in >>"
+
+  server_endpoint = "<< hostname:port of nomad load balancer >>"
+
+  dns_server = "<< ip address of your VPC DNS server >>"
+  blocked_cidrs = [
+    "<< cidr blocks you’d like to block access to e.g 10.0.1.0/24 >>"
+  ]
+  docker_network_cidr = "<< cidr block you’d like to use in docker within nomad client, should not be same as subnet cide block >>"   
+
+  instance_tags = {
+    "vendor" = "circleci"
+    "team"   = "sre"
+  }
+  nomad_auto_scaler = false # If true, terraform will generate an IAM user to be used by nomad-autoscaler in CircleCI Server.
+
+  # enable_irsa input will allow K8s service account to use IAM roles, you have to replace REGION, ACCOUNT_ID, OIDC_ID and K8S_NAMESPACE with appropriate value
+  # for more info, visit - https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html
+  enable_irsa = {}
+}
+
+output "nomad" {
+  value = module.nomad_clients
+}
+
 There are more examples in the [examples](./examples/) directory.
 - [Basic example](./examples/basic/main.tf)
 - [IRSA example](./examples/irsa/main.tf)
@@ -67,7 +118,7 @@ There are more examples in the [examples](./examples/) directory.
 |------|-------------|------|---------|:--------:|
 | basename | Name used as prefix for AWS resources | `string` | `""` | no |
 | blocked\_cidrs | List of CIDR blocks to block access to from within jobs, e.g. your K8s nodes.<br>You won't want to block access to external VMs here.<br>It's okay when your dns\_server is within a blocked CIDR block, you can use var.dns\_server to create an exemption. | `list(string)` | n/a | yes |
-| docker_network_cidrs | CIDR block to use in Docker Network, Should not be same as subnetworks CIDR | `string` | `10.10.0.0/16` | no |
+| docker_network_cidr | CIDR block to use in Docker Network, Should not be same as subnetworks CIDR | `string` | `10.10.0.0/16` | no |
 | dns\_server | If the IP address of your VPC DNS server is within one of the blocked CIDR blocks you can create an exemption by entering the IP address for it here | `string` | n/a | yes |
 | enable\_mtls | MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended. | `bool` | `true` | no |
 | instance\_type | AWS Node type for instance. Must be amd64 linux type.  The instance type must be large enough to fit the [resource classes](https://circleci.com/docs/2.0/executor-types/#available-docker-resource-classes) required.  Choosing smaller instance types is an opportunity for cost savings. | `string` | `"t3a.2xlarge"` | no |

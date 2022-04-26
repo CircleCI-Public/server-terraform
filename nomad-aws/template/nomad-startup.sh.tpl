@@ -56,7 +56,7 @@ cat <<EOT > /etc/docker/daemon.json
 {
     "userns-remap": "default",
     "default-address-pools": [
-        { "base":"${docker_network_cidrs}" , "size":24 }
+        { "base":"${docker_network_cidr}" , "size":24 }
     ]
 }
 EOT

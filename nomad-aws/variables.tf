@@ -33,7 +33,7 @@ variable "blocked_cidrs" {
     EOF
 }
 
-variable "docker_network_cidrs" {
+variable "docker_network_cidr" {
   type        = string
   description = <<-EOF
     List of CIDR blocks to be used in docker networks when running job on nomad client.
