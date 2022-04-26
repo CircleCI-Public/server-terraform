@@ -40,7 +40,7 @@ variable "docker_network_cidrs" {
     These CIDR block should not be the same as your infrastruture CIDR block.
     i.e - "10.10.0.0/16" or "172.32.0.0/16"
     EOF
-  default = "10.10.0.0/16"
+  default     = "10.10.0.0/16"
 }
 
 variable "dns_server" {
