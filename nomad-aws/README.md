@@ -52,7 +52,8 @@ module "nomad_clients" {
 }
 
 output "nomad" {
-  value = module.nomad_clients
+  value     = module.nomad_clients
+  sensitive = true
 }
 ```
 
