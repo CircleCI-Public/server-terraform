@@ -40,11 +40,11 @@ resource "google_compute_autoscaler" "nomad" {
 }
 
 resource "google_compute_instance_template" "nomad" {
-  name_prefix    = "nomad"
+  name_prefix    = "${var.name}-nomad"
   machine_type   = var.machine_type
   can_ip_forward = false
 
-  tags = ["nomad", "circleci-server"]
+  tags = ["nomad", "circleci-server", var.name]
 
   disk {
     source_image = data.google_compute_image.ubuntu_2004.self_link
@@ -63,6 +63,7 @@ resource "google_compute_instance_template" "nomad" {
       client_tls_cert       = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_cert
       client_tls_key        = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_key
       tls_ca                = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_tls_ca
+      docker_network_cidrs  = var.docker_network_cidrs
     }
   )
 
@@ -111,7 +112,7 @@ resource "google_compute_instance_group_manager" "nomad" {
   }
 
   target_pools       = [google_compute_target_pool.nomad.id]
-  base_instance_name = "nomad"
+  base_instance_name = "${var.name}-nomad"
 }
 
 data "google_compute_image" "ubuntu_2004" {
