@@ -76,7 +76,7 @@ provider "aws" {
 
 module "nomad_clients" {
   # We strongly recommend pinning the version using ref=<<release tag>> as is done here
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=3.4.0"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws"
 
   # Number of nomad clients to run
   nodes = 4
@@ -106,6 +106,7 @@ module "nomad_clients" {
 output "nomad" {
   value = module.nomad_clients
 }
+```
 
 There are more examples in the [examples](./examples/) directory.
 - [Basic example](./examples/basic/main.tf)
