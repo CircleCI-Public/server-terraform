@@ -94,13 +94,13 @@ module "nomad" {
   # we are using latest code for gcp nomad client here
   source = "./../../"
 
-  name            = var.name
-  zone            = var.zone
-  region          = var.region
-  network         = var.network
-  subnetwork      = var.subnetwork
-  server_endpoint = var.server_endpoint
-  machine_type    = var.machine_type
+  name                = var.name
+  zone                = var.zone
+  region              = var.region
+  network             = var.network
+  subnetwork          = var.subnetwork
+  server_endpoint     = var.server_endpoint
+  machine_type        = var.machine_type
   docker_network_cidr = var.docker_network_cidr
 
   unsafe_disable_mtls    = false
