@@ -90,7 +90,7 @@ module "nomad_clients" {
   blocked_cidrs = [
     "<< cidr blocks you’d like to block access to e.g 10.0.1.0/24 >>"
   ]
-  docker_network_cidr = "<< cidr block you’d like to use in docker within nomad client, should not be same as subnet cide block >>"   
+  docker_network_cidr = "<< cidr block you’d like to use in docker within nomad client, should not be same as subnet cidr block >>"
 
   instance_tags = {
     "vendor" = "circleci"

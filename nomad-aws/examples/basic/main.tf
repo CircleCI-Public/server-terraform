@@ -51,6 +51,9 @@ module "nomad-aws" {
     module.vpc.private_subnets[0]
   ]
 
+  # cidr block you’d like to use in docker within nomad client, should not be same as subnet cidr block
+  docker_network_cidr = "192.168.0.0/16"
+
   nomad_auto_scaler = false # If true, terraform will generate an IAM user to be used by nomad-autoscaler in CircleCI Server. The keys will be available in terraform's output
   max_nodes         = 5     # the max number of clients to scale to. Must be greater than our equal to the nodes set above.
 }
