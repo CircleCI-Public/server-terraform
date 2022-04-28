@@ -48,7 +48,7 @@ variable "docker_network_cidr" {
   description = <<-EOF
     IP CIDR block to be used in docker networks when running job on nomad client.
     This CIDR block should not be the same as your infrastruture CIDR block.
-    i.e - "10.10.0.0/16" or "172.32.0.0/16"
+    i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16"
     EOF
   default     = "10.10.0.0/16"
 }
