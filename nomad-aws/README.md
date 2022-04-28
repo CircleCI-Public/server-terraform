@@ -25,7 +25,7 @@ provider "aws" {
 
 module "nomad_clients" {
   # We strongly recommend pinning the version using ref=<<release tag>> as is done here
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=3.4.0"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=3.4.1"
 
   # Number of nomad clients to run
   nodes = 4
@@ -39,6 +39,7 @@ module "nomad_clients" {
   blocked_cidrs = [
     "<< cidr blocks you’d like to block access to e.g 10.0.1.0/24 >>"
   ]
+  docker_network_cidr = "<< IP cidr you’d like to use in docker within nomad client, should not be same as subnet cidr block >>"
 
   instance_tags = {
     "vendor" = "circleci"
@@ -75,7 +76,7 @@ provider "aws" {
 }
 
 module "nomad_clients" {
-  # We strongly recommend pinning the version using ref=<<release tag>> as is done here
+  # we are using latest code for aws nomad client here, but We strongly recommend pinning the version using ref=<<release tag>> as in above example
   source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws"
 
   # Number of nomad clients to run
@@ -90,7 +91,7 @@ module "nomad_clients" {
   blocked_cidrs = [
     "<< cidr blocks you’d like to block access to e.g 10.0.1.0/24 >>"
   ]
-  docker_network_cidr = "<< cidr block you’d like to use in docker within nomad client, should not be same as subnet cidr block >>"
+  docker_network_cidr = "<< IP cidr you’d like to use in docker within nomad client, should not be same as subnet cidr block >>"
 
   instance_tags = {
     "vendor" = "circleci"
