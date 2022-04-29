@@ -74,16 +74,6 @@ variable "machine_type" {
   default = "n2-standard-8"
 }
 
-variable "docker_network_cidr" {
-  type        = string
-  description = <<-EOF
-    IP CIDR block to be used in docker networks when running job on nomad client.
-    This CIDR block should not be the same as your infrastruture CIDR block.
-    i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16"
-    EOF
-  default     = "10.10.0.0/16"
-}
-
 provider "google-beta" {
   project = var.project
   region  = var.region
@@ -94,14 +84,13 @@ module "nomad" {
   # we are using latest code for gcp nomad client here
   source = "./../../"
 
-  name                = var.name
-  zone                = var.zone
-  region              = var.region
-  network             = var.network
-  subnetwork          = var.subnetwork
-  server_endpoint     = var.server_endpoint
-  machine_type        = var.machine_type
-  docker_network_cidr = var.docker_network_cidr
+  name            = var.name
+  zone            = var.zone
+  region          = var.region
+  network         = var.network
+  subnetwork      = var.subnetwork
+  server_endpoint = var.server_endpoint
+  machine_type    = var.machine_type
 
   unsafe_disable_mtls    = false
   assign_public_ip       = true
