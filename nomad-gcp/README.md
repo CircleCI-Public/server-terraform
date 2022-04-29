@@ -29,39 +29,6 @@ output "module" {
 }
 ```
 
-Using main branch codebase:
-
-```Terraform
-provider "google-beta" {
-  project = "my-project"
-  region  = "us-east1"
-  zone    = "us-east1-a"
-}
-
-module "nomad" {
-  # we are using latest code for gcp nomad client here, but We strongly recommend pinning the version using ref=<<release tag>> as in above example
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-gcp"
-
-  name            = "test"
-  zone            = "us-east1-a"
-  region          = "us-east1"
-  network         = "default"
-  subnetwork      = "default"
-  server_endpoint = "nomad.example.com:4647"
-  docker_network_cidr = "10.10.0.0/16"             # this CIDR should not be same as subnetwork CIDR
-
-
-  # Autoscaling for Managed Instance Group
-  nomad_auto_scaler        = true       # If true, will generate a service account to be used by nomad-autoscaler. The is output in the file nomad-as-key.json if enable_workload_identity is false
-  enable_workload_identity = false       # If using GCP work identities rather than static keys in CircleCI Server
-  k8s_namespace            = "circleci-server"            # If enable_workload_identity is true, provide k8s_namespace else leave as is
-}
-
-output "module" {
-  value = module.nomad
-}
-```
-
 There are more examples in the [examples](./examples/) directory.
 
 ## Requirements

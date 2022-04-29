@@ -40,11 +40,11 @@ resource "google_compute_autoscaler" "nomad" {
 }
 
 resource "google_compute_instance_template" "nomad" {
-  name_prefix    = "${var.name}-nomad"
+  name_prefix    = "nomad"
   machine_type   = var.machine_type
   can_ip_forward = false
 
-  tags = ["nomad", "circleci-server", var.name]
+  tags = ["nomad", "circleci-server"]
 
   disk {
     source_image = data.google_compute_image.ubuntu_2004.self_link
@@ -112,7 +112,7 @@ resource "google_compute_instance_group_manager" "nomad" {
   }
 
   target_pools       = [google_compute_target_pool.nomad.id]
-  base_instance_name = "${var.name}-nomad"
+  base_instance_name = "nomad"
 }
 
 data "google_compute_image" "ubuntu_2004" {

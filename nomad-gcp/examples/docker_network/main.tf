@@ -1,4 +1,4 @@
-###  If your VPC is falling in these 2 CIDR range - "172.32.0.0/16" or "192.168.0.0/16" 
+###  If your VPC is falling in this CIDR range - "10.10.0.0/16"
 ###  You must need to use different CIDR for "docker_network_cidr" to avoid the IP overlapping issue
 ###
 
@@ -33,7 +33,7 @@ variable "subnetwork" {
 
 variable "server_endpoint" {
   type    = string
-  default = "nomad.example.com.com:4647"
+  default = "nomad.example.com:4647"
 }
 
 
