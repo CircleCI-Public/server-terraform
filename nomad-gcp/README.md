@@ -29,7 +29,7 @@ output "module" {
 }
 ```
 
-Use v3.4.1 codebase:
+Using main branch codebase:
 
 ```Terraform
 provider "google-beta" {
@@ -40,7 +40,7 @@ provider "google-beta" {
 
 module "nomad" {
   # we are using latest code for gcp nomad client here, but We strongly recommend pinning the version using ref=<<release tag>> as in above example
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-gcp?ref=3.4.1"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-gcp"
 
   name            = "test"
   zone            = "us-east1-a"
