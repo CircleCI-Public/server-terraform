@@ -5,7 +5,7 @@ resource "random_string" "key_suffix" {
 
 resource "aws_key_pair" "ssh_key" {
   count      = var.ssh_key != null ? 1 : 0
-  key_name   = "${var.basename}-circleci-server-nomad-ssh-key-${random_string.key_suffix.result}"
+  key_name   = "circleci-server-nomad-ssh-key-${random_string.key_suffix.result}"
   public_key = var.ssh_key
 }
 

@@ -19,10 +19,10 @@ module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
   name                 = "nomad-vpc"
-  cidr                 = "10.0.0.0/16"
+  cidr                 = "192.168.0.0/16"
   azs                  = ["us-east-1a"]
-  public_subnets       = ["10.0.0.0/24"]
-  private_subnets      = ["10.0.1.0/24"]
+  public_subnets       = ["192.168.0.0/24"]
+  private_subnets      = ["192.168.1.0/24"]
   enable_nat_gateway   = true
   single_nat_gateway   = true
   enable_dns_hostnames = true
@@ -46,7 +46,7 @@ module "nomad-aws" {
 
   # AWS DNS Server runs on the third IP address of the VPC block. We define it
   # here to allow access to if from the Nomad clients.
-  dns_server = "10.0.0.2"
+  dns_server = "192.168.0.2"
 
   blocked_cidrs = [
     # Block access to private subnet. You may which to do this if you
@@ -54,9 +54,6 @@ module "nomad-aws" {
     # access is running there.
     module.vpc.private_subnets[0]
   ]
-
-  # cidr block you’d like to use in docker within nomad client, should not be same as subnet cidr block
-  docker_network_cidr = "192.168.0.0/16"
 
   nomad_auto_scaler = true # If true, terraform will generate an IAM user to be used by nomad-autoscaler in CircleCI Server.
   max_nodes         = 5    # the max number of clients to scale to. Must be greater than our equal to the nodes set above.
