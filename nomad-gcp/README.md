@@ -29,37 +29,6 @@ output "module" {
 }
 ```
 
-Use latest codebase:
-
-```Terraform
-provider "google-beta" {
-  project = "my-project"
-  region  = "us-east1"
-  zone    = "us-east1-a"
-}
-
-module "nomad" {
-  # we are using latest code for gcp nomad client here, but We strongly recommend pinning the version using ref=<<release tag>> as in above example
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-gcp"
-
-  name            = "test"
-  zone            = "us-east1-a"
-  region          = "us-east1"
-  network         = "default"
-  subnetwork      = "default"
-  server_endpoint = "nomad.example.com:4647"
-
-  # Autoscaling for Managed Instance Group
-  nomad_auto_scaler        = true       # If true, will generate a service account to be used by nomad-autoscaler. The is output in the file nomad-as-key.json if enable_workload_identity is false
-  enable_workload_identity = false       # If using GCP work identities rather than static keys in CircleCI Server
-  k8s_namespace            = "circleci-server"            # If enable_workload_identity is true, provide k8s_namespace else leave as is
-}
-
-output "module" {
-  value = module.nomad
-}
-```
-
 There are more examples in the [examples](./examples/) directory.
 
 ## Requirements
@@ -100,6 +69,7 @@ There are more examples in the [examples](./examples/) directory.
 | autoscaling\_mode | Autoscaler mode. Can be<br>- "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules<br>- "OFF": Autoscaler will never scale up or down<br>- "ONLY\_UP": Autoscaler will only scale up (default)<br>Warning: jobs may be interrupted on scale down. Only select "ON" if<br>interruptions are acceptible for your use case. | `string` | `"ONLY_UP"` | no |
 | autoscaling\_schedules | Autoscaler scaling schedules. Accepts the same arguments are documented<br>upstream here: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_autoscaler#scaling_schedules | <pre>list(object({<br>    name                  = string<br>    min_required_replicas = number<br>    schedule              = string<br>    time_zone             = string<br>    duration_sec          = number<br>    disabled              = bool<br>    description           = string<br>  }))</pre> | `[]` | no |
 | blocked\_cidrs | List of CIDR blocks to block access to from inside nomad jobs | `list(string)` | `[]` | no |
+| docker_network_cidr | CIDR block to use in Docker Network, Should not be same as subnetworks CIDR | `string` | `10.10.0.0/16` | no |
 | disk\_size\_gb | Root disk size in GB | `number` | `300` | no |
 | disk\_type | Root disk type. Can be 'pd-standard', 'pd-ssd', 'pd-balanced' or 'local-ssd' | `string` | `"pd-ssd"` | no |
 | machine\_type | Instance type for nomad clients.  The machine type must be large enough to fit the [resource classes](https://circleci.com/docs/2.0/executor-types/#available-docker-resource-classes) required.  Choosing smaller instance types is an opportunity for cost savings. | `string` | `"n2d-standard-8"` | no |

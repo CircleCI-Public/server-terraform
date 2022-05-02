@@ -43,6 +43,16 @@ variable "blocked_cidrs" {
   description = "List of CIDR blocks to block access to from inside nomad jobs"
 }
 
+variable "docker_network_cidr" {
+  type        = string
+  description = <<-EOF
+    IP CIDR block to be used in docker networks when running job on nomad client.
+    This CIDR block should not be the same as your VPC CIDR block.
+    i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16"
+    EOF
+  default     = "10.10.0.0/16"
+}
+
 variable "min_replicas" {
   type        = number
   default     = 1
