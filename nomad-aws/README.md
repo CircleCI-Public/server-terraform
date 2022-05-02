@@ -68,6 +68,7 @@ There are more examples in the [examples](./examples/) directory.
 |------|-------------|------|---------|:--------:|
 | basename | Name used as prefix for AWS resources | `string` | `""` | no |
 | blocked\_cidrs | List of CIDR blocks to block access to from within jobs, e.g. your K8s nodes.<br>You won't want to block access to external VMs here.<br>It's okay when your dns\_server is within a blocked CIDR block, you can use var.dns\_server to create an exemption. | `list(string)` | n/a | yes |
+| docker_network_cidr | CIDR block to use in Docker Network, Should not be same as subnetworks CIDR | `string` | `10.10.0.0/16` | no |
 | dns\_server | If the IP address of your VPC DNS server is within one of the blocked CIDR blocks you can create an exemption by entering the IP address for it here | `string` | n/a | yes |
 | enable\_mtls | MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended. | `bool` | `true` | no |
 | instance\_type | AWS Node type for instance. Must be amd64 linux type.  The instance type must be large enough to fit the [resource classes](https://circleci.com/docs/2.0/executor-types/#available-docker-resource-classes) required.  Choosing smaller instance types is an opportunity for cost savings. | `string` | `"t3a.2xlarge"` | no |

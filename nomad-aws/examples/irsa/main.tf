@@ -19,10 +19,10 @@ module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
   name                 = "nomad-vpc"
-  cidr                 = "10.0.0.0/16"
+  cidr                 = "192.168.0.0/16"
   azs                  = ["us-east-1a"]
-  public_subnets       = ["10.0.0.0/24"]
-  private_subnets      = ["10.0.1.0/24"]
+  public_subnets       = ["192.168.0.0/24"]
+  private_subnets      = ["192.168.1.0/24"]
   enable_nat_gateway   = true
   single_nat_gateway   = true
   enable_dns_hostnames = true
@@ -46,7 +46,7 @@ module "nomad-aws" {
 
   # AWS DNS Server runs on the third IP address of the VPC block. We define it
   # here to allow access to if from the Nomad clients.
-  dns_server = "10.0.0.2"
+  dns_server = "192.168.0.2"
 
   blocked_cidrs = [
     # Block access to private subnet. You may which to do this if you
