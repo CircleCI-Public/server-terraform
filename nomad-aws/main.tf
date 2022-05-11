@@ -62,7 +62,7 @@ resource "aws_iam_instance_profile" "nomad_client_profile" {
   role  = var.role_name
 }
 
-resource "aws_launch_template" "nomad_client" {
+resource "aws_launch_template" "nomad_clients" {
   name_prefix   = "${var.basename}-nomad-clients-"
   instance_type = var.instance_type
   image_id      = data.aws_ami.ubuntu_focal.id
@@ -87,8 +87,12 @@ resource "aws_launch_template" "nomad_client" {
   vpc_security_group_ids = length(var.security_group_id) != 0 ? var.security_group_id : local.nomad_security_groups
   user_data              = data.cloudinit_config.nomad_user_data.rendered
 
-  lifecycle {
-    create_before_destroy = true
+  dynamic "tag_specifications" {
+    for_each = ["instance", "volume"]
+    content {
+      resource_type = tag_specifications.value
+      tags          = var.instance_tags
+    }
   }
 }
 
@@ -101,7 +105,7 @@ resource "aws_autoscaling_group" "clients_asg" {
   force_delete        = true
 
   launch_template {
-    id      = aws_launch_template.nomad_client.id
+    id      = aws_launch_template.nomad_clients.id
     version = var.launch_template_version
   }
 

@@ -98,6 +98,7 @@ variable "instance_tags" {
   type = map(string)
   default = {
     "vendor" = "circleci"
+    "team"   = "server"
   }
 }
 
