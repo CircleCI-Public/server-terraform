@@ -101,6 +101,12 @@ variable "instance_tags" {
   }
 }
 
+variable "launch_template_version" {
+  type        = string
+  description = "Specific version of the instance template"
+  default     = "$Default"
+}
+
 variable "role_name" {
   type        = string
   description = "Name of the role to add to the instance profile"

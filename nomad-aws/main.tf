@@ -62,35 +62,52 @@ resource "aws_iam_instance_profile" "nomad_client_profile" {
   role  = var.role_name
 }
 
-resource "aws_launch_configuration" "nomad_client_lc" {
+resource "aws_launch_template" "nomad_clients" {
+  name_prefix   = "${var.basename}-nomad-clients-"
   instance_type = var.instance_type
   image_id      = data.aws_ami.ubuntu_focal.id
   key_name      = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
 
-  iam_instance_profile = var.role_name != null ? aws_iam_instance_profile.nomad_client_profile[0].name : null
+  block_device_mappings {
+    device_name = "/dev/sda1"
 
-  root_block_device {
-    volume_type = var.volume_type
-    volume_size = "100"
+    ebs {
+      volume_type = var.volume_type
+      volume_size = 100
+    }
   }
 
-  security_groups = length(var.security_group_id) != 0 ? var.security_group_id : local.nomad_security_groups
+  dynamic "iam_instance_profile" {
+    for_each = var.role_name != null ? [1] : []
+    content {
+      arn = aws_iam_instance_profile.nomad_client_profile[0].arn
+    }
+  }
 
-  user_data_base64 = data.cloudinit_config.nomad_user_data.rendered
+  vpc_security_group_ids = length(var.security_group_id) != 0 ? var.security_group_id : local.nomad_security_groups
+  user_data              = data.cloudinit_config.nomad_user_data.rendered
 
-  lifecycle {
-    create_before_destroy = true
+  dynamic "tag_specifications" {
+    for_each = ["instance", "volume"]
+    content {
+      resource_type = tag_specifications.value
+      tags          = var.instance_tags
+    }
   }
 }
 
 resource "aws_autoscaling_group" "clients_asg" {
-  name                 = "${var.basename}_circleci_nomad_clients_asg"
-  vpc_zone_identifier  = var.subnet != "" ? [var.subnet] : var.subnets
-  launch_configuration = aws_launch_configuration.nomad_client_lc.name
-  max_size             = var.max_nodes
-  min_size             = var.nomad_auto_scaler ? 1 : 0 # When using nomad-autoscaler, the min nodes can't be less than 1. For more info: https://github.com/hashicorp/nomad-autoscaler/issues/530
-  desired_capacity     = var.nodes
-  force_delete         = true
+  name                = "${var.basename}_circleci_nomad_clients_asg"
+  vpc_zone_identifier = var.subnet != "" ? [var.subnet] : var.subnets
+  max_size            = var.max_nodes
+  min_size            = var.nomad_auto_scaler ? 1 : 0 # When using nomad-autoscaler, the min nodes can't be less than 1. For more info: https://github.com/hashicorp/nomad-autoscaler/issues/530
+  desired_capacity    = var.nodes
+  force_delete        = true
+
+  launch_template {
+    id      = aws_launch_template.nomad_clients.id
+    version = var.launch_template_version
+  }
 
   tag {
     key                 = "Name"
