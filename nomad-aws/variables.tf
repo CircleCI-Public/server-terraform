@@ -104,7 +104,7 @@ variable "instance_tags" {
 variable "launch_template_version" {
   type        = string
   description = "Specific version of the instance template"
-  default     = "$Default"
+  default     = "$Latest"
 }
 
 variable "role_name" {
