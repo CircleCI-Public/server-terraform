@@ -33,7 +33,7 @@ variable "subnetwork" {
 
 variable "server_endpoint" {
   type    = string
-  default = "nomad.example.com:4647"
+  default = "example.com:4647"
 }
 
 
