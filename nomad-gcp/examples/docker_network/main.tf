@@ -33,7 +33,7 @@ variable "subnetwork" {
 
 variable "server_endpoint" {
   type    = string
-  default = "nomad.example.com:4647"
+  default = "example.com:4647"
 }
 
 
@@ -64,7 +64,7 @@ variable "name" {
 variable "enable_workload_identity" {
   type        = bool
   default     = false
-  description = "If true, Workload Identity will be used rather than static credentials'"
+  description = "If true, Workload Identity will be used rather than static credentials. Ensure Workload Identities are first enabled on your GKE cluster: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity"
 }
 
 variable "k8s_namespace" {

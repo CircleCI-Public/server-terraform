@@ -21,7 +21,7 @@ module "nomad" {
   zone            = "us-east1-a"
   region          = "us-east1"
   network         = "default"
-  server_endpoint = "nomad.example.com:4647"
+  server_endpoint = "example.com:4647"
 }
 
 output "module" {
@@ -86,7 +86,7 @@ There are more examples in the [examples](./examples/) directory.
 | target\_cpu\_utilization | Target CPU utilization to trigger autoscaling | `number` | `0.5` | no |
 | unsafe\_disable\_mtls | Disables mTLS between nomad client and servers. Compromises the authenticity and confidentiality of client-server communication. Should not be set to true in any production setting | `bool` | `false` | no |
 | zone | GCP compute zone to deploy nomad clients into (e.g us-east1-a) | `string` | n/a | yes |
-| enable_workload_identity | Enable nomad service account as gcp workload identity | `bool` | `false` | no |
+| enable_workload_identity | Enable nomad service account as gcp workload identity. Ensure Workload Identities are first enabled on your GKE cluster: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity | `bool` | `false` | no |
 | k8s_namespace | k8s namespace where application is installed | `string` | `circleci-server` | Yes, if enable_workload_identity is true |
 
 ## Outputs
