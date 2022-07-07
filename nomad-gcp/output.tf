@@ -10,6 +10,18 @@ output "nomad_tls_ca" {
   value = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_tls_ca
 }
 
+output "nomad_server_cert_base64" {
+  value = var.unsafe_disable_mtls ? base64encode(module.tls[0].nomad_server_cert) : ""
+}
+
+output "nomad_server_key_base64" {
+  value = var.unsafe_disable_mtls ? nonsensitive(base64encode(module.tls[0].nomad_server_key)) : ""
+}
+
+output "nomad_tls_ca_base64" {
+  value = var.unsafe_disable_mtls ? base64encode(module.tls[0].nomad_tls_ca) : ""
+}
+
 output "managed_instance_group_name" {
   value = google_compute_instance_group_manager.nomad.name
 }

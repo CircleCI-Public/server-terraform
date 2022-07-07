@@ -14,6 +14,18 @@ output "nomad_tls_ca" {
   value = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""
 }
 
+output "nomad_server_cert_base64" {
+  value = var.enable_mtls ? base64encode(module.nomad_tls[0].nomad_server_cert) : ""
+}
+
+output "nomad_server_key_base64" {
+  value = var.enable_mtls ? nonsensitive(base64encode(module.nomad_tls[0].nomad_server_key)) : ""
+}
+
+output "nomad_tls_ca_base64" {
+  value = var.enable_mtls ? base64encode(module.nomad_tls[0].nomad_tls_ca) : ""
+}
+
 output "nomad_sg_id" {
   value = aws_security_group.nomad_sg.id
 }
