@@ -6,7 +6,7 @@ module "tls" {
 }
 
 resource "google_compute_autoscaler" "nomad" {
-  name   = var.name
+  name   = "${var.name}-nomad-group"
   zone   = var.zone
   target = google_compute_instance_group_manager.nomad.id
 
@@ -40,11 +40,11 @@ resource "google_compute_autoscaler" "nomad" {
 }
 
 resource "google_compute_instance_template" "nomad" {
-  name_prefix    = "nomad"
+  name_prefix    = "${var.name}-nomad-clients-"
   machine_type   = var.machine_type
   can_ip_forward = false
 
-  tags = ["nomad", "circleci-server"]
+  tags = ["nomad", "circleci-server", "${var.name}-nomad-clients"]
 
   disk {
     source_image = data.google_compute_image.ubuntu_2004.self_link
@@ -98,12 +98,12 @@ resource "google_compute_instance_template" "nomad" {
 }
 
 resource "google_compute_target_pool" "nomad" {
-  name   = var.name
+  name   = "${var.name}-nomad"
   region = var.region
 }
 
 resource "google_compute_instance_group_manager" "nomad" {
-  name = var.name
+  name = "${var.name}-nomad"
   zone = var.zone
 
   version {
@@ -112,7 +112,7 @@ resource "google_compute_instance_group_manager" "nomad" {
   }
 
   target_pools       = [google_compute_target_pool.nomad.id]
-  base_instance_name = "nomad"
+  base_instance_name = "${var.name}-nomad"
 }
 
 data "google_compute_image" "ubuntu_2004" {
@@ -136,5 +136,5 @@ resource "google_compute_firewall" "default" {
   }
 
   source_ranges = var.retry_with_ssh_allowed_cidr_blocks
-  target_tags   = ["nomad", "circleci-server"]
+  target_tags   = ["nomad", "circleci-server", var.name]
 }
