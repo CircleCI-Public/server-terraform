@@ -1,11 +1,16 @@
 ### SERVICE ACCOUNT ###
 data "google_project" "project" {
+  count = var.project_id == "" ? 1 : 0
+}
+
+locals {
+  project_id = var.project_id == "" ? data.google_project.project[0].project_id : var.project_id
 }
 
 resource "google_service_account" "nomad_as_service_account" {
   count = var.nomad_auto_scaler ? 1 : 0
 
-  project      = data.google_project.project.project_id
+  project      = local.project_id
   account_id   = "${var.name}-nomad-autoscaler-sa"
   display_name = "${var.name}-nomad-autoscaler-sa"
   description  = "${var.name} service account for CircleCI Server cluster component"
@@ -28,7 +33,7 @@ resource "google_service_account_iam_binding" "nomad_as_work_identity_k8s" {
   service_account_id = google_service_account.nomad_as_service_account[0].name
   role               = "roles/iam.workloadIdentityUser"
   members = [
-    "serviceAccount:${data.google_project.project.project_id}.svc.id.goog[${var.k8s_namespace}/nomad-autoscaler]",
+    "serviceAccount:${local.project_id}.svc.id.goog[${var.k8s_namespace}/nomad-autoscaler]",
   ]
 }
 

@@ -1,3 +1,9 @@
+variable "project_id" {
+  type        = string
+  description = "GCP project ID to deploy resources into. By default uses the data sourced GCP project ID."
+  default = ""
+}
+
 variable "zone" {
   type        = string
   description = "GCP compute zone to deploy nomad clients into (e.g us-east1-a)"
