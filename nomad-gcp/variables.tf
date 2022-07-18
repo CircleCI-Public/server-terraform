@@ -1,7 +1,7 @@
 variable "project_id" {
   type        = string
   description = "GCP project ID to deploy resources into. By default uses the data sourced GCP project ID."
-  default = ""
+  default     = ""
 }
 
 variable "zone" {

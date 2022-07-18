@@ -27,8 +27,8 @@ output "managed_instance_group_zone" {
 }
 
 output "service_account_key" {
-  value = base64decode(google_service_account_key.nomad-as-key[0].private_key)
-  sensitive = true
+  value       = base64decode(google_service_account_key.nomad-as-key[0].private_key)
+  sensitive   = true
   description = "Base64 decoded service account key."
 }
 
