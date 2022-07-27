@@ -11,7 +11,7 @@ output "nomad_tls_ca" {
 }
 
 output "nomad_server_cert_base64" {
-  value = var.unsafe_disable_mtls ? "" : base64encode(module.tls[0].nomad_server_cert) 
+  value = var.unsafe_disable_mtls ? "" : base64encode(module.tls[0].nomad_server_cert)
 }
 
 output "nomad_server_key_base64" {
