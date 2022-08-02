@@ -4,7 +4,7 @@ data "google_project" "project" {
 }
 
 locals {
-  project_id = var.project_id == "" ? data.google_project.project[0].project_id : var.project_id
+  project_id    = var.project_id == "" ? data.google_project.project[0].project_id : var.project_id
   output_sa_key = var.nomad_auto_scaler && !var.enable_workload_identity
 }
 
