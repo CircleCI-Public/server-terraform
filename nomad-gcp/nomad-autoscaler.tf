@@ -5,6 +5,7 @@ data "google_project" "project" {
 
 locals {
   project_id = var.project_id == "" ? data.google_project.project[0].project_id : var.project_id
+  output_sa_key = var.nomad_auto_scaler && !var.enable_workload_identity
 }
 
 resource "google_service_account" "nomad_as_service_account" {
@@ -38,12 +39,12 @@ resource "google_service_account_iam_binding" "nomad_as_work_identity_k8s" {
 }
 
 resource "google_service_account_key" "nomad-as-key" {
-  count              = var.nomad_auto_scaler && !var.enable_workload_identity ? 1 : 0
+  count              = local.output_sa_key ? 1 : 0
   service_account_id = google_service_account.nomad_as_service_account[0].name
 }
 
 resource "local_file" "nomad-as-key-file" {
-  count    = var.nomad_auto_scaler && !var.enable_workload_identity ? 1 : 0
+  count    = local.output_sa_key ? 1 : 0
   content  = base64decode(google_service_account_key.nomad-as-key[0].private_key)
   filename = "${path.cwd}/nomad-as-key.json"
 }
