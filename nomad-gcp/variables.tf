@@ -44,9 +44,9 @@ variable "server_endpoint" {
 }
 
 variable "server_port_nomad" {
-  type = number
+  type        = number
   description = "Port that the server endpoint listens on for nomad connections (defaults to 4647)."
-  default = 4647
+  default     = 4647
 }
 
 variable "blocked_cidrs" {
