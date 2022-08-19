@@ -1,3 +1,7 @@
+locals {
+  server_endpoint_and_port = "${var.server_endpoint}:${var.server_port_nomad}"
+}
+
 resource "random_string" "key_suffix" {
   length  = 8
   special = false
@@ -22,7 +26,7 @@ data "aws_ami" "ubuntu_focal" {
 
 module "nomad_tls" {
   source                = "../shared/modules/tls"
-  nomad_server_endpoint = var.server_endpoint
+  nomad_server_endpoint = local.server_endpoint_and_port
   count                 = var.enable_mtls ? 1 : 0
 }
 
@@ -44,7 +48,7 @@ data "cloudinit_config" "nomad_user_data" {
     content = templatefile(
       "${path.module}/template/nomad-startup.sh.tpl",
       {
-        nomad_server_endpoint = var.server_endpoint
+        nomad_server_endpoint = local.server_endpoint_and_port
         client_tls_cert       = var.enable_mtls ? module.nomad_tls[0].nomad_client_cert : ""
         client_tls_key        = var.enable_mtls ? module.nomad_tls[0].nomad_client_key : ""
         tls_ca                = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""

@@ -33,9 +33,8 @@ variable "subnetwork" {
 
 variable "server_endpoint" {
   type    = string
-  default = "example.com:4647"
+  default = "example.com"
 }
-
 
 variable "min_replicas" {
   type        = number

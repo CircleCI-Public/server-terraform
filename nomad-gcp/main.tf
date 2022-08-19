@@ -1,7 +1,11 @@
+locals {
+  server_endpoint_and_port = "${var.server_endpoint}:${var.server_port_nomad}"
+}
+
 module "tls" {
   source = "./../shared/modules/tls"
 
-  nomad_server_endpoint = var.server_endpoint
+  nomad_server_endpoint = local.server_endpoint_and_port
   count                 = var.unsafe_disable_mtls ? 0 : 1
 }
 
@@ -58,7 +62,7 @@ resource "google_compute_instance_template" "nomad" {
     "${path.module}/templates/nomad-startup.sh.tpl",
     {
       add_server_join       = var.add_server_join ? var.add_server_join : ""
-      nomad_server_endpoint = var.server_endpoint
+      nomad_server_endpoint = local.server_endpoint_and_port
       blocked_cidrs         = var.blocked_cidrs
       client_tls_cert       = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_cert
       client_tls_key        = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_key

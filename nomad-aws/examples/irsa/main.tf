@@ -42,7 +42,7 @@ module "nomad-aws" {
 
   # Location of your Nomad server endpoint. This should be exposed from your
   # server installation via a load balancer service.
-  server_endpoint = "example.com:4647"
+  server_endpoint = "example.com"
 
   # AWS DNS Server runs on the third IP address of the VPC block. We define it
   # here to allow access to if from the Nomad clients.

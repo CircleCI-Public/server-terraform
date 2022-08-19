@@ -21,7 +21,13 @@ variable "security_group_id" {
 
 variable "server_endpoint" {
   type        = string
-  description = "Domain and port of RPC service of Nomad control plane (e.g example.com:4647)"
+  description = "Domain of RPC service of Nomad control plane (e.g example.com)"
+}
+
+variable "server_port_nomad" {
+  type = number
+  description = "Port that the server endpoint listens on for nomad connections (defaults to 4647)."
+  default = 4647
 }
 
 variable "blocked_cidrs" {

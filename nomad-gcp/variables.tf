@@ -40,7 +40,13 @@ variable "retry_with_ssh_allowed_cidr_blocks" {
 
 variable "server_endpoint" {
   type        = string
-  description = "Hostname:port of nomad control plane"
+  description = "Domain of RPC service of Nomad control plane (e.g example.com)"
+}
+
+variable "server_port_nomad" {
+  type = number
+  description = "Port that the server endpoint listens on for nomad connections (defaults to 4647)."
+  default = 4647
 }
 
 variable "blocked_cidrs" {
