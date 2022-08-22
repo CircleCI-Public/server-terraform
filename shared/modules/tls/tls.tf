@@ -8,9 +8,9 @@ terraform {
   }
 }
 
-
 locals {
-  cert_validity_period = 876600 # 100 years, basically doesn't expire
+  cert_validity_period  = 876600 # 100 years, basically doesn't expire
+  nomad_server_endpoint = "${var.nomad_server_hostname}:${var.nomad_server_port}"
 }
 
 resource "tls_private_key" "nomad_ca" {
@@ -51,7 +51,7 @@ resource "tls_cert_request" "nomad_client" {
   private_key_pem = tls_private_key.nomad_client.private_key_pem
 
   subject {
-    common_name  = var.nomad_server_endpoint
+    common_name  = local.nomad_server_endpoint
     organization = "nomad:client"
   }
 
@@ -91,7 +91,7 @@ resource "tls_cert_request" "nomad_server" {
   private_key_pem = tls_private_key.nomad_server.private_key_pem
 
   subject {
-    common_name  = var.nomad_server_endpoint
+    common_name  = local.nomad_server_endpoint
     organization = "nomad:client"
   }
 

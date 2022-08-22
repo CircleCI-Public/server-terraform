@@ -1,4 +1,10 @@
-variable "nomad_server_endpoint" {
+variable "nomad_server_hostname" {
   type        = string
-  description = "Domain and port of RPC service of Nomad control plane (e.g example.com:4647)"
+  description = "Hostname of the nomad server."
+}
+
+variable "nomad_server_port" {
+  type        = number
+  description = "Port that the nomad server endpoint listens on."
+  default     = 4647
 }

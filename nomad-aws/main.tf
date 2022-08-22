@@ -26,7 +26,8 @@ data "aws_ami" "ubuntu_focal" {
 
 module "nomad_tls" {
   source                = "../shared/modules/tls"
-  nomad_server_endpoint = local.server_endpoint_and_port
+  nomad_server_hostname = var.server_endpoint
+  nomad_server_port     = var.server_port_nomad
   count                 = var.enable_mtls ? 1 : 0
 }
 

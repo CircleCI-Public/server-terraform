@@ -3,9 +3,9 @@ locals {
 }
 
 module "tls" {
-  source = "./../shared/modules/tls"
-
-  nomad_server_endpoint = local.server_endpoint_and_port
+  source                = "./../shared/modules/tls"
+  nomad_server_hostname = var.server_endpoint
+  nomad_server_port     = var.server_port_nomad
   count                 = var.unsafe_disable_mtls ? 0 : 1
 }
 
