@@ -22,6 +22,10 @@ variable "security_group_id" {
 variable "nomad_server_hostname" {
   type        = string
   description = "Hostname of RPC service of Nomad control plane (e.g circleci.example.com)"
+  validation {
+    condition     = !contains(var.nomad_server_hostname, ":")
+    error_message = "Port cannot be specified, only hostname."
+  }
 }
 
 variable "nomad_server_port" {
