@@ -1,5 +1,5 @@
 locals {
-  server_endpoint_and_port = "${var.server_endpoint}:${var.server_port_nomad}"
+  nomad_server_hostname_and_port = "${var.nomad_server_hostname}:${var.nomad_server_port}"
 }
 
 resource "random_string" "key_suffix" {
@@ -26,8 +26,8 @@ data "aws_ami" "ubuntu_focal" {
 
 module "nomad_tls" {
   source                = "../shared/modules/tls"
-  nomad_server_hostname = var.server_endpoint
-  nomad_server_port     = var.server_port_nomad
+  nomad_server_hostname = var.nomad_server_hostname
+  nomad_server_port     = var.nomad_server_port
   count                 = var.enable_mtls ? 1 : 0
 }
 

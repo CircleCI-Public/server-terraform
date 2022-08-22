@@ -38,14 +38,14 @@ variable "retry_with_ssh_allowed_cidr_blocks" {
   description = "List of source IP CIDR blocks that can use the 'retry with SSH' feature of CircleCI jobs"
 }
 
-variable "server_endpoint" {
+variable "nomad_server_hostname" {
   type        = string
-  description = "Domain of RPC service of Nomad control plane (e.g example.com)"
+  description = "Hostname of RPC service of Nomad control plane (e.g circleci.example.com)"
 }
 
-variable "server_port_nomad" {
+variable "nomad_server_port" {
   type        = number
-  description = "Port that the server endpoint listens on for nomad connections (defaults to 4647)."
+  description = "Port that the server endpoint listens on for nomad connections."
   default     = 4647
 }
 

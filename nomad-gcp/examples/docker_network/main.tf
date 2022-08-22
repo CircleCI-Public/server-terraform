@@ -31,7 +31,7 @@ variable "subnetwork" {
   # default = "https://www.googleapis.com/compute/v1/projects/<your-project>/regions/<your-region>/subnetworks/default"
 }
 
-variable "server_endpoint" {
+variable "nomad_server_hostname" {
   type    = string
   default = "example.com"
 }
@@ -103,7 +103,7 @@ module "nomad" {
   region              = var.region
   network             = var.network
   subnetwork          = var.subnetwork
-  server_endpoint     = var.server_endpoint
+  nomad_server_hostname = var.nomad_server_hostname
   machine_type        = var.machine_type
   docker_network_cidr = var.docker_network_cidr
 

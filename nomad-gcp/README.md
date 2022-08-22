@@ -21,7 +21,7 @@ module "nomad" {
   zone            = "us-east1-a"
   region          = "us-east1"
   network         = "default"
-  server_endpoint = "example.com"
+  nomad_server_hostname = "example.com"
 }
 
 output "module" {
