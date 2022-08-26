@@ -19,9 +19,19 @@ variable "security_group_id" {
   default     = []
 }
 
-variable "server_endpoint" {
+variable "nomad_server_hostname" {
   type        = string
-  description = "Domain and port of RPC service of Nomad control plane (e.g example.com:4647)"
+  description = "Hostname of RPC service of Nomad control plane (e.g circleci.example.com)"
+  validation {
+    condition     = !can(regex(":", var.nomad_server_hostname))
+    error_message = "Found ':' in hostname. Port cannot be specified."
+  }
+}
+
+variable "nomad_server_port" {
+  type        = number
+  description = "Port that the server endpoint listens on for nomad connections."
+  default     = 4647
 }
 
 variable "blocked_cidrs" {

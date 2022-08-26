@@ -79,7 +79,8 @@ There are more examples in the [examples](./examples/) directory.
 | role_name | Name of the role to add to the instance profile | `string` | `null` | no |
 | volume\_type | The EBS volume type of the nomad nodes. If gp3 is not available in your desired region, switch to gp2 | `string` | `gp3` | no |
 | security\_group\_id | ID for the security group for Nomad clients.<br>See security documentation for recommendations. | `list(string)` | `[]` | no |
-| server\_endpoint | Domain and port of RPC service of Nomad control plane which is called "Nomad Load Balancer" in KOTs admin (e.g 127.0.0.1:4647) | `string` | n/a | yes |
+| server\_endpoint | Domain of RPC service of Nomad control plane which is called "Nomad Load Balancer" in KOTs admin (e.g 127.0.0.1) | `string` | n/a | yes |
+| server\_port\_nomad | Port that the server endpoint listens on for nomad connections (defaults to 4647). | `number` |4647 | no |
 | ssh\_key | SSH Public key to access nomad nodes | `string` | `null` | no |
 | subnet | Subnet ID | `string` | `""` | yes* |
 | subnets | Subnet IDs | `list(string)` | `[""]` | yes* |

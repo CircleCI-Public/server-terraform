@@ -1,7 +1,11 @@
-module "tls" {
-  source = "./../shared/modules/tls"
+locals {
+  nomad_server_hostname_and_port = "${var.nomad_server_hostname}:${var.nomad_server_port}"
+}
 
-  nomad_server_endpoint = var.server_endpoint
+module "tls" {
+  source                = "./../shared/modules/tls"
+  nomad_server_hostname = var.nomad_server_hostname
+  nomad_server_port     = var.nomad_server_port
   count                 = var.unsafe_disable_mtls ? 0 : 1
 }
 
@@ -58,7 +62,7 @@ resource "google_compute_instance_template" "nomad" {
     "${path.module}/templates/nomad-startup.sh.tpl",
     {
       add_server_join       = var.add_server_join ? var.add_server_join : ""
-      nomad_server_endpoint = var.server_endpoint
+      nomad_server_endpoint = local.nomad_server_hostname_and_port
       blocked_cidrs         = var.blocked_cidrs
       client_tls_cert       = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_cert
       client_tls_key        = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_key

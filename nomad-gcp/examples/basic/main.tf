@@ -27,11 +27,10 @@ variable "subnetwork" {
   # default = "https://www.googleapis.com/compute/v1/projects/<your-project>/regions/<your-region>/subnetworks/default"
 }
 
-variable "server_endpoint" {
+variable "nomad_server_hostname" {
   type    = string
-  default = "example.com:4647"
+  default = "example.com"
 }
-
 
 variable "min_replicas" {
   type        = number
@@ -84,13 +83,13 @@ module "nomad" {
   # we are using latest code for gcp nomad client here
   source = "./../../"
 
-  name            = var.name
-  zone            = var.zone
-  region          = var.region
-  network         = var.network
-  subnetwork      = var.subnetwork
-  server_endpoint = var.server_endpoint
-  machine_type    = var.machine_type
+  name                  = var.name
+  zone                  = var.zone
+  region                = var.region
+  network               = var.network
+  subnetwork            = var.subnetwork
+  nomad_server_hostname = var.nomad_server_hostname
+  machine_type          = var.machine_type
 
   unsafe_disable_mtls    = false
   assign_public_ip       = true
