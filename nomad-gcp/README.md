@@ -9,23 +9,24 @@ A basic example is as simple as this:
 
 ```Terraform
 provider "google-beta" {
-  project = "my-project"
-  region  = "us-east1"
-  zone    = "us-east1-a"
+  project = "<< GCP project id >>"
+  region  = "<< GCP compute region to deploy nomad clients >>""
+  zone    = "<< GCP compute zone to deploy nomad clients >>""
 }
 
-module "nomad" {
+module "nomad_clients" {
   # We strongly recommend pinning the version using ref=<<release tag>> as is done here
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-gcp?ref=3.2.0"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-gcp?ref=4.0.0"
 
-  zone            = "us-east1-a"
-  region          = "us-east1"
+  zone            = "<< GCP compute zone to deploy nomad clients >>"
+  region          = "<< GCP compute region to deploy nomad clients >>"
   network         = "default"
-  nomad_server_hostname = "example.com"
+  server_endpoint = "<< Hostname:port of nomad control plane >>"
+  name            = "<< name prefix of nomad clients >>
 }
 
 output "module" {
-  value = module.nomad
+  value = module.nomad_clients
 }
 ```
 
