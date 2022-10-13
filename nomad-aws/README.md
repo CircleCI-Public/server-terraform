@@ -25,7 +25,7 @@ provider "aws" {
 
 module "nomad_clients" {
   # We strongly recommend pinning the version using ref=<<release tag>> as is done here
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=3.4.0"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=4.0.0"
 
   # Number of nomad clients to run
   nodes = 4
@@ -49,6 +49,9 @@ module "nomad_clients" {
   # enable_irsa input will allow K8s service account to use IAM roles, you have to replace REGION, ACCOUNT_ID, OIDC_ID and K8S_NAMESPACE with appropriate value
   # for more info, visit - https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html
   enable_irsa = {}
+
+  ssh_key = "<< public key to be placed on each nomad client >>"
+  basename = "<< name prefix for nomad clients >>"
 }
 
 output "nomad" {
