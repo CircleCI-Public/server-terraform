@@ -33,7 +33,7 @@ module "nomad_clients" {
   subnet = "<< ID of subnet you want to run nomad clients in >>"
   vpc_id = "<< ID of VPC you want to run nomad client in >>"
 
-  server_endpoint = "<< hostname:port of nomad load balancer >>"
+  server_endpoint = "<< hostname of server installation >>"
 
   dns_server = "<< ip address of your VPC DNS server >>"
   blocked_cidrs = [
@@ -82,8 +82,7 @@ There are more examples in the [examples](./examples/) directory.
 | role_name | Name of the role to add to the instance profile | `string` | `null` | no |
 | volume\_type | The EBS volume type of the nomad nodes. If gp3 is not available in your desired region, switch to gp2 | `string` | `gp3` | no |
 | security\_group\_id | ID for the security group for Nomad clients.<br>See security documentation for recommendations. | `list(string)` | `[]` | no |
-| server\_endpoint | Domain of RPC service of Nomad control plane which is called "Nomad Load Balancer" in KOTs admin (e.g 127.0.0.1) | `string` | n/a | yes |
-| server\_port\_nomad | Port that the server endpoint listens on for nomad connections (defaults to 4647). | `number` |4647 | no |
+| server\_endpoint | Hostname of the server installation | `string` | n/a | yes |
 | ssh\_key | SSH Public key to access nomad nodes | `string` | `null` | no |
 | subnet | Subnet ID | `string` | `""` | yes* |
 | subnets | Subnet IDs | `list(string)` | `[""]` | yes* |

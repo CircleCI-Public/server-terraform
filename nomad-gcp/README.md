@@ -21,7 +21,7 @@ module "nomad_clients" {
   zone            = "<< GCP compute zone to deploy nomad clients >>"
   region          = "<< GCP compute region to deploy nomad clients >>"
   network         = "default"
-  server_endpoint = "<< Hostname:port of nomad control plane >>"
+  server_endpoint = "<< Hostname of server installation >>"
   name            = "<< name prefix of nomad clients >>
 }
 
@@ -83,8 +83,7 @@ There are more examples in the [examples](./examples/) directory.
 | preemptible | Whether or not to use preemptible nodes | `bool` | `false` | no |
 | region | GCP region to deploy nomad clients into (e.g us-east1) | `string` | n/a | yes |
 | retry\_with\_ssh\_allowed\_cidr\_blocks | List of source IP CIDR blocks that can use the 'retry with SSH' feature of CircleCI jobs | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
-| server\_endpoint | Domain of RPC service of Nomad control plane which is called "Nomad Load Balancer" in KOTs admin (e.g 127.0.0.1) | `string` | n/a | yes |
-| server\_port\_nomad | Port that the server endpoint listens on for nomad connections (defaults to 4647). | `number` |4647 | no |
+| server\_endpoint | Hostname of the server installation | `string` | n/a | yes |
 | target\_cpu\_utilization | Target CPU utilization to trigger autoscaling | `number` | `0.5` | no |
 | unsafe\_disable\_mtls | Disables mTLS between nomad client and servers. Compromises the authenticity and confidentiality of client-server communication. Should not be set to true in any production setting | `bool` | `false` | no |
 | zone | GCP compute zone to deploy nomad clients into (e.g us-east1-a) | `string` | n/a | yes |

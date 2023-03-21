@@ -16,14 +16,14 @@ consume the AWS Nomad client module as follows:
 
 ```terraform
 module "my-aws-nomad-clients" {
-  # Pin release to 4.0.0 (for example) and use /nomad-aws subdirectory
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=4.0.0"
+  # Pin release to 4.1.0 (for example) and use /nomad-aws subdirectory
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=4.1.0"
 
   # Other variables here...
 }
 ```
 
-> Note the use of `ref=4.0.0` to select a specific git tag and
+> Note the use of `ref=4.1.0` to select a specific git tag and
 > `//nomad-aws` to select the `nomad-aws` module.
 
 [generic git repository]: https://www.terraform.io/docs/language/modules/sources.html#generic-git-repository
@@ -34,6 +34,7 @@ The modules in this repository are meant to be used with [terraform
 v0.15.4](https://releases.hashicorp.com/terraform/0.15.4/) and above.
 
 ### M1 Macbooks
+
 If using an M1 Macbook to run terraform init, plan, or apply commands, it's possible you may run into a versioning error with the hashicorp/tls provider. For this, we recommend the [m1-terraform-provider-helper](https://github.com/kreuzwerker/m1-terraform-provider-helper) CLI tool.
 
 First, navigate to the directory where you attempted the `terraform init/plan/apply` command and faced the error. Then run the following to install the provider compatible with the M1 Mac, double checking that the version matches that listed [here](shared/modules/tls/main.tf).
