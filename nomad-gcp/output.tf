@@ -11,15 +11,18 @@ output "nomad_tls_ca" {
 }
 
 output "nomad_server_cert_base64" {
-  value = var.unsafe_disable_mtls ? "" : base64encode(module.tls[0].nomad_server_cert)
+  description = "set this value for the `nomad.server.rpc.mTLS.certificate` key in the CircleCI Server's Helm values.yaml"
+  value       = var.unsafe_disable_mtls ? "" : base64encode(module.tls[0].nomad_server_cert)
 }
 
 output "nomad_server_key_base64" {
-  value = var.unsafe_disable_mtls ? "" : nonsensitive(base64encode(module.tls[0].nomad_server_key))
+  description = "set this value for the `nomad.server.rpc.mTLS.privateKey` key in the CircleCI Server's Helm values.yaml"
+  value       = var.unsafe_disable_mtls ? "" : nonsensitive(base64encode(module.tls[0].nomad_server_key))
 }
 
 output "nomad_tls_ca_base64" {
-  value = var.unsafe_disable_mtls ? "" : base64encode(module.tls[0].nomad_tls_ca)
+  description = "set this value for the `nomad.server.rpc.mTLS.CACertificate` key in the CircleCI Server's Helm values.yaml"
+  value       = var.unsafe_disable_mtls ? "" : base64encode(module.tls[0].nomad_tls_ca)
 }
 
 output "managed_instance_group_name" {
