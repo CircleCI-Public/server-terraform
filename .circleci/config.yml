@@ -26,7 +26,7 @@ executors:
   default:
     resource_class: small
     docker:
-      - image: hashicorp/terraform:0.15.4
+      - image: hashicorp/terraform:1.4.6
 jobs:
   validate:
     executor: default
