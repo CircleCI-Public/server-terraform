@@ -141,7 +141,7 @@ variable "enable_irsa" {
   description = "If passed a valid OIDC MAP, terraform will create K8s Service Account Role to be used by nomad autoscaler."
 }
 
-variable "ebs_volume_size_gb" {
+variable "disk_size_gb" {
   type = number
   default = 100
   description = "The volume size, in GB to each nomad client's /dev/sda1 disk."
