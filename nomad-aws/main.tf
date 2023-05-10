@@ -78,7 +78,7 @@ resource "aws_launch_template" "nomad_clients" {
 
     ebs {
       volume_type = var.volume_type
-      volume_size = 100
+      volume_size = var.ebs_volume_size_gb
     }
   }
 
