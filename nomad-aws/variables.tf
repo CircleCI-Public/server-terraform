@@ -142,8 +142,8 @@ variable "enable_irsa" {
 }
 
 variable "disk_size_gb" {
-  type = number
-  default = 100
+  type        = number
+  default     = 100
   description = "The volume size, in GB to each nomad client's /dev/sda1 disk."
 }
 
