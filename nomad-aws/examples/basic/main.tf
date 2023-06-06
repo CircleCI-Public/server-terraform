@@ -15,8 +15,8 @@ provider "aws" {
 # An example VPC for demonstration. This might already exist if you deployed
 # server in a preexisting VPC and want your nomad clients to run there.
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
-  version = "4.0.2"
+  source               = "terraform-aws-modules/vpc/aws"
+  version              = "4.0.2"
   name                 = "nomad-vpc"
   cidr                 = "192.168.0.0/16"
   azs                  = ["us-east-1a"]
