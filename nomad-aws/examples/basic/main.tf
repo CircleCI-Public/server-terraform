@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">=1.4.6"
+  required_version = ">=1.1.9"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~>4.35.0"
+      version = "~>4.66"
     }
   }
 }
@@ -16,7 +16,7 @@ provider "aws" {
 # server in a preexisting VPC and want your nomad clients to run there.
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-
+  version = "4.0.2"
   name                 = "nomad-vpc"
   cidr                 = "192.168.0.0/16"
   azs                  = ["us-east-1a"]
