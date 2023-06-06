@@ -18,10 +18,10 @@ data "aws_ami" "ubuntu_focal" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = var.machine_image_names
   }
 
-  owners = ["099720109477", "513442679011"]
+  owners = var.machine_image_owners
 }
 
 module "nomad_tls" {

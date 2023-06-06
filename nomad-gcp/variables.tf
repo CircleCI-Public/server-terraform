@@ -176,3 +176,15 @@ variable "k8s_namespace" {
   default     = "circleci-server"
   description = "If enable_workload_identity is true, provide application k8s namespace"
 }
+
+variable "machine_image_project" {
+  type        = string
+  description = "The project value used to retrieve the virtual machine image."
+  default     = "ubuntu-os-cloud"
+}
+
+variable "machine_image_family" {
+  type        = string
+  description = "The family value used to retrieve the virtual machine image."
+  default     = "ubuntu-2004-lts"
+}

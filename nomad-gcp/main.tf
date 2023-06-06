@@ -51,7 +51,7 @@ resource "google_compute_instance_template" "nomad" {
   tags = ["nomad", "circleci-server", "${var.name}-nomad-clients"]
 
   disk {
-    source_image = data.google_compute_image.ubuntu_2004.self_link
+    source_image = data.google_compute_image.machine_image.self_link
     disk_type    = var.disk_type
     disk_size_gb = var.disk_size_gb
     boot         = true
@@ -119,9 +119,9 @@ resource "google_compute_instance_group_manager" "nomad" {
   base_instance_name = "${var.name}-nomad"
 }
 
-data "google_compute_image" "ubuntu_2004" {
-  family  = "ubuntu-2004-lts"
-  project = "ubuntu-os-cloud"
+data "google_compute_image" "machine_image" {
+  family  = var.machine_image_family
+  project = var.machine_image_project
 }
 
 
