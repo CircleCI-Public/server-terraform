@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/CircleCI-Public/server-terraform.svg?style=shield)](https://circleci.com/gh/CircleCI-Public/server-terraform)
+
 # Server Terraform
 
 This repository contains a collection of [Terraform](https://www.terraform.io)

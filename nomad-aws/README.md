@@ -88,8 +88,10 @@ There are more examples in the [examples](./examples/) directory.
 | subnets | Subnet IDs | `list(string)` | `[""]` | yes* |
 | vpc\_id | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |
 | enable_irsa | Enable IAM Roles for K8s service account | `map` | `{}` | no |
+| disk_size_gb | The volume size, in GB to each nomad client's /dev/sda1 disk. | `number` | `100` | no |
 | machine_image_owners | List of AWS account IDs that own the images to be used for nomad virtual machines. | `list(string)` | `["099720109477", "513442679011"]` | no |
 | machine_image_names | Strings to filter image names for nomad virtual machine images. | `list(string)` | `["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]` | no |
+
 
 * Note: `subnet` or `subnets` is required, but not both. The use of `subnet` will supersede `subnets`.
 
