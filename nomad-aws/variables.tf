@@ -154,7 +154,7 @@ locals {
 
 variable "machine_image_owners" {
   type = list(string)
-  description = "List of AWS accounts that own the images to be used for nomad virtual machines."
+  description = "List of AWS account IDs that own the images to be used for nomad virtual machines."
   default = ["099720109477", "513442679011"]
 }
 
