@@ -178,13 +178,13 @@ variable "k8s_namespace" {
 }
 
 variable "machine_image_project" {
-  type = string
+  type        = string
   description = "The project value used to retrieve the virtual machine image."
-  default = "ubuntu-os-cloud"
+  default     = "ubuntu-os-cloud"
 }
 
 variable "machine_image_family" {
-  type = string
+  type        = string
   description = "The family value used to retrieve the virtual machine image."
-  default = "ubuntu-2004-lts"
+  default     = "ubuntu-2004-lts"
 }
