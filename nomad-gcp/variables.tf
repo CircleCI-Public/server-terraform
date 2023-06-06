@@ -150,7 +150,7 @@ variable "disk_type" {
 variable "disk_size_gb" {
   type        = number
   default     = 300
-  description = "Root disk size in GB"
+  description = "Size of the root disk for nomad clients in GB."
 }
 
 variable "name" {
