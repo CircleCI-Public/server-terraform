@@ -89,6 +89,8 @@ There are more examples in the [examples](./examples/) directory.
 | zone | GCP compute zone to deploy nomad clients into (e.g us-east1-a) | `string` | n/a | yes |
 | enable_workload_identity | Enable nomad service account as gcp workload identity. Ensure Workload Identities are first enabled on your GKE cluster: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity | `bool` | `false` | no |
 | k8s_namespace | k8s namespace where application is installed | `string` | `circleci-server` | Yes, if enable_workload_identity is true |
+| machine_image_project | The project value used to retrieve the virtual machine image. | `string` | `ubuntu-os-cloud` | no |
+| machine_image_family | The family value used to retrieve the virtual machine image. | `string` | `ubuntu-2004-lts` | no |
 
 ## Outputs
 
