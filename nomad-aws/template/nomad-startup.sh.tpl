@@ -205,7 +205,6 @@ docker run \
   --interactive \
   --name "docker-gc" \
   --privileged \
-  --net=host \
   --userns=host \
   --volume /var/run/docker.sock:/var/run/docker.sock \
   --volume /var/lib/docker:/var/lib/docker:ro \
