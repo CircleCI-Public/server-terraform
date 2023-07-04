@@ -6,3 +6,5 @@ repos:
       args:
         - nomad-aws
     - id: terraform_docs
+      args:
+          - --hook-config=--path-to-file=nomad-aws/README.md
