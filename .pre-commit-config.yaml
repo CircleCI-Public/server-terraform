@@ -4,9 +4,5 @@ repos:
   hooks:
     - id: terraform_fmt
       args:
-        - --args=nomad-aws
-        - --args=nomad-gcp
+        - --args=-recursive
     - id: terraform_docs
-      args:
-        - --args=nomad-aws
-        - --args=nomad-gcp
