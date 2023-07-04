@@ -106,3 +106,10 @@ There are more examples in the [examples](./examples/) directory.
 | nomad\_server\_cert\_base64 | set this value for the `nomad.server.rpc.mTLS.certificate` key in the [CircleCI Server's Helm values.yaml](https://circleci.com/docs/server/installation/installation-reference/#all-values-yaml-options) |
 | nomad\_server\_key\_base64 | set this value for the `nomad.server.rpc.mTLS.privateKey` key in the [CircleCI Server's Helm values.yaml](https://circleci.com/docs/server/installation/installation-reference/#all-values-yaml-options) |
 | nomad\_tls\_ca\_base64 | set this value for the `nomad.server.rpc.mTLS.CACertificate` key in the [CircleCI Server's Helm values.yaml](https://circleci.com/docs/server/installation/installation-reference/#all-values-yaml-options) |
+
+
+---
+
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
