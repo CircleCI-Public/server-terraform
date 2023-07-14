@@ -18,7 +18,6 @@ resource "tls_private_key" "nomad_ca" {
 }
 
 resource "tls_self_signed_cert" "nomad_ca" {
-  key_algorithm   = tls_private_key.nomad_ca.algorithm
   private_key_pem = tls_private_key.nomad_ca.private_key_pem
 
   subject {
@@ -47,7 +46,6 @@ resource "tls_private_key" "nomad_client" {
 }
 
 resource "tls_cert_request" "nomad_client" {
-  key_algorithm   = tls_private_key.nomad_client.algorithm
   private_key_pem = tls_private_key.nomad_client.private_key_pem
 
   subject {
@@ -67,7 +65,6 @@ resource "tls_cert_request" "nomad_client" {
 
 resource "tls_locally_signed_cert" "nomad_client" {
   cert_request_pem   = tls_cert_request.nomad_client.cert_request_pem
-  ca_key_algorithm   = tls_private_key.nomad_ca.algorithm
   ca_private_key_pem = tls_private_key.nomad_ca.private_key_pem
   ca_cert_pem        = tls_self_signed_cert.nomad_ca.cert_pem
 
@@ -87,7 +84,6 @@ resource "tls_private_key" "nomad_server" {
 }
 
 resource "tls_cert_request" "nomad_server" {
-  key_algorithm   = tls_private_key.nomad_server.algorithm
   private_key_pem = tls_private_key.nomad_server.private_key_pem
 
   subject {
@@ -107,7 +103,6 @@ resource "tls_cert_request" "nomad_server" {
 
 resource "tls_locally_signed_cert" "nomad_server" {
   cert_request_pem   = tls_cert_request.nomad_server.cert_request_pem
-  ca_key_algorithm   = tls_private_key.nomad_ca.algorithm
   ca_private_key_pem = tls_private_key.nomad_ca.private_key_pem
   ca_cert_pem        = tls_self_signed_cert.nomad_ca.cert_pem
 
