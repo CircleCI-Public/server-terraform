@@ -61,6 +61,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install dependencies
+          command: apt-get update && apt-get install -y curl
+      - run:
           name: Install terraform-docs
           command: |
             TERRAFORM_DOCS_VERSION="v0.16.0"
