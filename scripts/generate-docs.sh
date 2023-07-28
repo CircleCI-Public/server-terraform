@@ -9,8 +9,8 @@ function check_terraform_docs_exists() {
 }
 
 function run_terraform_docs() {
-    script_dir=$(realpath $(dirname $0))
-    terraform-docs markdown table --output-file $script_dir/$1 --output-mode inject $2
+    script_dir=$(realpath $(dirname "$0"))
+    terraform-docs markdown table --output-file "$script_dir/$1" --output-mode inject "$2"
 }
 
 
