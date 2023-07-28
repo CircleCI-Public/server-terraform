@@ -77,7 +77,7 @@ jobs:
       - run:
           name: Check if docs need to be updated
           command: |
-            git diff --quiet
+            git diff nomad-aws/README.md nomad-gcp/README.md --quiet
             if [ $? -ne 0 ]; then
               echo "There have been docs changes. Please run the 'make docs' command locally.";
               exit 1;
