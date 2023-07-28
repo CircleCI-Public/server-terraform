@@ -75,7 +75,6 @@ jobs:
           name: Generate Docs
           command: |
             cd scripts
-            which terraform-docs
             sh generate-docs.sh
       - run:
           name: Check if docs need to be updated
