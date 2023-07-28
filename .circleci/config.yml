@@ -73,7 +73,11 @@ jobs:
             mv terraform-docs /usr/local/terraform-docs
       - run:
           name: Generate Docs
-          command: cd scripts && sh generate-docs.sh
+          command: |
+            cd scripts
+            which /usr/local/terraform-docs
+            which terraform-docs
+            sh generate-docs.sh
       - run:
           name: Check if docs need to be updated
           command: |

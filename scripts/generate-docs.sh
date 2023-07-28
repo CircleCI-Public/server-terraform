@@ -4,7 +4,7 @@
 function check_terraform_docs_exists() {
     if ! command -v terraform-docs &> /dev/null; then
         echo "The terraform-docs CLI tool must be installed to continue"
-        exit
+        exit 1;
     fi;
 }
 
@@ -12,7 +12,6 @@ function run_terraform_docs() {
     script_dir=$(realpath "$(dirname "$0")")
     terraform-docs markdown table --output-file "$script_dir/$1" --output-mode inject "$2"
 }
-
 
 check_terraform_docs_exists
 echo "Autogenerating terraform docs"
