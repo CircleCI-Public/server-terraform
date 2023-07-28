@@ -62,7 +62,7 @@ jobs:
       - checkout
       - run:
           name: Generate Docs
-          command: make docs
+          command: cd scripts && bash generate-docs.sh
       - run:
           name: Check if docs need to be updated
           command: |
