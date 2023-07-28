@@ -9,6 +9,7 @@ workflows:
     jobs:
       - shellcheck/check
       - format
+      - check_docs
       - validate:
           name: Nomad AWS basic
           tf_path: nomad-aws/examples/basic
@@ -54,3 +55,21 @@ jobs:
       - run:
           name: terraform fmt
           command: terraform fmt -check -diff -recursive
+
+  check_docs:
+    executor: default
+    steps:
+      - checkout
+      - run:
+          name: Generate Docs
+          command: make docs
+      - run:
+          name: Check if docs need to be updated
+          command: |
+            git diff --quiet
+            if [ $? -ne 0 ]; then
+              echo "There have been docs changes. Please run the 'make docs' command locally.";
+              exit 1;
+            else
+              echo "Docs are up to date"
+            fi
