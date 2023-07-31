@@ -9,6 +9,7 @@ workflows:
     jobs:
       - shellcheck/check
       - format
+      - check_docs
       - validate:
           name: Nomad AWS basic
           tf_path: nomad-aws/examples/basic
@@ -54,3 +55,34 @@ jobs:
       - run:
           name: terraform fmt
           command: terraform fmt -check -diff -recursive
+
+  check_docs:
+    executor: default
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: apk update && apk add curl
+      - run:
+          name: Install terraform-docs
+          command: |
+            TERRAFORM_DOCS_VERSION="v0.16.0"
+            curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/$TERRAFORM_DOCS_VERSION/terraform-docs-$TERRAFORM_DOCS_VERSION-$(uname)-amd64.tar.gz
+            tar -xzf terraform-docs.tar.gz
+            chmod +x terraform-docs
+            mv terraform-docs /usr/local/bin/terraform-docs
+      - run:
+          name: Generate Docs
+          command: |
+            cd scripts
+            sh generate-docs.sh
+      - run:
+          name: Check if docs need to be updated
+          command: |
+            git diff --quiet nomad-aws/README.md nomad-gcp/README.md
+            if [ $? -ne 0 ]; then
+              echo "There have been docs changes. Please run the 'make docs' command locally.";
+              exit 1;
+            else
+              echo "Docs are up to date"
+            fi
