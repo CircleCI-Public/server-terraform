@@ -42,7 +42,7 @@ If using an M1 Macbook to run terraform init, plan, or apply commands, it's poss
 First, navigate to the directory where you attempted the `terraform init/plan/apply` command and faced the error. Then run the following to install the provider compatible with the M1 Mac, double checking that the version matches that listed [here](shared/modules/tls/main.tf).
 
 ```bash
-m1-terraform-provider-helper install hashicorp/tls -v v3.1.0
+m1-terraform-provider-helper install hashicorp/tls -v v3.2.0
 ```
 
 ---
