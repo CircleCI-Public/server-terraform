@@ -9,6 +9,18 @@ log() {
 	echo -e "$${color}$${msg}$${reset}"
 }
 
+revert_cgroups_version_and_reboot() {
+	if grep -q "system.unified_cgroup_hierarchy=0" /etc/default/grub; then
+	echo "System already using cgroups v1"
+	return 0
+	fi
+
+	sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
+	sudo update-grub
+	echo "Rebooting"
+	sudo reboot
+}
+
 tune_io_scheduler() {
 	log "Tuning kernel IO scheduler if needed"
 	if [ -f /sys/block/nvme0n1/queue/scheduler ] && grep -q 'mq-deadline' /sys/block/nvme0n1/queue/scheduler
@@ -250,3 +262,5 @@ docker_chain="DOCKER-USER"
 /sbin/iptables --wait --insert $docker_chain 5 -i docker+ --destination "${cidr_block}" --jump DROP
 /sbin/iptables --wait --insert $docker_chain 5 -i br+ --destination "${cidr_block}" --jump DROP
 %{ endfor ~}
+
+revert_cgroups_version_and_reboot
