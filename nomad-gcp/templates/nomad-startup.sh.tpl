@@ -79,8 +79,10 @@ configure_circleci() {
 install_nomad() {
 	log "Installing Nomad"
 	install zip
-	curl -o nomad.zip https://releases.hashicorp.com/nomad/1.1.2/nomad_1.1.2_linux_amd64.zip
-	unzip nomad.zip
+	curl --retry 99 --retry-delay 1 --retry-connrefused -o linux_amd64.zip "https://circleci-binary-releases.s3.amazonaws.com/nomad/${patched_nomad_version}/linux_amd64.zip"
+	curl --retry 99 --retry-delay 1 --retry-connrefused -o linux_amd64.zip.sha "https://circleci-binary-releases.s3.amazonaws.com/nomad/${patched_nomad_version}/linux_amd64.zip.sha"
+	sha256sum -c linux_amd64.zip.sha || exit 1
+	unzip linux_amd64.zip
 	mv nomad /usr/bin
 }
 

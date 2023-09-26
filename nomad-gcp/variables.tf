@@ -188,3 +188,9 @@ variable "machine_image_family" {
   description = "The family value used to retrieve the virtual machine image."
   default     = "ubuntu-2004-lts"
 }
+
+variable "patched_nomad_version" {
+  type        = string
+  description = "The version of CircleCI's fork Nomad to install"
+  default     = "1.4.568-bfc9a6ec4"
+}
