@@ -35,16 +35,6 @@ module "my-aws-nomad-clients" {
 The modules in this repository are meant to be used with [terraform
 v0.15.4](https://releases.hashicorp.com/terraform/0.15.4/) and above.
 
-### M1 Macbooks
-
-If using an M1 Macbook to run terraform init, plan, or apply commands, it's possible you may run into a versioning error with the hashicorp/tls provider. For this, we recommend the [m1-terraform-provider-helper](https://github.com/kreuzwerker/m1-terraform-provider-helper) CLI tool.
-
-First, navigate to the directory where you attempted the `terraform init/plan/apply` command and faced the error. Then run the following to install the provider compatible with the M1 Mac, double checking that the version matches that listed [here](shared/modules/tls/main.tf).
-
-```bash
-m1-terraform-provider-helper install hashicorp/tls -v v3.2.0
-```
-
 ---
 
 ## How to contribute
