@@ -2,6 +2,8 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+CGROUPS_FLAG_FILE="/var/run/cgroups_reverted_to_v1"
+
 log() {
 	msg=$1
 	color="\e[1;36m" # Bold, Cyan
@@ -10,15 +12,17 @@ log() {
 }
 
 revert_cgroups_version_and_reboot() {
-	if grep -q "system.unified_cgroup_hierarchy=0" /etc/default/grub; then
-	echo "System already using cgroups v1"
-	return 0
+	if [ ! -f "$CGROUPS_FLAG_FILE" ]; then
+		if grep -q "system.unified_cgroup_hierarchy=0" /etc/default/grub; then
+		echo "System already using cgroups v1"
+		return 0
+		fi
+		sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
+		sudo update-grub
+		touch $CGROUPS_FLAG_FILE
+		echo "Rebooting"
+		sudo reboot
 	fi
-
-	sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="\(.*\)"/GRUB_CMDLINE_LINUX_DEFAULT="\1 systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
-	sudo update-grub
-	echo "Rebooting"
-	sudo reboot
 }
 
 tune_io_scheduler() {
@@ -230,6 +234,8 @@ setup_docker_gc() {
 	systemctl enable --now docker-gc
 }
 
+revert_cgroups_version_and_reboot
+
 tune_io_scheduler
 system_update
 add_docker_repo
@@ -263,4 +269,3 @@ docker_chain="DOCKER-USER"
 /sbin/iptables --wait --insert $docker_chain 5 -i br+ --destination "${cidr_block}" --jump DROP
 %{ endfor ~}
 
-revert_cgroups_version_and_reboot
