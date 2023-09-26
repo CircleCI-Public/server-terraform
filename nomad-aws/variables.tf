@@ -169,3 +169,9 @@ variable "machine_image_names" {
   description = "Strings to filter image names for nomad virtual machine images."
   default     = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
 }
+
+variable "patched_nomad_version" {
+  type        = string
+  description = "The version of CircleCI's fork Nomad to install"
+  default     = "1.4.568-bfc9a6ec4"
+}
