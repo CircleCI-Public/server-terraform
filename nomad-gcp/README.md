@@ -96,6 +96,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_nomad_auto_scaler"></a> [nomad\_auto\_scaler](#input\_nomad\_auto\_scaler) | If true, terraform will create a service account to be used by nomad autoscaler. | `bool` | `false` | no |
 | <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com) | `string` | n/a | yes |
 | <a name="input_nomad_server_port"></a> [nomad\_server\_port](#input\_nomad\_server\_port) | Port that the server endpoint listens on for nomad connections. | `number` | `4647` | no |
+| <a name="input_patched_nomad_version"></a> [patched\_nomad\_version](#input\_patched\_nomad\_version) | The version of CircleCI's fork Nomad to install | `string` | `"1.4.568-bfc9a6ec4"` | no |
 | <a name="input_preemptible"></a> [preemptible](#input\_preemptible) | Whether or not to use preemptible nodes | `bool` | `false` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | GCP project ID to deploy resources into. By default uses the data sourced GCP project ID. | `string` | `""` | no |
 | <a name="input_region"></a> [region](#input\_region) | GCP region to deploy nomad clients into (e.g us-east1) | `string` | n/a | yes |

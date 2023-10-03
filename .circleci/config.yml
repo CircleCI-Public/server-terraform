@@ -62,7 +62,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: apk update && apk add curl
+          command: apk add --update-cache --upgrade curl
       - run:
           name: Install terraform-docs
           command: |
@@ -79,10 +79,11 @@ jobs:
       - run:
           name: Check if docs need to be updated
           command: |
+            set +eo pipefail
             git diff --quiet nomad-aws/README.md nomad-gcp/README.md
             if [ $? -ne 0 ]; then
-              echo "There have been docs changes. Please run the 'make docs' command locally.";
-              exit 1;
+              echo "There have been docs changes. Please run the 'make docs' command locally."
+              exit 1
             else
-              echo "Docs are up to date"
+              echo "Docs are up to date. No changes required."
             fi
