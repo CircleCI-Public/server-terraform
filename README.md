@@ -58,10 +58,10 @@ We love contributions! Here is how to get started:
 - Once your work is complete, you may create a PR for your branch
 - Each commit is tested for formatting and syntax errors
 - We test PRs in our own test environments
-- PRs are reviewed and approved by members of CircleCI's Server team
+- PRs are reviewed and approved by members of CircleCI's [On-Prem team](https://github.com/orgs/CircleCI-Public/teams/on-prem)
 
 ### Reporting Issues
 
 - Feature requests or problems found may be reported by creating an issue
   within this repository
-- CircleCI's Server team will review and respond to issues.
+- CircleCI's [On-Prem team](https://github.com/orgs/CircleCI-Public/teams/on-prem) will review and respond to issues.
