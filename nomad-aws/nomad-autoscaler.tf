@@ -40,10 +40,10 @@ resource "aws_iam_role" "nomad_role" {
   tags = local.tags
 }
 
-resource "aws_iam_role_policy" "nomad_nodegroup_iam_role_policy" {
-  count = var.create_nomad_nodegroup_iam_role_policy ? 1 : 0
+resource "aws_iam_role_policy" "nomad_nodes_iam_role_policy" {
+  count = var.nomad_auto_scaler ? 1 : 0
 
-  name   = "${var.basename}-nomad-nodegroup-iam-role-policy"
-  role   = var.nodegroup_iam_role
-  policy = templatefile("${path.module}/template/nomad_nodegroup_iam_role_policy.tpl", {})
+  name   = "${var.basename}-nomad-nodes-iam-role-policy"
+  role   = var.nodes_iam_role
+  policy = templatefile("${path.module}/template/nomad_nodes_iam_role_policy.tpl", {})
 }
