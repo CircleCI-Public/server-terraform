@@ -25,6 +25,10 @@ workflows:
            - shellcheck/check
 
 executors:
+  tfsec:
+    resource_class: small
+    docker:
+      - image: circleci/python:latest
   default:
     resource_class: small
     docker:
@@ -58,7 +62,7 @@ jobs:
           command: terraform fmt -check -diff -recursive
 
   tfsec:
-    executor: default
+    executor: tfsec
     steps:
       - checkout
       - run:
