@@ -6,3 +6,11 @@ docs:
 format:
 	@echo "Formatting terraform"
 	@terraform fmt -recursive
+
+.PHONY: test
+test:
+	@make tfsec
+
+.PHONY: tfsec
+tfsec:
+	@tfsec .
