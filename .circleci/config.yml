@@ -10,6 +10,7 @@ workflows:
       - shellcheck/check
       - format
       - check_docs
+      - tfsec
       - validate:
           name: Nomad AWS basic
           tf_path: nomad-aws/examples/basic
@@ -24,6 +25,10 @@ workflows:
            - shellcheck/check
 
 executors:
+  tfsec:
+    resource_class: small
+    docker:
+      - image: circleci/python:latest
   default:
     resource_class: small
     docker:
@@ -55,6 +60,17 @@ jobs:
       - run:
           name: terraform fmt
           command: terraform fmt -check -diff -recursive
+
+  tfsec:
+    executor: tfsec
+    steps:
+      - checkout
+      - run:
+          name: install tfsec
+          command: curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
+      - run:
+          name: run tfsec
+          command: tfsec .
 
   check_docs:
     executor: default
