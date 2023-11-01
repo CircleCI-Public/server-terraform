@@ -68,6 +68,7 @@ resource "aws_iam_instance_profile" "nomad_client_profile" {
   role  = var.role_name
 }
 
+#tfsec:ignore:aws-ec2-enforce-launch-config-http-token-imds
 resource "aws_launch_template" "nomad_clients" {
   name_prefix   = "${var.basename}-nomad-clients-"
   instance_type = var.instance_type

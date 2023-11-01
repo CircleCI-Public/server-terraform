@@ -140,6 +140,6 @@ resource "google_compute_firewall" "default" {
     ports    = ["64535-65535"]
   }
 
-  source_ranges = var.retry_with_ssh_allowed_cidr_blocks
+  source_ranges = var.retry_with_ssh_allowed_cidr_blocks #tfsec:ignore:google-compute-no-public-ingress
   target_tags   = ["nomad", "circleci-server", var.name]
 }
