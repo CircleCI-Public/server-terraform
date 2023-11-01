@@ -141,17 +141,6 @@ variable "enable_irsa" {
   description = "If passed a valid OIDC MAP, terraform will create K8s Service Account Role to be used by nomad autoscaler."
 }
 
-variable "nodes_iam_role" {
-  type    = string
-  default = ""
-
-  description = <<EOF
-    The IAM role name for the node group (AWS-managed) or worker group (self-managed) that is associated with the EKS
-    cluster where the Nomad Autoscaler is deployed. This must be populated if `nomad_auto_scaler` is enabled.
-    It ensures that an IAM policy with the minimum permissions required by the Nomad Autoscaler is created.
-  EOF
-}
-
 variable "disk_size_gb" {
   type        = number
   default     = 100

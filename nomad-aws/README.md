@@ -46,11 +46,6 @@ module "nomad_clients" {
   }
   nomad_auto_scaler = false # If true, terraform will generate an IAM user to be used by nomad-autoscaler in CircleCI Server.
 
-  # If `nomad_auto_scaler` is enabled, `nodes_iam_role` must be populated with the IAM role name for the node group (AWS-managed)
-  # or worker group (self-managed) associated with the EKS cluster the Nomad Autoscaler is deployed on.
-  # This ensures an IAM policy is created with the minimum permissions required by the Nomad Autoscaler.
-  nodes_iam_role = ""
-
   # enable_irsa input will allow K8s service account to use IAM roles, you have to replace REGION, ACCOUNT_ID, OIDC_ID and K8S_NAMESPACE with appropriate value
   # for more info, visit - https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
   enable_irsa = {}
@@ -101,7 +96,6 @@ There are more examples in the [examples](./examples/) directory.
 | [aws_iam_access_key.nomad_asg_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) | resource |
 | [aws_iam_instance_profile.nomad_client_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_role.nomad_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy.nomad_nodes_iam_role_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_user.nomad_asg_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user_policy.nomad_asg_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy) | resource |
 | [aws_key_pair.ssh_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
@@ -130,7 +124,6 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_machine_image_owners"></a> [machine\_image\_owners](#input\_machine\_image\_owners) | List of AWS account IDs that own the images to be used for nomad virtual machines. | `list(string)` | <pre>[<br>  "099720109477",<br>  "513442679011"<br>]</pre> | no |
 | <a name="input_max_nodes"></a> [max\_nodes](#input\_max\_nodes) | Maximum number of nomad clients to create. Must be greater than or equal to nodes | `number` | `5` | no |
 | <a name="input_nodes"></a> [nodes](#input\_nodes) | Number of nomad clients to create | `number` | n/a | yes |
-| <a name="input_nodes_iam_role"></a> [nodes\_iam\_role](#input\_nodes\_iam\_role) | The IAM role name for the node group (AWS-managed) or worker group (self-managed) that is associated with the EKS<br>    cluster where the Nomad Autoscaler is deployed. This must be populated if `nomad_auto_scaler` is enabled.<br>    It ensures that an IAM policy with the minimum permissions required by the Nomad Autoscaler is created. | `string` | `""` | no |
 | <a name="input_nomad_auto_scaler"></a> [nomad\_auto\_scaler](#input\_nomad\_auto\_scaler) | If set to true, A Nomad User or A Role will be created based on enable\_irsa variable values | `bool` | `false` | no |
 | <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com) | `string` | n/a | yes |
 | <a name="input_nomad_server_port"></a> [nomad\_server\_port](#input\_nomad\_server\_port) | Port that the server endpoint listens on for nomad connections. | `number` | `4647` | no |

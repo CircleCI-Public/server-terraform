@@ -28,7 +28,7 @@ executors:
   tfsec:
     resource_class: small
     docker:
-      - image: circleci/python:latest
+      - image: cimg/base:current
   default:
     resource_class: small
     docker:
