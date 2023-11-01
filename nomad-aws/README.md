@@ -33,7 +33,7 @@ module "nomad_clients" {
   subnet = "<< ID of subnet you want to run nomad clients in >>"
   vpc_id = "<< ID of VPC you want to run nomad client in >>"
 
-  nomad_server_hostname = "<< hostname of server installation >>"
+  server_endpoint = "<< hostname of server installation >>"
 
   dns_server = "<< ip address of your VPC DNS server >>"
   blocked_cidrs = [
@@ -45,13 +45,6 @@ module "nomad_clients" {
     "team"   = "sre"
   }
   nomad_auto_scaler = false # If true, terraform will generate an IAM user to be used by nomad-autoscaler in CircleCI Server.
-
-  # If `nomad_auto_scaler` is enabled, `nodegroup_iam_role` should be populated with
-  # the EKS nodegroup IAM role name associated with the EKS cluster the Nomad Autoscaler is deployed on,
-  # and `create_nomad_nodegroup_iam_role_policy` should be set to `true`.
-  # This ensures an IAM policy is created with the minimum permissions required by the Nomad Autoscaler.
-  create_nomad_nodegroup_iam_role_policy = false
-  nodegroup_iam_role = ""
 
   # enable_irsa input will allow K8s service account to use IAM roles, you have to replace REGION, ACCOUNT_ID, OIDC_ID and K8S_NAMESPACE with appropriate value
   # for more info, visit - https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
@@ -103,7 +96,6 @@ There are more examples in the [examples](./examples/) directory.
 | [aws_iam_access_key.nomad_asg_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) | resource |
 | [aws_iam_instance_profile.nomad_client_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_role.nomad_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy.nomad_nodegroup_iam_role_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_user.nomad_asg_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user_policy.nomad_asg_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy) | resource |
 | [aws_key_pair.ssh_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
@@ -120,7 +112,6 @@ There are more examples in the [examples](./examples/) directory.
 |------|-------------|------|---------|:--------:|
 | <a name="input_basename"></a> [basename](#input\_basename) | Name used as prefix for AWS resources | `string` | `""` | no |
 | <a name="input_blocked_cidrs"></a> [blocked\_cidrs](#input\_blocked\_cidrs) | List of CIDR blocks to block access to from within jobs, e.g. your K8s nodes.<br>You won't want to block access to external VMs here.<br>It's okay when your dns\_server is within a blocked CIDR block, you can use var.dns\_server to create an exemption. | `list(string)` | n/a | yes |
-| <a name="input_create_nomad_nodegroup_iam_role_policy"></a> [create\_nomad\_nodegroup\_iam\_role\_policy](#input\_create\_nomad\_nodegroup\_iam\_role\_policy) | Indicates whether the `nomad_nodegroup_iam_role_policy` should be created | `bool` | `false` | no |
 | <a name="input_disk_size_gb"></a> [disk\_size\_gb](#input\_disk\_size\_gb) | The volume size, in GB to each nomad client's /dev/sda1 disk. | `number` | `100` | no |
 | <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | If the IP address of your VPC DNS server is within one of the blocked CIDR blocks you can create an exemption by entering the IP address for it here | `string` | n/a | yes |
 | <a name="input_docker_network_cidr"></a> [docker\_network\_cidr](#input\_docker\_network\_cidr) | IP CIDR to be used in docker networks when running job on nomad client.<br>This CIDR block should not be the same as your VPC CIDR block.<br>i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16" | `string` | `"10.10.0.0/16"` | no |
@@ -132,7 +123,6 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_machine_image_names"></a> [machine\_image\_names](#input\_machine\_image\_names) | Strings to filter image names for nomad virtual machine images. | `list(string)` | <pre>[<br>  "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"<br>]</pre> | no |
 | <a name="input_machine_image_owners"></a> [machine\_image\_owners](#input\_machine\_image\_owners) | List of AWS account IDs that own the images to be used for nomad virtual machines. | `list(string)` | <pre>[<br>  "099720109477",<br>  "513442679011"<br>]</pre> | no |
 | <a name="input_max_nodes"></a> [max\_nodes](#input\_max\_nodes) | Maximum number of nomad clients to create. Must be greater than or equal to nodes | `number` | `5` | no |
-| <a name="input_nodegroup_iam_role"></a> [nodegroup\_iam\_role](#input\_nodegroup\_iam\_role) | Specifies the IAM role name for the EKS nodegroup that is associated with the EKS cluster where the Nomad Autoscaler is deployed.<br>    This should be populated if `nomad_auto_scaler` is enabled.<br>    It ensures that an IAM policy with the minimum permissions required by the Nomad Autoscaler is created.<br>    Note that this is dependent on `create_nomad_nodegroup_iam_role_policy` being set to `true`. | `string` | `""` | no |
 | <a name="input_nodes"></a> [nodes](#input\_nodes) | Number of nomad clients to create | `number` | n/a | yes |
 | <a name="input_nomad_auto_scaler"></a> [nomad\_auto\_scaler](#input\_nomad\_auto\_scaler) | If set to true, A Nomad User or A Role will be created based on enable\_irsa variable values | `bool` | `false` | no |
 | <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com) | `string` | n/a | yes |
