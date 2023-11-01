@@ -33,7 +33,7 @@ module "nomad_clients" {
   subnet = "<< ID of subnet you want to run nomad clients in >>"
   vpc_id = "<< ID of VPC you want to run nomad client in >>"
 
-  server_endpoint = "<< hostname of server installation >>"
+  nomad_server_hostname = "<< hostname of server installation >>"
 
   dns_server = "<< ip address of your VPC DNS server >>"
   blocked_cidrs = [
