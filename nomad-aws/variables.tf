@@ -123,7 +123,7 @@ variable "role_name" {
   default     = null
 }
 
-# Check for IRSA Role (more details)  - https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html
+# Check for IRSA Role (more details)  - https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
 #   enable_irsa  = {
 #                  oidc_principal_id  = "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>"
 #                  oidc_eks_variable  = "oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>:sub"
