@@ -175,3 +175,15 @@ variable "patched_nomad_version" {
   description = "The version of CircleCI's fork Nomad to install"
   default     = "1.4.568-bfc9a6ec4"
 }
+
+variable "allowed_ips_retry_ssh" {
+  type        = list(string)
+  description = "List of IPv4 ranges that are permitted to access nomad nodes for the retry-with-ssh feature"
+  default     = ["0.0.0.0/0"]
+}
+
+variable "allowed_ips_circleci_server_nomad_access" {
+  type        = list(string)
+  description = "List of IPv4 ranges that are permitted to access nomad nodes; used for circleci-server-to-nomad communication"
+  default     = ["0.0.0.0/0"]
+}

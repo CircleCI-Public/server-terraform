@@ -75,6 +75,10 @@ resource "aws_launch_template" "nomad_clients" {
   image_id      = data.aws_ami.ubuntu_focal.id
   key_name      = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
 
+  metadata_options {
+    http_tokens = "required"
+  }
+
   block_device_mappings {
     device_name = "/dev/sda1"
 
