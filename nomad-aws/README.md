@@ -110,6 +110,8 @@ There are more examples in the [examples](./examples/) directory.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_allowed_ips_circleci_server_nomad_access"></a> [allowed\_ips\_circleci\_server\_nomad\_access](#input\_allowed\_ips\_circleci\_server\_nomad\_access) | List of IPv4 ranges that are permitted to access nomad nodes; used for circleci-server-to-nomad communication | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
+| <a name="input_allowed_ips_retry_ssh"></a> [allowed\_ips\_retry\_ssh](#input\_allowed\_ips\_retry\_ssh) | List of IPv4 ranges that are permitted to access nomad nodes for the retry-with-ssh feature | `list(string)` | <pre>[<br>  "0.0.0.0/0"<br>]</pre> | no |
 | <a name="input_basename"></a> [basename](#input\_basename) | Name used as prefix for AWS resources | `string` | `""` | no |
 | <a name="input_blocked_cidrs"></a> [blocked\_cidrs](#input\_blocked\_cidrs) | List of CIDR blocks to block access to from within jobs, e.g. your K8s nodes.<br>You won't want to block access to external VMs here.<br>It's okay when your dns\_server is within a blocked CIDR block, you can use var.dns\_server to create an exemption. | `list(string)` | n/a | yes |
 | <a name="input_disk_size_gb"></a> [disk\_size\_gb](#input\_disk\_size\_gb) | The volume size, in GB to each nomad client's /dev/sda1 disk. | `number` | `100` | no |
