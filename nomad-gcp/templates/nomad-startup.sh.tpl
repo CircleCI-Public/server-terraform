@@ -225,8 +225,8 @@ system_update
 add_docker_repo
 
 install ntp
-install docker-ce=5:20.10.14~3-0~ubuntu-focal
-install docker-ce-cli=5:20.10.14~3-0~ubuntu-focal
+install docker-ce=5:25.0.2-1~ubuntu.20.04~focal
+install docker-ce-cli=5:25.0.2-1~ubuntu.20.04~focal
 install jq
 
 enabled_docker_userns
