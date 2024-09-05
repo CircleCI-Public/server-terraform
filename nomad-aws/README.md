@@ -52,6 +52,8 @@ module "nomad_clients" {
 
   ssh_key = "<< public key to be placed on each nomad client >>"
   basename = "<< name prefix for nomad clients >>"
+
+  enable_imdsv2 = "<< optional/required >>"
 }
 
 output "nomad" {
@@ -117,6 +119,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_disk_size_gb"></a> [disk\_size\_gb](#input\_disk\_size\_gb) | The volume size, in GB to each nomad client's /dev/sda1 disk. | `number` | `100` | no |
 | <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | If the IP address of your VPC DNS server is within one of the blocked CIDR blocks you can create an exemption by entering the IP address for it here | `string` | n/a | yes |
 | <a name="input_docker_network_cidr"></a> [docker\_network\_cidr](#input\_docker\_network\_cidr) | IP CIDR to be used in docker networks when running job on nomad client.<br>This CIDR block should not be the same as your VPC CIDR block.<br>i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16" | `string` | `"10.10.0.0/16"` | no |
+| <a name="input_enable_imdsv2"></a> [enable\_imdsv2](#input\_enable\_imdsv2) | Enabling or Disabling IMDSv2 on the Nomad clients. IMDSv2 is only supported on CircleCI Server 4.6.0 or greater. | `string` | `optional` | no |
 | <a name="input_enable_irsa"></a> [enable\_irsa](#input\_enable\_irsa) | If passed a valid OIDC MAP, terraform will create K8s Service Account Role to be used by nomad autoscaler. | `map(any)` | `{}` | no |
 | <a name="input_enable_mtls"></a> [enable\_mtls](#input\_enable\_mtls) | MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended. | `bool` | `true` | no |
 | <a name="input_instance_tags"></a> [instance\_tags](#input\_instance\_tags) | n/a | `map(string)` | <pre>{<br>  "vendor": "circleci"<br>}</pre> | no |
