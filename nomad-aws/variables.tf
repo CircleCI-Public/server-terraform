@@ -187,3 +187,9 @@ variable "allowed_ips_circleci_server_nomad_access" {
   description = "List of IPv4 ranges that are permitted to access nomad nodes; used for circleci-server-to-nomad communication"
   default     = ["0.0.0.0/0"]
 }
+
+variable "enable_imdsv2" {
+  type        = string
+  description = "Enable or Disable IMDSv2 on Nomad clients. Optional or Required. This is only supported on, or after, CircleCI Server 4.6.0" 
+  default     = "optional"
+}
