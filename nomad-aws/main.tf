@@ -76,7 +76,7 @@ resource "aws_launch_template" "nomad_clients" {
   key_name      = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
 
   metadata_options {
-    http_tokens = "required"
+    http_tokens = var.enable_imdsv2
   }
 
   block_device_mappings {
