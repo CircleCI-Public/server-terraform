@@ -190,6 +190,6 @@ variable "allowed_ips_circleci_server_nomad_access" {
 
 variable "enable_imdsv2" {
   type        = string
-  description = "Enable or Disable IMDSv2 on Nomad clients. Optional or Required. This is only supported on, or after, CircleCI Server 4.6.0" 
+  description = "Enable or Disable IMDSv2 on Nomad clients. Optional or Required. This is only supported on, or after, CircleCI Server 4.6.0"
   default     = "optional"
 }
