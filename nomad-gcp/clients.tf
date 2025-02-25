@@ -4,10 +4,12 @@ locals {
 }
 
 module "tls" {
-  source                = "./../shared/modules/tls"
-  nomad_server_hostname = var.nomad_server_hostname
-  nomad_server_port     = var.nomad_server_port
-  count                 = var.unsafe_disable_mtls ? 0 : 1
+  source                  = "./../shared/modules/tls"
+  nomad_server_hostname   = ""
+  nomad_server_port       = 0
+  nomad_server_dns_enable = var.nomad_server_dns_enable
+  nomad_server_dns_name   = "${var.name}-*.${var.zone}.c.${var.project_id}.internal"
+  count                   = var.unsafe_disable_mtls ? 0 : 1
 }
 
 resource "google_compute_autoscaler" "nomad" {

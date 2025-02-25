@@ -275,3 +275,9 @@ variable "server_target_cpu_utilization" {
   default     = 0.8
   description = "Target CPU utilization to trigger autoscaling"
 }
+
+variable "nomad_server_dns_enable" {
+  type        = bool
+  description = "Whether to enable DNS for the nomad server."
+  default     = false
+}

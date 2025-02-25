@@ -10,8 +10,8 @@ module "server" {
   nomad_server_hostname         = var.nomad_server_hostname
   name                          = var.name
   project_id                    = var.project_id
-  tls_cert                      = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_cert
-  tls_key                       = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_key
+  tls_cert                      = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_server_cert
+  tls_key                       = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_server_key
   tls_ca                        = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_tls_ca
   min_server_replicas           = var.min_server_replicas
   max_server_replicas           = var.max_server_replicas

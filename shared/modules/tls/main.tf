@@ -10,7 +10,7 @@ terraform {
 
 locals {
   cert_validity_period  = 876600 # 100 years, basically doesn't expire
-  nomad_server_endpoint = "${var.nomad_server_hostname}:${var.nomad_server_port}"
+  nomad_server_endpoint = var.nomad_server_dns_enable ? var.nomad_server_dns_name : "${var.nomad_server_hostname}:${var.nomad_server_port}"
 }
 
 resource "tls_private_key" "nomad_ca" {
