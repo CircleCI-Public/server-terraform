@@ -25,9 +25,9 @@ system_update() {
 }
 
 install() {
-	package=$1
+	package=$@
 	log "Installing $${package}"
-	apt-get install -y "$${package}"
+	apt-get install -y $${package}
 }
 
 
@@ -78,12 +78,16 @@ configure_circleci() {
 
 install_nomad() {
 	log "Installing Nomad"
-	install zip
-	curl --retry 99 --retry-delay 1 --retry-connrefused -o linux_amd64.zip "https://circleci-binary-releases.s3.amazonaws.com/nomad/${patched_nomad_version}/linux_amd64.zip"
-	curl --retry 99 --retry-delay 1 --retry-connrefused -o linux_amd64.zip.sha "https://circleci-binary-releases.s3.amazonaws.com/nomad/${patched_nomad_version}/linux_amd64.zip.sha"
-	sha256sum -c linux_amd64.zip.sha || exit 1
-	unzip linux_amd64.zip
-	mv nomad /usr/bin
+	install wget gpg coreutils zip
+	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+	sudo apt-get update	
+
+	if [ -z "$patched_nomad_version" ] || [ "$patched_nomad_version"=="latest" ]; then
+		install nomad
+	else
+		install nomad=${patched_nomad_version}
+	fi
 }
 
 configure_nomad() {
@@ -119,7 +123,8 @@ configure_nomad() {
 	if [ "${add_server_join}" ]; then
 	cat <<-EOT >> /etc/nomad/config.hcl
 	  server_join = {
-	    retry_join = ["${nomad_server_endpoint}"]
+	#    retry_join = ["${nomad_server_endpoint}"]
+		retry_join = ["${server_retry_join}"]
 	  }
 	EOT
 	fi

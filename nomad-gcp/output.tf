@@ -1,8 +1,8 @@
-output "nomad_server_cert" {
+output "nomad_tls_cert" {
   value = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_server_cert
 }
 
-output "nomad_server_key" {
+output "nomad_tls_key" {
   value = var.unsafe_disable_mtls ? "" : nonsensitive(module.tls[0].nomad_server_key)
 }
 
@@ -10,12 +10,12 @@ output "nomad_tls_ca" {
   value = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_tls_ca
 }
 
-output "nomad_server_cert_base64" {
+output "nomad_tls_cert_base64" {
   description = "set this value for the `nomad.server.rpc.mTLS.certificate` key in the CircleCI Server's Helm values.yaml"
   value       = var.unsafe_disable_mtls ? "" : base64encode(module.tls[0].nomad_server_cert)
 }
 
-output "nomad_server_key_base64" {
+output "nomad_tls_key_base64" {
   description = "set this value for the `nomad.server.rpc.mTLS.privateKey` key in the CircleCI Server's Helm values.yaml"
   value       = var.unsafe_disable_mtls ? "" : nonsensitive(base64encode(module.tls[0].nomad_server_key))
 }
