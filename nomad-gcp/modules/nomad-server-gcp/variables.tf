@@ -47,11 +47,6 @@ variable "nomad_server_hostname" {
   }
 }
 
-variable "nomad_server_port" {
-  type        = number
-  description = "Port that the server endpoint listens on for nomad connections."
-  default     = 4646
-}
 
 variable "blocked_cidrs" {
   type        = list(string)
@@ -71,18 +66,11 @@ variable "assign_public_ip" {
   description = "Assign public IP"
 }
 
-variable "preemptible" {
-  type        = bool
-  default     = false
-  description = "Whether or not to use preemptible nodes"
-}
-
 variable "name" {
   type        = string
   default     = "nomad"
   description = "VM instance name for nomad client"
 }
-
 
 variable "machine_image_project" {
   type        = string

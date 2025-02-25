@@ -83,9 +83,9 @@ configure_nomad() {
 	data_dir = "/opt/nomad"
 	datacenter = "default"
 	advertise {
-	  http = "$(hostname --ip-address)"
-	  rpc = "$(hostname --ip-address)"
-	  serf = "$(hostname --ip-address)"
+	  http = "$(hostname --ip-address)"  # 4646
+	  rpc = "$(hostname --ip-address)"   # 4647
+	  serf = "$(hostname --ip-address)"  # 4648
 	}
 	server {
 		enabled = true

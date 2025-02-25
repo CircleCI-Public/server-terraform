@@ -123,8 +123,8 @@ configure_nomad() {
 	if [ "${add_server_join}" ]; then
 	cat <<-EOT >> /etc/nomad/config.hcl
 	  server_join = {
-	#    retry_join = ["${nomad_server_endpoint}"]
-		retry_join = ["${server_retry_join}"]
+	    retry_join = ["${nomad_server_endpoint}"]
+		# retry_join = ["${server_retry_join}"]
 	  }
 	EOT
 	fi

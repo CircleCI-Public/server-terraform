@@ -3,25 +3,8 @@ locals {
 
 }
 
-resource "google_tags_tag_key" "key" {
-  parent      = "projects/${var.project_id}"
-  short_name  = "circleci-${var.name}-nomad-servers-tag-key"
-  description = "Tag key for CircleCI Nomad server tags"
-}
-
-resource "google_tags_tag_value" "value" {
-  parent      = google_tags_tag_key.key.id
-  short_name  = "circleci-${var.name}-nomad-servers"
-  description = "Tag key value for CircleCI Nomad server tags"
-}
-
-# resource "google_tags_tag_binding" "binding" {
-#   parent    = "//compute.googleapis.com/projects/${var.project_id}/global/instanceTemplates/${google_compute_instance_template.nomad.id}"
-#   tag_value = google_tags_tag_value.value.id
-# }
-
 resource "google_compute_autoscaler" "nomad" {
-  name   = "${var.name}-nomad-server-group"
+  name   = "${var.name}-nomad-server-autoscaler"
   zone   = var.zone
   target = google_compute_instance_group_manager.nomad.id
 
@@ -51,6 +34,23 @@ resource "google_compute_autoscaler" "nomad" {
         description           = scaling_schedules.value["description"]
       }
     }
+  }
+}
+
+resource "google_compute_health_check" "nomad" {
+  name        = "${var.name}-nomad-server-health-check"
+
+  timeout_sec         = 5
+  check_interval_sec  = 10
+  healthy_threshold   = 4
+  unhealthy_threshold = 5
+
+  http_health_check {
+    port                = "4646"
+    host               = "127.0.0.1"
+    request_path       = "/v1/agent/health?type=server"
+    proxy_header       = "NONE"
+    response          = "{\"server\":{\"message\":\"ok\",\"ok\":true}}"
   }
 }
 
@@ -137,6 +137,11 @@ resource "google_compute_instance_group_manager" "nomad" {
   target_pools       = [google_compute_target_pool.nomad.id]
   target_size        = var.min_server_replicas
   base_instance_name = "${var.name}-nomad-server"
+
+  auto_healing_policies {
+    health_check      = google_compute_health_check.nomad.id
+    initial_delay_sec = 300
+  }
 }
 
 data "google_compute_image" "machine_image" {
@@ -171,4 +176,16 @@ resource "google_compute_firewall" "nomad" {
 
   source_ranges = var.retry_with_ssh_allowed_cidr_blocks #tfsec:ignore:google-compute-no-public-ingress
   target_tags   = local.tags
+}
+
+
+resource "google_compute_forwarding_rule" "nomad" {
+  region                = var.region
+  name                  = "${var.name}-nomad-server-forwarding-rule"
+  target                = google_compute_target_pool.nomad.self_link
+  load_balancing_scheme = "EXTERNAL"
+  port_range            = "4646-4748"
+  ip_protocol           = "TCP"
+  # network               = var.network
+  # subnetwork            = var.subnetwork
 }

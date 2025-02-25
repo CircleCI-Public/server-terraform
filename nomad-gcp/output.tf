@@ -41,16 +41,10 @@ output "managed_instance_group_zone" {
   value = google_compute_instance_group_manager.nomad.zone
 }
 
-output "service_account_key" {
-  value       = local.output_sa_key ? base64decode(google_service_account_key.nomad-as-key[0].private_key) : ""
-  sensitive   = true
-  description = "Base64 decoded service account key."
+output "managed_instance_group_instances_nomad_server" {
+  value = module.server.nomad_server_instance_group_manager
 }
 
-output "service_account_key_location" {
-  value = var.enable_workload_identity ? "" : "${path.cwd}/nomad-as-key.json"
-}
-
-output "service_account_email" {
-  value = var.nomad_auto_scaler ? google_service_account.nomad_as_service_account[0].email : ""
+output "nomad_server_nlb" {
+  value = module.server.nomad_server_nlb_ip
 }

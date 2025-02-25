@@ -1,19 +1,20 @@
 locals {
-  nomad_server_hostname_and_port = "${var.nomad_server_hostname}:${var.nomad_server_port}"
+  nomad_server_host = var.nomad_server_enabled ? module.server.nomad_server_nlb_ip : var.nomad_server_hostname 
+  nomad_server_hostname_and_port = "${local.nomad_server_host}:${var.nomad_server_port}"
   server_retry_join              = "provider=gce project_name=${var.project_id} zone_pattern=${var.zone} tag_value=circleci-${var.name}-nomad-servers"
 }
 
 module "tls" {
   source                  = "./../shared/modules/tls"
-  nomad_server_hostname   = ""
-  nomad_server_port       = 0
-  nomad_server_dns_enable = var.nomad_server_dns_enable
+  nomad_server_hostname   = var.nomad_server_hostname
+  nomad_server_port       = var.nomad_server_port
+  nomad_server_dns_enable = var.nomad_server_enabled
   nomad_server_dns_name   = "${var.name}-*.${var.zone}.c.${var.project_id}.internal"
   count                   = var.unsafe_disable_mtls ? 0 : 1
 }
 
 resource "google_compute_autoscaler" "nomad" {
-  name   = "${var.name}-nomad-group"
+  name   = "${var.name}-nomad-clients-autoscaler"
   zone   = var.zone
   target = google_compute_instance_group_manager.nomad.id
 
@@ -43,6 +44,23 @@ resource "google_compute_autoscaler" "nomad" {
         description           = scaling_schedules.value["description"]
       }
     }
+  }
+}
+
+resource "google_compute_health_check" "nomad" {
+  name        = "${var.name}-nomad-client-health-check"
+
+  timeout_sec         = 5
+  check_interval_sec  = 10
+  healthy_threshold   = 4
+  unhealthy_threshold = 5
+
+  http_health_check {
+    port                = "4646"
+    host               = "127.0.0.1"
+    request_path       = "/v1/agent/health?type=client"
+    proxy_header       = "NONE"
+    response          = "{\"client\":{\"message\":\"ok\",\"ok\":true}}"
   }
 }
 
@@ -131,6 +149,11 @@ resource "google_compute_instance_group_manager" "nomad" {
 
   target_pools       = [google_compute_target_pool.nomad.id]
   base_instance_name = "${var.name}-nomad"
+
+    auto_healing_policies {
+    health_check      = google_compute_health_check.nomad.id
+    initial_delay_sec = 300
+  }
 }
 
 data "google_compute_image" "machine_image" {
