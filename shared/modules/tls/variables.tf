@@ -12,7 +12,7 @@ variable "nomad_server_port" {
 variable "nomad_server_dns_enable" {
   type        = bool
   description = "Whether to enable DNS for the nomad server."
-  default = false
+  default     = false
 }
 
 variable "nomad_server_dns_name" {
