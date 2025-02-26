@@ -1,24 +1,21 @@
-locals {
-  nomad_server_hostname_and_port = "${var.nomad_server_hostname}:${var.nomad_server_port}"
-  server_retry_join              = "provider=gce project_name=${var.project_id} zone_pattern=${var.zone} tag_value=circleci-${var.name}-nomad-servers"
+data "google_compute_image" "machine_image" {
+  family  = var.machine_image_family
+  project = var.machine_image_project
 }
 
-module "tls" {
-  source                = "./../shared/modules/tls"
-  nomad_server_hostname = var.nomad_server_hostname
-  nomad_server_port     = var.nomad_server_port
-  count                 = var.unsafe_disable_mtls ? 0 : 1
+locals {
+  tags = ["nomad-server", "circleci-nomad-server", "circleci-${var.name}-nomad-servers", "nomad"]
 }
 
 resource "google_compute_autoscaler" "nomad" {
-  name   = "${var.name}-nomad-clients-autoscaler"
+  name   = "${var.name}-nomad-server-autoscaler"
   zone   = var.zone
   target = google_compute_instance_group_manager.nomad.id
 
   autoscaling_policy {
-    max_replicas = var.max_replicas
-    min_replicas = var.min_replicas
-    mode         = var.autoscaling_mode
+    max_replicas = var.max_server_replicas
+    min_replicas = var.min_server_replicas
+    mode         = var.server_autoscaling_mode
 
     # Wait 60s * 2 = 2 minutes for initialization before measuring CPU
     # utilization for autoscaling actions. This is the approximate boot
@@ -26,11 +23,11 @@ resource "google_compute_autoscaler" "nomad" {
     cooldown_period = 120
 
     cpu_utilization {
-      target = var.target_cpu_utilization
+      target = var.server_target_cpu_utilization
     }
 
     dynamic "scaling_schedules" {
-      for_each = var.autoscaling_schedules
+      for_each = var.server_autoscaling_schedules
       content {
         name                  = scaling_schedules.value["name"]
         min_required_replicas = scaling_schedules.value["min_required_replicas"]
@@ -45,7 +42,7 @@ resource "google_compute_autoscaler" "nomad" {
 }
 
 resource "google_compute_health_check" "nomad" {
-  name = "${var.name}-nomad-client-health-check"
+  name = "${var.name}-nomad-server-health-check"
 
   timeout_sec         = 5
   check_interval_sec  = 10
@@ -55,38 +52,42 @@ resource "google_compute_health_check" "nomad" {
   http_health_check {
     port         = "4646"
     host         = "127.0.0.1"
-    request_path = "/v1/agent/health?type=client"
+    request_path = "/v1/agent/health?type=server"
     proxy_header = "NONE"
-    response     = "{\"client\":{\"message\":\"ok\",\"ok\":true}}"
+    response     = "{\"server\":{\"message\":\"ok\",\"ok\":true}}"
   }
 }
 
 resource "google_compute_instance_template" "nomad" {
-  name_prefix    = "${var.name}-nomad-clients-"
+  name_prefix    = "${var.name}-nomad-servers-"
   machine_type   = var.machine_type
   can_ip_forward = false
 
-  tags = ["nomad", "circleci-server", "${var.name}-nomad-clients"]
+  tags = local.tags
+
+  labels = {
+    app = "circleci-${var.name}-nomad-servers",
+  }
 
   disk {
     source_image = data.google_compute_image.machine_image.self_link
-    disk_type    = var.disk_type
-    disk_size_gb = var.disk_size_gb
+    disk_type    = var.server_disk_type
+    disk_size_gb = var.server_disk_size_gb
     boot         = true
     auto_delete  = true
   }
 
   metadata_startup_script = templatefile(
-    "${path.module}/templates/nomad-startup.sh.tpl",
+    "${path.module}/templates/nomad-server-startup.sh.tpl",
     {
-      nomad_version         = var.nomad_version
-      add_server_join       = var.add_server_join ? var.add_server_join : ""
+      patched_nomad_version = var.patched_nomad_version
       blocked_cidrs         = var.blocked_cidrs
-      client_tls_cert       = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_cert
-      client_tls_key        = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_key
-      tls_ca                = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_tls_ca
-      docker_network_cidr   = var.docker_network_cidr
-      server_retry_join     = var.nomad_server_enabled ? local.server_retry_join : local.nomad_server_hostname_and_port
+      tls_cert              = var.tls_cert
+      tls_key               = var.tls_key
+      tls_ca                = var.tls_ca
+      max_replicas          = var.max_server_replicas
+      min_replicas          = var.min_server_replicas
+      server_retry_join     = var.server_retry_join
     }
   )
 
@@ -108,12 +109,6 @@ resource "google_compute_instance_template" "nomad" {
     enable_secure_boot = true
   }
 
-  scheduling {
-    # Automatic restart and preemptible are mutually exclusive for
-    # some reason
-    automatic_restart = var.preemptible ? false : true
-    preemptible       = var.preemptible
-  }
 
   lifecycle {
     create_before_destroy = true
@@ -130,12 +125,12 @@ resource "google_compute_instance_template" "nomad" {
 }
 
 resource "google_compute_target_pool" "nomad" {
-  name   = "${var.name}-nomad"
+  name   = "${var.name}-nomad-server-pool"
   region = var.region
 }
 
 resource "google_compute_instance_group_manager" "nomad" {
-  name = "${var.name}-nomad"
+  name = "${var.name}-nomad-server-group"
   zone = var.zone
 
   version {
@@ -144,23 +139,17 @@ resource "google_compute_instance_group_manager" "nomad" {
   }
 
   target_pools       = [google_compute_target_pool.nomad.id]
-  base_instance_name = "${var.name}-nomad"
+  target_size        = var.min_server_replicas
+  base_instance_name = "${var.name}-nomad-server"
 
   auto_healing_policies {
     health_check      = google_compute_health_check.nomad.id
     initial_delay_sec = 300
   }
-
 }
 
-data "google_compute_image" "machine_image" {
-  family  = var.machine_image_family
-  project = var.machine_image_project
-}
-
-
-resource "google_compute_firewall" "default" {
-  name    = "allow-retry-with-ssh-circleci-server-${var.name}"
+resource "google_compute_firewall" "nomad" {
+  name    = "allow-connection-nomad-clients-to-nomad-server-for-${var.name}"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
@@ -170,9 +159,31 @@ resource "google_compute_firewall" "default" {
 
   allow {
     protocol = "tcp"
-    ports    = ["0-65535"]
+    ports    = ["4646-4748"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["4646-4748"]
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
   }
 
   source_ranges = var.retry_with_ssh_allowed_cidr_blocks #tfsec:ignore:google-compute-no-public-ingress
-  target_tags   = ["nomad", "circleci-server", var.name]
+  target_tags   = local.tags
+}
+
+
+# Only External type Load balancer is supported for target pool
+resource "google_compute_forwarding_rule" "nomad" {
+  region                = var.region
+  name                  = "${var.name}-nomad-server-forwarding-rule"
+  target                = google_compute_target_pool.nomad.self_link
+  load_balancing_scheme = "EXTERNAL"
+  port_range            = "4646-4748"
+  ip_protocol           = "TCP"
+  ip_address            = var.nomad_server_ip_address
 }
