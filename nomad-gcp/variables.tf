@@ -219,7 +219,7 @@ variable "max_server_replicas" {
 
 variable "server_machine_type" {
   type        = string
-  default     = "n2-standard-4" # Intel | 8vCPU | 32GiB
+  default     = "n2-standard-4" # Intel | 4vCPU | 16GiB
   description = "Instance type for nomad server"
 }
 
@@ -231,7 +231,7 @@ variable "server_disk_type" {
 
 variable "server_disk_size_gb" {
   type        = number
-  default     = 50
+  default     = 20
   description = "Size of the root disk for nomad server in GB."
 }
 
@@ -243,7 +243,7 @@ variable "nomad_server_auto_scaler" {
 
 variable "server_autoscaling_mode" {
   type        = string
-  default     = "ON"
+  default     = "OFF"
   description = <<-EOF
     Autoscaler mode. Can be
     - "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules
