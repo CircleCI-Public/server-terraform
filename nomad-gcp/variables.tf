@@ -200,8 +200,9 @@ variable "nomad_version" {
 # Only used if nomad server is enabled
 
 variable "nomad_server_enabled" {
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
+  description = "Set to true to enable nomad server"
 }
 
 variable "min_server_replicas" {
@@ -237,7 +238,7 @@ variable "server_disk_size_gb" {
 variable "nomad_server_auto_scaler" {
   type        = bool
   default     = true
-  description = "If true, terraform will create a service account to be used by nomad autoscaler."
+  description = "If true, terraform will enable autoscaling for nomad server cluster"
 }
 
 variable "server_autoscaling_mode" {
@@ -273,5 +274,5 @@ variable "server_autoscaling_schedules" {
 variable "server_target_cpu_utilization" {
   type        = number
   default     = 0.8
-  description = "Target CPU utilization to trigger autoscaling"
+  description = "Target CPU utilization to trigger autoscaling for nomad server cluster"
 }

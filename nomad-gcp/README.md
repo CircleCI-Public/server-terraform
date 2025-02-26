@@ -99,11 +99,15 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_name"></a> [name](#input\_name) | VM instance name for nomad client | `string` | `"nomad"` | no |
 | <a name="input_network"></a> [network](#input\_network) | Network to deploy nomad clients into | `string` | `"default"` | no |
 | <a name="input_nomad_auto_scaler"></a> [nomad\_auto\_scaler](#input\_nomad\_auto\_scaler) | If true, terraform will create a service account to be used by nomad autoscaler. | `bool` | `false` | no |
-| <a name="input_nomad_server_auto_scaler"></a> [nomad\_server\_auto\_scaler](#input\_nomad\_server\_auto\_scaler) | If true, terraform will create a service account to be used by nomad autoscaler. | `bool` | `true` | no |
-| <a name="input_nomad_server_enabled"></a> [nomad\_server\_enabled](#input\_nomad\_server\_enabled) | n/a | `bool` | `false` | no |
+| <a name="input_nomad_server_auto_scaler"></a> [nomad\_server\_auto\_scaler](#input\_nomad\_server\_auto\_scaler) | If true, terraform will enable autoscaling for nomad server cluster | `bool` | `true` | no |
+| <a name="input_nomad_server_enabled"></a> [nomad\_server\_enabled](#input\_nomad\_server\_enabled) | Set to true to enable nomad server | `bool` | `false` | no |
 | <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com) | `string` | n/a | yes |
 | <a name="input_nomad_server_port"></a> [nomad\_server\_port](#input\_nomad\_server\_port) | Port that the server endpoint listens on for nomad connections. | `number` | `4647` | no |
+<<<<<<< HEAD
 | <a name="input_nomad_version"></a> [nomad\_version](#input\_nomad\_version) | The version of Nomad to install | `string` | `"1.9.7-1"` | no |
+=======
+| <a name="input_patched_nomad_version"></a> [patched\_nomad\_version](#input\_patched\_nomad\_version) | The version of Nomad to install | `string` | `"latest"` | no |
+>>>>>>> ce0283f (updated docs)
 | <a name="input_preemptible"></a> [preemptible](#input\_preemptible) | Whether or not to use preemptible nodes | `bool` | `false` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | GCP project ID to deploy resources into. By default uses the data sourced GCP project ID. | `string` | `""` | no |
 | <a name="input_region"></a> [region](#input\_region) | GCP region to deploy nomad clients into (e.g us-east1) | `string` | n/a | yes |
@@ -113,7 +117,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_server_disk_size_gb"></a> [server\_disk\_size\_gb](#input\_server\_disk\_size\_gb) | Size of the root disk for nomad server in GB. | `number` | `50` | no |
 | <a name="input_server_disk_type"></a> [server\_disk\_type](#input\_server\_disk\_type) | Root disk type. Can be 'pd-standard', 'pd-ssd', 'pd-balanced' or 'local-ssd' | `string` | `"pd-ssd"` | no |
 | <a name="input_server_machine_type"></a> [server\_machine\_type](#input\_server\_machine\_type) | Instance type for nomad server | `string` | `"n2-standard-4"` | no |
-| <a name="input_server_target_cpu_utilization"></a> [server\_target\_cpu\_utilization](#input\_server\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling | `number` | `0.8` | no |
+| <a name="input_server_target_cpu_utilization"></a> [server\_target\_cpu\_utilization](#input\_server\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling for nomad server cluster | `number` | `0.8` | no |
 | <a name="input_subnetwork"></a> [subnetwork](#input\_subnetwork) | Subnetwork to deploy nomad clients into. NB. This is required if using custom subnets | `string` | `""` | no |
 | <a name="input_target_cpu_utilization"></a> [target\_cpu\_utilization](#input\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling | `number` | `0.5` | no |
 | <a name="input_unsafe_disable_mtls"></a> [unsafe\_disable\_mtls](#input\_unsafe\_disable\_mtls) | Disables mTLS between nomad client and servers. Compromises the authenticity and confidentiality of client-server communication. Should not be set to true in any production setting | `bool` | `false` | no |
