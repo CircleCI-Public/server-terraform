@@ -224,14 +224,15 @@ variable "server_disk_size_gb" {
 }
 
 variable "server_machine_type" {
-    type        = string
-    description = "The instance type of the EC2 Nomad Servers."
-    default     = "m4.xlarge"
+  type        = string
+  description = "The instance type of the EC2 Nomad Servers."
+  default     = "m4.xlarge"
 }
 
 variable "server_ssh_key" {
-    type = string
-    description = "An SSH key you wish to attach to SSH into the nomad-server instances. Must allow port 22"
+  type        = string
+  description = "An SSH key you wish to attach to SSH into the nomad-server instances. Must allow port 22"
+  default     = null
 }
 
 variable "allow_ssh" {
@@ -245,7 +246,29 @@ variable "server_public_ip" {
   default     = false
   description = "Should the EC2 instances have a public IP?"
   validation {
-    condition     = var.public_ip == true || var.public_ip == false
+    condition     = var.server_public_ip == true || var.server_public_ip == false
     error_message = "The value for public_ip must be either true or false."
+  }
+}
+
+variable "tag_key_for_discover" {
+  type        = string
+  description = "The tag key placed on each EC2 instance for Nomad Server discoverability."
+  default     = "identifier"
+}
+
+variable "tag_value_for_discover" {
+  type        = string
+  description = "The tag value placed on each EC2 instance for Nomad Server discoverability."
+  default     = "nomad-server-instance"
+}
+
+variable "addr_type" {
+  type        = string
+  description = "What IP should the Nomad servers discover"
+  default     = "private_v4"
+  validation {
+    condition     = contains(["private_v4"], var.addr_type)
+    error_message = "This variable must be 'private_v4'."
   }
 }

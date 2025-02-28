@@ -57,6 +57,10 @@ data "cloudinit_config" "nomad_user_data" {
         blocked_cidrs         = var.blocked_cidrs
         docker_network_cidr   = var.docker_network_cidr
         dns_server            = var.dns_server
+        tag_key               = var.tag_key_for_discover
+        tag_value             = var.tag_value_for_discover
+        addr_type             = var.addr_type
+        region                = var.aws_region
       }
     )
   }

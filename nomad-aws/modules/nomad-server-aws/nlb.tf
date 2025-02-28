@@ -5,7 +5,7 @@ resource "aws_lb" "internal_nlb" {
   load_balancer_type = "network"
 
   dynamic "subnet_mapping" {
-    for_each = [ aws_subnet.nomad-server-subnet.id ]
+    for_each = [aws_subnet.nomad-server-subnet.id]
     content {
       subnet_id = subnet_mapping.value
     }
@@ -20,7 +20,7 @@ resource "aws_lb" "internal_nlb" {
 
 resource "aws_lb_target_group" "target_group" {
   name     = var.target_group_name
-  port     = 4647 
+  port     = 4647
   protocol = "TCP"
   vpc_id   = aws_vpc.nomad-server-vpc.id
   tags     = var.tags
@@ -28,7 +28,7 @@ resource "aws_lb_target_group" "target_group" {
 
 resource "aws_lb_listener" "nlb_listener_4646" {
   load_balancer_arn = aws_lb.internal_nlb.arn
-  port              = 4646  
+  port              = 4646
   protocol          = "TCP"
 
   default_action {
@@ -50,7 +50,7 @@ resource "aws_lb_listener" "nlb_listener_4647" {
 
 resource "aws_lb_listener" "nlb_listener_4648" {
   load_balancer_arn = aws_lb.internal_nlb.arn
-  port              = 4648 
+  port              = 4648
   protocol          = "TCP"
 
   default_action {

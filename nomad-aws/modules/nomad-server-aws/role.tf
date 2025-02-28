@@ -6,8 +6,8 @@ resource "aws_iam_policy" "describe_ec2_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = "ec2:DescribeInstances"
+        Effect   = "Allow"
+        Action   = "ec2:DescribeInstances"
         Resource = "*"
       }
     ]
@@ -16,7 +16,7 @@ resource "aws_iam_policy" "describe_ec2_policy" {
 }
 
 resource "aws_iam_role" "nomad_role" {
-  name               = var.nomad_role_name
+  name = var.nomad_role_name
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

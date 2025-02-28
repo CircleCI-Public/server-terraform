@@ -63,7 +63,7 @@ server {
     enabled = true
     bootstrap_expect = ${bootstrap_expect}
     server_join {
-        retry_join = ["provider="aws" tag_key=${tag_key} tag_value=${tag_value} addr_type=${addr_type} region=${region}"]
+        retry_join = ["provider=aws tag_key=${tag_key} tag_value=${tag_value} addr_type=${addr_type} region=${region}"]
         retry_max  = 30
         retry_interval = "30s"
     }
