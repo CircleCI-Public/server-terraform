@@ -189,8 +189,8 @@ variable "machine_image_family" {
   default     = "ubuntu-2004-lts"
 }
 
-variable "patched_nomad_version" {
+variable "nomad_version" {
   type        = string
-  description = "The version of CircleCI's fork Nomad to install"
-  default     = "1.4.568-bfc9a6ec4"
+  description = "The version of Nomad to install"
+  default     = "1.9.7-1"
 }
