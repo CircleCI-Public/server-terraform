@@ -132,7 +132,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_nomad_auto_scaler"></a> [nomad\_auto\_scaler](#input\_nomad\_auto\_scaler) | If set to true, A Nomad User or A Role will be created based on enable\_irsa variable values | `bool` | `false` | no |
 | <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com) | `string` | n/a | yes |
 | <a name="input_nomad_server_port"></a> [nomad\_server\_port](#input\_nomad\_server\_port) | Port that the server endpoint listens on for nomad connections. | `number` | `4647` | no |
-| <a name="input_patched_nomad_version"></a> [patched\_nomad\_version](#input\_patched\_nomad\_version) | The version of CircleCI's fork Nomad to install | `string` | `"1.4.568-bfc9a6ec4"` | no |
+| <a name="input_nomad_version"></a> [nomad\_version](#input\_nomad\_version) | The version of Nomad to install | `string` | `"1.9.7-1"` | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the role to add to the instance profile | `string` | `null` | no |
 | <a name="input_security_group_id"></a> [security\_group\_id](#input\_security\_group\_id) | ID for the security group for Nomad clients.<br/>See security documentation for recommendations. | `list(string)` | `[]` | no |
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes | `string` | `null` | no |
