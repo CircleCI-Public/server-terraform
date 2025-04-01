@@ -81,12 +81,12 @@ fi
 echo "--------------------------------------"
 echo "         Installing nomad"
 echo "--------------------------------------"
-apt-get install -y zip
-curl --retry 99 --retry-delay 1 --retry-connrefused -o linux_amd64.zip "https://circleci-binary-releases.s3.amazonaws.com/nomad/${patched_nomad_version}/linux_amd64.zip"
-curl --retry 99 --retry-delay 1 --retry-connrefused -o linux_amd64.zip.sha "https://circleci-binary-releases.s3.amazonaws.com/nomad/${patched_nomad_version}/linux_amd64.zip.sha"
-sha256sum -c linux_amd64.zip.sha || exit 1
-unzip linux_amd64.zip
-mv nomad /usr/bin
+sudo apt-get update && \
+sudo apt-get install wget gpg coreutils
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt-get update && sudo apt-get install nomad=${nomad_version}
+
 
 echo "--------------------------------------"
 echo "       Installling TLS certs"
