@@ -47,80 +47,11 @@ variable "nomad_server_hostname" {
   }
 }
 
-variable "nomad_server_port" {
-  type        = number
-  description = "Port that the server endpoint listens on for nomad connections."
-  default     = 4647
-}
 
 variable "blocked_cidrs" {
   type        = list(string)
   default     = []
   description = "List of CIDR blocks to block access to from inside nomad jobs"
-}
-
-variable "docker_network_cidr" {
-  type        = string
-  description = <<-EOF
-    IP CIDR block to be used in docker networks when running job on nomad client.
-    This CIDR block should not be the same as your VPC CIDR block.
-    i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16"
-    EOF
-  default     = "10.10.0.0/16"
-}
-
-variable "min_replicas" {
-  type        = number
-  default     = 1
-  description = "Minimum number of nomad clients when scaled down"
-}
-
-variable "max_replicas" {
-  type        = number
-  default     = 4
-  description = "Max number of nomad clients when scaled up"
-}
-
-variable "nomad_auto_scaler" {
-  type        = bool
-  default     = false
-  description = "If true, terraform will create a service account to be used by nomad autoscaler."
-}
-
-variable "autoscaling_mode" {
-  type        = string
-  default     = "ONLY_UP"
-  description = <<-EOF
-    Autoscaler mode. Can be
-    - "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules
-    - "OFF": Autoscaler will never scale up or down
-    - "ONLY_UP": Autoscaler will only scale up (default)
-    Warning: jobs may be interrupted on scale down. Only select "ON" if
-    interruptions are acceptible for your use case.
-  EOF
-}
-
-variable "autoscaling_schedules" {
-  type = list(object({
-    name                  = string
-    min_required_replicas = number
-    schedule              = string
-    time_zone             = string
-    duration_sec          = number
-    disabled              = bool
-    description           = string
-  }))
-  default     = []
-  description = <<-EOF
-    Autoscaler scaling schedules. Accepts the same arguments are documented
-    upstream here: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_autoscaler#scaling_schedules
-  EOF
-}
-
-variable "target_cpu_utilization" {
-  type        = number
-  default     = 0.5
-  description = "Target CPU utilization to trigger autoscaling"
 }
 
 variable "machine_type" {
@@ -135,46 +66,10 @@ variable "assign_public_ip" {
   description = "Assign public IP"
 }
 
-variable "preemptible" {
-  type        = bool
-  default     = false
-  description = "Whether or not to use preemptible nodes"
-}
-
-variable "disk_type" {
-  type        = string
-  default     = "pd-ssd"
-  description = "Root disk type. Can be 'pd-standard', 'pd-ssd', 'pd-balanced' or 'local-ssd'"
-}
-
-variable "disk_size_gb" {
-  type        = number
-  default     = 300
-  description = "Size of the root disk for nomad clients in GB."
-}
-
 variable "name" {
   type        = string
   default     = "nomad"
   description = "VM instance name for nomad client"
-}
-
-variable "add_server_join" {
-  type        = bool
-  default     = true
-  description = "Includes the 'server_join' block when setting up nomad clients. Should be disabled when the nomad server endpoint is not immediately known (eg, for dedicated nomad clients)."
-}
-
-variable "enable_workload_identity" {
-  type        = bool
-  default     = false
-  description = "If true, Workload Identity will be used rather than static credentials. Ensure Workload Identities are first enabled on your GKE cluster: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity"
-}
-
-variable "k8s_namespace" {
-  type        = string
-  default     = "circleci-server"
-  description = "If enable_workload_identity is true, provide application k8s namespace"
 }
 
 variable "machine_image_project" {
@@ -189,20 +84,10 @@ variable "machine_image_family" {
   default     = "ubuntu-2004-lts"
 }
 
-variable "nomad_version" {
+variable "patched_nomad_version" {
   type        = string
   description = "The version of Nomad to install"
-  default     = "1.9.7-1"
-}
-
-
-# Below are variables for nomad server
-# Only used if nomad server is enabled
-
-variable "nomad_server_enabled" {
-  type        = bool
-  default     = false
-  description = "Set to true to enable nomad server"
+  default     = "latest"
 }
 
 variable "min_server_replicas" {
@@ -219,7 +104,7 @@ variable "max_server_replicas" {
 
 variable "server_machine_type" {
   type        = string
-  default     = "n2-standard-4" # Intel | 4vCPU | 16GiB
+  default     = "n2-standard-4" # Intel | 8vCPU | 32GiB
   description = "Instance type for nomad server"
 }
 
@@ -231,19 +116,32 @@ variable "server_disk_type" {
 
 variable "server_disk_size_gb" {
   type        = number
-  default     = 20
-  description = "Size of the root disk for nomad server in GB."
+  default     = 80
+  description = "Size of the root disk for nomad clients in GB."
 }
 
-variable "nomad_server_auto_scaler" {
-  type        = bool
-  default     = true
-  description = "If true, terraform will enable autoscaling for nomad server cluster"
+variable "tls_cert" {
+  type        = string
+  default     = ""
+  description = "TLS certificate for nomad server"
+}
+
+variable "tls_ca" {
+  type        = string
+  default     = ""
+  description = "TLS CA for nomad server"
+
+}
+
+variable "tls_key" {
+  type        = string
+  default     = ""
+  description = "TLS key for nomad server"
 }
 
 variable "server_autoscaling_mode" {
   type        = string
-  default     = "OFF"
+  default     = "ON"
   description = <<-EOF
     Autoscaler mode. Can be
     - "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules
@@ -271,8 +169,22 @@ variable "server_autoscaling_schedules" {
   EOF
 }
 
+variable "nomad_server_auto_scaler" {
+  type        = bool
+  default     = true
+  description = "If true, terraform will create a service account to be used by nomad autoscaler."
+}
+
 variable "server_target_cpu_utilization" {
   type        = number
   default     = 0.8
-  description = "Target CPU utilization to trigger autoscaling for nomad server cluster"
+  description = "Target CPU utilization to trigger autoscaling"
+}
+
+variable "server_retry_join" {
+  type = string
+}
+
+variable "nomad_server_ip_address" {
+  type = string
 }
