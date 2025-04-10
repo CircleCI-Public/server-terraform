@@ -1,3 +1,8 @@
+variable "aws_region" {
+  type        = string
+  description = "The AWS region"
+  default     = ""
+}
 variable "subnet" {
   type        = string
   description = "Subnet ID"
@@ -192,4 +197,78 @@ variable "enable_imdsv2" {
   type        = string
   description = "Enable or Disable IMDSv2 on Nomad clients. Optional or Required. This is only supported on, or after, CircleCI Server 4.6.0"
   default     = "optional"
+}
+
+variable "nomad_server_enabled" {
+  type        = bool
+  default     = false
+  description = "Set to true to enable nomad server"
+}
+
+variable "min_server_replicas" {
+  type        = number
+  default     = 5
+  description = "Minimum number of Nomad Server instances"
+}
+
+variable "max_server_replicas" {
+  type        = number
+  default     = 7
+  description = "Maximum number of Nomad Server instances"
+}
+
+variable "server_disk_size_gb" {
+  type        = number
+  default     = 20
+  description = "Disk size for nomad server instances"
+}
+
+variable "server_machine_type" {
+  type        = string
+  description = "The instance type of the EC2 Nomad Servers."
+  default     = "m4.xlarge"
+}
+
+variable "server_ssh_key" {
+  type        = string
+  description = "An SSH key you wish to attach to SSH into the nomad-server instances. Must allow port 22"
+  default     = null
+}
+
+variable "allow_ssh" {
+  description = "Enable SSH access inbound (true/false)"
+  type        = bool
+  default     = false
+}
+
+variable "server_public_ip" {
+  type        = bool
+  default     = false
+  description = "Should the EC2 instances have a public IP?"
+  validation {
+    condition     = var.server_public_ip == true || var.server_public_ip == false
+    error_message = "The value for public_ip must be either true or false."
+  }
+}
+
+variable "tag_key_for_discover" {
+  type        = string
+  description = "The tag key placed on each EC2 instance for Nomad Server discoverability."
+  default     = "identifier"
+}
+
+variable "tag_value_for_discover" {
+  type        = string
+  description = "The tag value placed on each EC2 instance for Nomad Server discoverability."
+  default     = "nomad-server-instance"
+}
+
+variable "addr_type" {
+  type        = string
+  description = "What IP should the Nomad servers discover"
+  default     = "private_v4"
+  validation {
+    condition     = contains(["private_v4"], var.addr_type)
+    error_message = "This variable must be 'private_v4'."
+  }
 }

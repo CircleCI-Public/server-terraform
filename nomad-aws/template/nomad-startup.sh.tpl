@@ -120,8 +120,10 @@ advertise {
 client {
     enabled = true
     # Expecting to have DNS record for nomad server(s)
-    server_join = {
-        retry_join = ["${nomad_server_endpoint}"]
+    server_join {
+        retry_join = ["provider="aws" tag_key="${tag_key}" tag_value=${tag_value} addr_type=${addr_type} region=${region}"]
+        retry_max  = 30
+        retry_interval = "30s"
     }
     node_class = "linux-64bit"
     options = {"driver.raw_exec.enable" = "1"}
