@@ -121,7 +121,7 @@ client {
     enabled = true
     # Expecting to have DNS record for nomad server(s)
     server_join {
-        retry_join = ["provider="aws" tag_key="${tag_key}" tag_value=${tag_value} addr_type=${addr_type} region=${region}"]
+        retry_join = ["${server_retry_join}"]
         retry_max  = 30
         retry_interval = "30s"
     }
