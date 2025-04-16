@@ -16,7 +16,8 @@
             "Effect": "Allow",
             "Action": [
                 "autoscaling:DescribeScalingActivities",
-                "autoscaling:DescribeAutoScalingGroups"
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeInstanceRefreshes"
             ],
             "Resource": "*"
         }
