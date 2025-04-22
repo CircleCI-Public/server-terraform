@@ -17,7 +17,9 @@
             "Action": [
                 "autoscaling:DescribeScalingActivities",
                 "autoscaling:DescribeAutoScalingGroups",
-                "autoscaling:DescribeInstanceRefreshes"
+                "autoscaling:DescribeInstanceRefreshes",
+                "ec2:DescribeInstances",
+                "ec2:DescribeInstanceStatus"
             ],
             "Resource": "*"
         }

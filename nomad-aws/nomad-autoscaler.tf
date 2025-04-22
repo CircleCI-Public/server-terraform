@@ -20,11 +20,10 @@ resource "aws_iam_user_policy" "nomad_asg_user" {
   })
 }
 
-
 resource "aws_iam_role" "nomad_role" {
   count = local.autoscaler_type == "role" ? 1 : 0
 
-  name = "${var.basename}-circleci-nomad-autoscaler-irsa-role"
+  name = "${var.basename}-circleci-nomad-clients-autoscaler-irsa-role"
   assume_role_policy = templatefile("${path.module}/template/nomad_irsa_trust_policy.tpl", {
     OIDC_PRINCIPAL_ID   = lookup(var.enable_irsa, "oidc_principal_id", "")
     OIDC_EKS_VARIABLE   = lookup(var.enable_irsa, "oidc_eks_variable", "")

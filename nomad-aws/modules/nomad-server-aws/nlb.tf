@@ -1,29 +1,35 @@
+data "aws_vpc" "nomad" {
+  id = var.vpc_id
+}
+
 # Create the Internal NLB
 resource "aws_lb" "internal_nlb" {
-  name               = var.nlb_name
+  name               = "${var.basename}-circleci-nomad-server-nlb"
   internal           = true
   load_balancer_type = "network"
 
   dynamic "subnet_mapping" {
-    for_each = [aws_subnet.nomad-server-subnet.id]
+    for_each = local.subnet_ids
     content {
       subnet_id = subnet_mapping.value
     }
   }
   tags = merge(
-    var.tags,
+    local.tags,
     {
-      "Name" = var.nlb_name
+      "Name" = "${var.basename}-circleci-nomad-server-nlb"
     },
   )
+
+  depends_on = [aws_autoscaling_group.autoscale]
 }
 
 resource "aws_lb_target_group" "target_group" {
-  name     = var.target_group_name
+  name     = "${var.basename}-circleci-nomad-server-tg"
   port     = 4647
   protocol = "TCP"
-  vpc_id   = aws_vpc.nomad-server-vpc.id
-  tags     = var.tags
+  vpc_id   = var.vpc_id
+  tags     = local.tags
 }
 
 resource "aws_lb_listener" "nlb_listener_4646" {

@@ -1,5 +1,5 @@
 resource "aws_iam_policy" "describe_ec2_policy" {
-  name        = "DescribeEC2Policy"
+  name        = "${var.basename}-circleci-nomad-server-role-policy"
   description = "Policy to allow ec2:DescribeInstances"
 
   policy = jsonencode({
@@ -12,11 +12,11 @@ resource "aws_iam_policy" "describe_ec2_policy" {
       }
     ]
   })
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_iam_role" "nomad_role" {
-  name = var.nomad_role_name
+  name = "${var.basename}-circleci-nomad-server-autoscaler-irsa-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -29,7 +29,7 @@ resource "aws_iam_role" "nomad_role" {
       }
     ]
   })
-  tags = var.tags
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "attach_policy_to_role" {
@@ -38,6 +38,6 @@ resource "aws_iam_role_policy_attachment" "attach_policy_to_role" {
 }
 
 resource "aws_iam_instance_profile" "nomad_instance_profile" {
-  name = var.nomad_instance_profile_name
+  name = "${var.basename}-circleci-nomad-server-instance-profile"
   role = aws_iam_role.nomad_role.name
 }
