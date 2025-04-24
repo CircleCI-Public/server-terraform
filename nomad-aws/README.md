@@ -98,7 +98,11 @@ There are more examples in the [examples](./examples/) directory.
 | [aws_autoscaling_group.clients_asg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group) | resource |
 | [aws_iam_access_key.nomad_asg_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_access_key) | resource |
 | [aws_iam_instance_profile.nomad_client_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
+| [aws_iam_policy.describe_ec2_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_role.nomad_instance_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.nomad_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.attach_policy_to_existing_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.attach_policy_to_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_user.nomad_asg_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user) | resource |
 | [aws_iam_user_policy.nomad_asg_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy) | resource |
 | [aws_key_pair.ssh_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
@@ -107,6 +111,9 @@ There are more examples in the [examples](./examples/) directory.
 | [aws_security_group.ssh_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [random_string.key_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [aws_ami.ubuntu_focal](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_iam_policy_document.assume_ec2_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.ec2_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_role.existing_nomad_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_role) | data source |
 | [cloudinit_config.nomad_user_data](https://registry.terraform.io/providers/hashicorp/cloudinit/latest/docs/data-sources/config) | data source |
 
 ## Inputs
@@ -120,6 +127,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | The AWS region | `string` | `""` | no |
 | <a name="input_basename"></a> [basename](#input\_basename) | Name used as prefix for AWS resources | `string` | `""` | no |
 | <a name="input_blocked_cidrs"></a> [blocked\_cidrs](#input\_blocked\_cidrs) | List of CIDR blocks to block access to from within jobs, e.g. your K8s nodes.<br/>You won't want to block access to external VMs here.<br/>It's okay when your dns\_server is within a blocked CIDR block, you can use var.dns\_server to create an exemption. | `list(string)` | n/a | yes |
+| <a name="input_desired_server_replicas"></a> [desired\_server\_replicas](#input\_desired\_server\_replicas) | Desired number of Nomad Server instances | `number` | `3` | no |
 | <a name="input_disk_size_gb"></a> [disk\_size\_gb](#input\_disk\_size\_gb) | The volume size, in GB to each nomad client's /dev/sda1 disk. | `number` | `100` | no |
 | <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | If the IP address of your VPC DNS server is within one of the blocked CIDR blocks you can create an exemption by entering the IP address for it here | `string` | n/a | yes |
 | <a name="input_docker_network_cidr"></a> [docker\_network\_cidr](#input\_docker\_network\_cidr) | IP CIDR to be used in docker networks when running job on nomad client.<br/>This CIDR block should not be the same as your VPC CIDR block.<br/>i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16" | `string` | `"10.10.0.0/16"` | no |
@@ -133,8 +141,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_machine_image_owners"></a> [machine\_image\_owners](#input\_machine\_image\_owners) | List of AWS account IDs that own the images to be used for nomad virtual machines. | `list(string)` | <pre>[<br/>  "833371238208"<br/>]</pre> | no |
 | <a name="input_max_nodes"></a> [max\_nodes](#input\_max\_nodes) | Maximum number of nomad clients to create. Must be greater than or equal to nodes | `number` | `5` | no |
 | <a name="input_max_server_replicas"></a> [max\_server\_replicas](#input\_max\_server\_replicas) | Maximum number of Nomad Server instances | `number` | `7` | no |
-| <a name="input_min_server_replicas"></a> [min\_server\_replicas](#input\_min\_server\_replicas) | Minimum number of Nomad Server instances | `number` | `5` | no |
-| <a name="input_nodes"></a> [nodes](#input\_nodes) | Number of nomad clients to create | `number` | n/a | yes |
+| <a name="input_nodes"></a> [nodes](#input\_nodes) | Desired Number of nomad clients to create | `number` | n/a | yes |
 | <a name="input_nomad_auto_scaler"></a> [nomad\_auto\_scaler](#input\_nomad\_auto\_scaler) | If set to true, A Nomad User or A Role will be created based on enable\_irsa variable values | `bool` | `false` | no |
 | <a name="input_nomad_server_enabled"></a> [nomad\_server\_enabled](#input\_nomad\_server\_enabled) | Set to true to enable nomad server | `bool` | `false` | no |
 | <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com) | `string` | n/a | yes |
@@ -150,7 +157,8 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet ID | `string` | `""` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Subnet IDs | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
 | <a name="input_tag_key_for_discover"></a> [tag\_key\_for\_discover](#input\_tag\_key\_for\_discover) | The tag key placed on each EC2 instance for Nomad Server discoverability. | `string` | `"identifier"` | no |
-| <a name="input_tag_value_for_discover"></a> [tag\_value\_for\_discover](#input\_tag\_value\_for\_discover) | The tag value placed on each EC2 instance for Nomad Server discoverability. | `string` | `"nomad-server-instance"` | no |
+| <a name="input_tag_key_name_value"></a> [tag\_key\_name\_value](#input\_tag\_key\_name\_value) | Value fo the name you want to name the EC2 instance. | `string` | `"circleci-nomad-server"` | no |
+| <a name="input_tag_value_for_discover"></a> [tag\_value\_for\_discover](#input\_tag\_value\_for\_discover) | The tag value placed on each EC2 instance for Nomad Server discoverability. | `string` | `"circleci-nomad-server-instance"` | no |
 | <a name="input_volume_type"></a> [volume\_type](#input\_volume\_type) | The EBS volume type of the node. If gp3 is not available in your desired region, switch to gp2 | `string` | `"gp3"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |
 
@@ -164,11 +172,18 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="output_nomad_asg_user_access_key"></a> [nomad\_asg\_user\_access\_key](#output\_nomad\_asg\_user\_access\_key) | n/a |
 | <a name="output_nomad_asg_user_secret_key"></a> [nomad\_asg\_user\_secret\_key](#output\_nomad\_asg\_user\_secret\_key) | n/a |
 | <a name="output_nomad_role"></a> [nomad\_role](#output\_nomad\_role) | n/a |
+| <a name="output_nomad_server_autoscaling_group_arn"></a> [nomad\_server\_autoscaling\_group\_arn](#output\_nomad\_server\_autoscaling\_group\_arn) | n/a |
+| <a name="output_nomad_server_autoscaling_group_name"></a> [nomad\_server\_autoscaling\_group\_name](#output\_nomad\_server\_autoscaling\_group\_name) | n/a |
+| <a name="output_nomad_server_autoscaling_role"></a> [nomad\_server\_autoscaling\_role](#output\_nomad\_server\_autoscaling\_role) | n/a |
 | <a name="output_nomad_server_cert"></a> [nomad\_server\_cert](#output\_nomad\_server\_cert) | n/a |
 | <a name="output_nomad_server_cert_base64"></a> [nomad\_server\_cert\_base64](#output\_nomad\_server\_cert\_base64) | set this value for the `nomad.server.rpc.mTLS.certificate` key in the CircleCI Server's Helm values.yaml |
 | <a name="output_nomad_server_key"></a> [nomad\_server\_key](#output\_nomad\_server\_key) | n/a |
 | <a name="output_nomad_server_key_base64"></a> [nomad\_server\_key\_base64](#output\_nomad\_server\_key\_base64) | set this value for the `nomad.server.rpc.mTLS.privateKey` key in the CircleCI Server's Helm values.yaml |
+| <a name="output_nomad_server_lb_arn"></a> [nomad\_server\_lb\_arn](#output\_nomad\_server\_lb\_arn) | n/a |
+| <a name="output_nomad_server_lb_url"></a> [nomad\_server\_lb\_url](#output\_nomad\_server\_lb\_url) | n/a |
+| <a name="output_nomad_server_sg_id"></a> [nomad\_server\_sg\_id](#output\_nomad\_server\_sg\_id) | n/a |
 | <a name="output_nomad_sg_id"></a> [nomad\_sg\_id](#output\_nomad\_sg\_id) | n/a |
 | <a name="output_nomad_tls_ca"></a> [nomad\_tls\_ca](#output\_nomad\_tls\_ca) | n/a |
 | <a name="output_nomad_tls_ca_base64"></a> [nomad\_tls\_ca\_base64](#output\_nomad\_tls\_ca\_base64) | set this value for the `nomad.server.rpc.mTLS.CACertificate` key in the CircleCI Server's Helm values.yaml |
+| <a name="output_update_nomad_profile_role"></a> [update\_nomad\_profile\_role](#output\_update\_nomad\_profile\_role) | n/a |
 <!-- END_TF_DOCS -->

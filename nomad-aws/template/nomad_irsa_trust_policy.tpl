@@ -10,7 +10,8 @@
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
                 "StringEquals": {
-                "${OIDC_EKS_VARIABLE}": "${K8S_SERVICE_ACCOUNT}"
+                "${OIDC_EKS_VARIABLE}:aud": "sts.amazonaws.com",
+                "${OIDC_EKS_VARIABLE}:sub": "${K8S_SERVICE_ACCOUNT}"
                 }
             }
         }

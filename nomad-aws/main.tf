@@ -1,6 +1,11 @@
 locals {
-  nomad_server_hostname_and_port = "${var.nomad_server_hostname}:${var.nomad_server_port}"
+
+  nomad_host_name_if_server      = var.nomad_server_enabled && var.nomad_server_hostname == "" ? "${var.basename}-circleci-nomad-server-nlb-*.elb.${var.aws_region}.amazonaws.com" : var.nomad_server_hostname
+  nomad_server_hostname_and_port = "${local.nomad_host_name_if_server}:${var.nomad_server_port}"
   server_retry_join              = "provider=aws tag_key=${var.tag_key_for_discover} tag_value=${var.tag_value_for_discover} addr_type=${var.addr_type} region=${var.aws_region}"
+  nomad_client_instance_role     = var.role_name != null ? var.role_name : aws_iam_role.nomad_instance_role[0].name
+
+  instance_tags = merge(var.instance_tags, { "type" = "nomad-client" })
 }
 
 resource "random_string" "key_suffix" {
@@ -10,7 +15,7 @@ resource "random_string" "key_suffix" {
 
 resource "aws_key_pair" "ssh_key" {
   count      = var.ssh_key != null ? 1 : 0
-  key_name   = "${var.basename}-circleci-server-nomad-ssh-key-${random_string.key_suffix.result}"
+  key_name   = "${var.basename}-circleci-server-nomad-client-ssh-key-${random_string.key_suffix.result}"
   public_key = var.ssh_key
 }
 
@@ -27,7 +32,7 @@ data "aws_ami" "ubuntu_focal" {
 
 module "nomad_tls" {
   source                = "../shared/modules/tls"
-  nomad_server_hostname = var.nomad_server_hostname
+  nomad_server_hostname = local.nomad_host_name_if_server
   nomad_server_port     = var.nomad_server_port
   count                 = var.enable_mtls ? 1 : 0
 }
@@ -65,9 +70,9 @@ data "cloudinit_config" "nomad_user_data" {
 }
 
 resource "aws_iam_instance_profile" "nomad_client_profile" {
-  count = var.role_name != null ? 1 : 0
+  count = local.nomad_client_instance_role != null ? 1 : 0
   name  = "${var.basename}-circleci-nomad-clients-instance-profile"
-  role  = var.role_name
+  role  = local.nomad_client_instance_role
 }
 
 #tfsec:ignore:aws-ec2-enforce-launch-config-http-token-imds
@@ -91,7 +96,7 @@ resource "aws_launch_template" "nomad_clients" {
   }
 
   dynamic "iam_instance_profile" {
-    for_each = var.role_name != null ? [1] : []
+    for_each = local.nomad_client_instance_role != null ? [1] : []
     content {
       arn = aws_iam_instance_profile.nomad_client_profile[0].arn
     }
@@ -104,7 +109,7 @@ resource "aws_launch_template" "nomad_clients" {
     for_each = ["instance", "volume"]
     content {
       resource_type = tag_specifications.value
-      tags          = var.instance_tags
+      tags          = local.instance_tags
     }
   }
 }
@@ -129,7 +134,7 @@ resource "aws_autoscaling_group" "clients_asg" {
   }
 
   dynamic "tag" {
-    for_each = var.instance_tags
+    for_each = local.instance_tags
     content {
       key                 = tag.key
       value               = tag.value

@@ -103,11 +103,11 @@ ${tls_ca}
 EOT
 
 echo "--------------------------------------"
-echo "      Creating config.hcl"
+echo "      Creating client.hcl"
 echo "--------------------------------------"
 
 mkdir -p /etc/nomad
-cat <<EOT > /etc/nomad/config.hcl
+cat <<EOT > /etc/nomad/client.hcl
 log_level = "DEBUG"
 name = "$INSTANCE_ID"
 data_dir = "/opt/nomad"
@@ -138,7 +138,7 @@ telemetry {
 EOT
 
 if [ "${client_tls_cert}" ]; then
-cat <<EOT >> /etc/nomad/config.hcl
+cat <<EOT >> /etc/nomad/client.hcl
 tls {
 http = false
     rpc  = true
@@ -163,7 +163,7 @@ Description="nomad"
 Restart=always
 RestartSec=30
 TimeoutStartSec=1m
-ExecStart=/usr/bin/nomad agent -config /etc/nomad/config.hcl
+ExecStart=/usr/bin/nomad agent -config /etc/nomad/client.hcl
 [Install]
 WantedBy=multi-user.target
 EOT
