@@ -1,3 +1,14 @@
+locals {
+
+  OIDC_EKS_VARIABLE = lookup(var.enable_irsa, "oidc_eks_variable", "")
+
+  OIDC_EKS_VARIABLE_STRIPPED = (
+    endswith(local.OIDC_EKS_VARIABLE, ":sub")
+    ? substr(local.OIDC_EKS_VARIABLE, 0, length(local.OIDC_EKS_VARIABLE) - length(":sub"))
+    : local.OIDC_EKS_VARIABLE
+  )
+}
+
 resource "aws_iam_user" "nomad_asg_user" {
   count = local.autoscaler_type == "user" ? 1 : 0
 
@@ -20,14 +31,13 @@ resource "aws_iam_user_policy" "nomad_asg_user" {
   })
 }
 
-
 resource "aws_iam_role" "nomad_role" {
   count = local.autoscaler_type == "role" ? 1 : 0
 
-  name = "${var.basename}-circleci-nomad-autoscaler-irsa-role"
+  name = "${var.basename}-circleci-nomad-clients-autoscaler-irsa-role"
   assume_role_policy = templatefile("${path.module}/template/nomad_irsa_trust_policy.tpl", {
     OIDC_PRINCIPAL_ID   = lookup(var.enable_irsa, "oidc_principal_id", "")
-    OIDC_EKS_VARIABLE   = lookup(var.enable_irsa, "oidc_eks_variable", "")
+    OIDC_EKS_VARIABLE   = local.OIDC_EKS_VARIABLE_STRIPPED
     K8S_SERVICE_ACCOUNT = lookup(var.enable_irsa, "k8s_service_account", "")
   })
 

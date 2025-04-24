@@ -1,0 +1,23 @@
+
+If you are attaching an existing IAM Role "${role}" with Nomad Clients, Update IAM Role's Trust relationships's Statement [] as below mentioned. 
+
+
+Assume Role Policy (Trust Relationships):
+---------------------------------------
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        },
+        .......
+        .......
+        .......
+    ]
+}
+

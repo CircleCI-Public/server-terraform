@@ -57,13 +57,12 @@ echo "      Creating server.hcl"
 echo "--------------------------------------"
 
 mkdir -p /etc/nomad/
-mkdir -p /etc/nomad.d/
-cat <<EOT > /etc/nomad.d/server.hcl
+cat <<EOT > /etc/nomad/server.hcl
 server {
     enabled = true
     bootstrap_expect = ${bootstrap_expect}
     server_join {
-        retry_join = ["provider=aws tag_key=${tag_key} tag_value=${tag_value} addr_type=${addr_type} region=${region}"]
+        retry_join = ["${server_retry_join}"]
         retry_max  = 30
         retry_interval = "30s"
     }
@@ -93,7 +92,7 @@ client {
 EOT
 
 if [ "${tls_cert}" ]; then
-cat <<-EOT >> /etc/nomad.d/server.hcl
+cat <<-EOT >> /etc/nomad/server.hcl
 tls {
     http = false
     rpc  = true
@@ -107,6 +106,21 @@ tls {
 }
 EOT
 fi
+
+echo "--------------------------------------"
+echo "      Creating nomad.conf"
+echo "--------------------------------------"
+cat <<EOT > /etc/systemd/system/nomad.service
+[Unit]
+Description="nomad"
+[Service]
+Restart=always
+RestartSec=30
+TimeoutStartSec=1m
+ExecStart=/usr/bin/nomad agent -config /etc/nomad/server.hcl
+[Install]
+WantedBy=multi-user.target
+EOT
 
 echo "--------------------------------------"
 echo "      Starting Nomad service"

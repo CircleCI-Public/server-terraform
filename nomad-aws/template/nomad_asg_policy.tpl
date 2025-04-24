@@ -7,7 +7,9 @@
             "Action": [
                 "autoscaling:CreateOrUpdateTags",
                 "autoscaling:UpdateAutoScalingGroup",
-                "autoscaling:TerminateInstanceInAutoScalingGroup"
+                "autoscaling:TerminateInstanceInAutoScalingGroup",
+                "autoscaling:DescribeAutoScalingGroups",
+				"autoscaling:DescribeScalingActivities"
             ],
             "Resource": "${ASG_ARN}"
         },
@@ -17,7 +19,9 @@
             "Action": [
                 "autoscaling:DescribeScalingActivities",
                 "autoscaling:DescribeAutoScalingGroups",
-                "autoscaling:DescribeInstanceRefreshes"
+                "autoscaling:DescribeInstanceRefreshes",
+                "ec2:DescribeInstances",
+                "ec2:DescribeInstanceStatus"
             ],
             "Resource": "*"
         }

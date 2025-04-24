@@ -65,7 +65,7 @@ variable "dns_server" {
 
 variable "nodes" {
   type        = number
-  description = "Number of nomad clients to create"
+  description = "Desired Number of nomad clients to create"
 }
 
 variable "max_nodes" {
@@ -205,12 +205,11 @@ variable "nomad_server_enabled" {
   description = "Set to true to enable nomad server"
 }
 
-variable "min_server_replicas" {
+variable "desired_server_replicas" {
   type        = number
-  default     = 5
-  description = "Minimum number of Nomad Server instances"
+  default     = 3
+  description = "Desired number of Nomad Server instances"
 }
-
 variable "max_server_replicas" {
   type        = number
   default     = 7
@@ -251,6 +250,11 @@ variable "server_public_ip" {
   }
 }
 
+variable "tag_key_name_value" {
+  type        = string
+  description = "Value fo the name you want to name the EC2 instance."
+  default     = "circleci-nomad-server"
+}
 variable "tag_key_for_discover" {
   type        = string
   description = "The tag key placed on each EC2 instance for Nomad Server discoverability."
@@ -260,7 +264,7 @@ variable "tag_key_for_discover" {
 variable "tag_value_for_discover" {
   type        = string
   description = "The tag value placed on each EC2 instance for Nomad Server discoverability."
-  default     = "nomad-server-instance"
+  default     = "circleci-nomad-server-instance"
 }
 
 variable "addr_type" {

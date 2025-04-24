@@ -3,16 +3,27 @@ variable "aws_region" {
   description = "The AWS region that you are in."
 }
 
-variable "vpc_cidr_range" {
+variable "vpc_id" {
   type        = string
-  description = "The default CIDR range."
-  default     = "10.0.1.0/24"
+  description = "VPC ID of VPC used for Nomad resources"
 }
 
-variable "vpc_subnet_range" {
+variable "subnet" {
   type        = string
-  description = "The default subnet range."
-  default     = "10.0.1.64/26"
+  description = "Subnet ID"
+  default     = ""
+}
+
+variable "subnets" {
+  type        = list(string)
+  description = "Subnet IDs"
+  default     = [""]
+}
+
+variable "basename" {
+  type        = string
+  description = "Name used as prefix for AWS resources"
+  default     = ""
 }
 
 variable "nomad_server_hostname" {
@@ -39,14 +50,13 @@ variable "enable_imdsv2" {
   }
 }
 
-
 variable "launch_template_instance_type" {
   type        = string
   description = "The instance type of the EC2 Nomad Servers."
   default     = "t2.micro"
 }
 
-variable "ssh_key_name" {
+variable "ssh_key" {
   type        = string
   description = "The SSH key you'd like to be on the Nomad Server instances."
   default     = null
@@ -74,28 +84,22 @@ variable "public_ip" {
 variable "machine_image_owners" {
   type        = list(string)
   description = "List of AWS account IDs that own the images to be used for nomad virtual machines."
-  default     = ["099720109477"]
+  default     = ["099720109477", "513442679011"]
 }
 
 variable "machine_image_names" {
   type        = list(string)
-  description = "Strings to filter image names for nomad server virtual machine images."
-  default     = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  description = "Strings to filter image names for nomad virtual machine images."
+  default     = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
 }
 
 #
 #Variables for ASG
 #
-variable "asg_name" {
-  type        = string
-  description = "Name of the auto scaling group."
-  default     = "circleci-nomad-server-asg"
-}
-
 variable "desired_capacity" {
   type        = number
   description = "Desired capacity of Nomad Server Instances."
-  default     = 5
+  default     = 3
   validation {
     condition     = var.desired_capacity >= 3
     error_message = "Nomad server requires a minimum of 3 instances."
@@ -118,16 +122,22 @@ variable "max_size" {
   default     = 7
 }
 
-variable "name_prefix_launch_template" {
-  type        = string
-  description = "Name prefix of your launch template."
-  default     = "circleci-nomad-server-launch-template"
+#
+#Tags and Names
+#
+variable "tags" {
+  type        = map(string)
+  description = "Map of tags you'd like to add to the Launch Template and ASG."
+  default = {
+    "vender" = "circleci"
+  }
 }
 
-variable "tag_key_name_value" {
+
+variable "launch_template_version" {
   type        = string
-  description = "Value fo the name you want to name the EC2 instance."
-  default     = "nomad-server"
+  description = "Specific version of the instance template"
+  default     = "$Latest"
 }
 
 variable "tag_key_for_discover" {
@@ -139,104 +149,7 @@ variable "tag_key_for_discover" {
 variable "tag_value_for_discover" {
   type        = string
   description = "The tag value placed on each EC2 instance for Nomad Server discoverability."
-  default     = "nomad-server-instance"
-}
-
-variable "vpc_zones_id" {
-  type        = list(string)
-  description = "A list of the VPC zones that you wish the ASG to use encased in []"
-}
-
-#
-#Variables for cloud init config
-#
-
-variable "cloud_provider" {
-  type        = string
-  description = "Provider for nomad server discover. Must be aws or gcp"
-  default     = "aws"
-  validation {
-    condition     = contains(["aws"], var.cloud_provider)
-    error_message = "This variable must be 'aws'"
-  }
-}
-
-variable "addr_type" {
-  type        = string
-  description = "What IP should the Nomad servers discover"
-  default     = "private_v4"
-  validation {
-    condition     = contains(["private_v4"], var.addr_type)
-    error_message = "This variable must be 'private_v4'."
-  }
-}
-
-#
-#IAM role configuration
-#
-variable "nomad_role_name" {
-  type        = string
-  description = "The name of the role that needs to be attached to the Nomad server instances."
-  default     = "circleci-nomad-server-role"
-}
-
-variable "nomad_instance_profile_name" {
-  type        = string
-  description = "The name of the instance profile that needs to be attached to the Nomad server instances."
-  default     = "circleci-nomad-server-instance-profile"
-}
-
-#
-#NLB Variables
-#
-
-variable "target_group_name" {
-  description = "The name of the target group"
-  type        = string
-  default     = "circleci-nomad-server-target-grp"
-}
-
-#
-#Tags and Names
-#
-variable "tags" {
-  type        = map(string)
-  description = "Map of tags you'd like to add to the Launch Template and ASG."
-  default = {
-    "type"  = "nomad-server"
-    "owner" = "circleci"
-  }
-}
-
-variable "subnet_name" {
-  type        = string
-  description = "Name of the Subnet"
-  default     = "circleci-nomad-server-subnet"
-}
-variable "internet_gateway_name" {
-  type        = string
-  description = "Name of the Internet Gateway"
-  default     = "circleci-nomad-server-igw"
-}
-variable "route_table_name" {
-  type        = string
-  description = "Name of the Route Table"
-  default     = "circleci-nomad-server-rt"
-}
-variable "nlb_name" {
-  type        = string
-  description = "Name of the Internal NLB"
-  default     = "circleci-nomad-server-nlb"
-}
-variable "vpc_name" {
-  type        = string
-  description = "Name of the VPC"
-  default     = "circleci-nomad-server-vpc"
-}
-variable "sg_name" {
-  type        = string
-  description = "Name of the Security Group"
-  default     = "circleci-nomad-server-sg"
+  default     = "circleci-nomad-server-instance"
 }
 
 variable "tls_cert" {
@@ -262,4 +175,15 @@ variable "allow_ssh" {
   description = "Enable SSH access inbound (true/false)"
   type        = bool
   default     = false
+}
+
+variable "random_string_suffix" {
+  description = "Random String"
+  type        = string
+}
+
+variable "server_retry_join" {
+  description = "Server Identifier to join the cluster"
+  default     = ""
+  type        = string
 }
