@@ -1,5 +1,7 @@
 locals {
-  nomad_server_hostname_and_port = "${var.nomad_server_hostname}:${var.nomad_server_port}"
+
+  nomad_host_name_if_server      = var.nomad_server_enabled && var.nomad_server_hostname == "" ? "${var.basename}-circleci-nomad-server-nlb-*.elb.${var.aws_region}.amazonaws.com" : var.nomad_server_hostname
+  nomad_server_hostname_and_port = "${local.nomad_host_name_if_server}:${var.nomad_server_port}"
   server_retry_join              = "provider=aws tag_key=${var.tag_key_for_discover} tag_value=${var.tag_value_for_discover} addr_type=${var.addr_type} region=${var.aws_region}"
   nomad_client_instance_role     = var.role_name != null ? var.role_name : aws_iam_role.nomad_instance_role[0].name
 
@@ -30,7 +32,7 @@ data "aws_ami" "ubuntu_focal" {
 
 module "nomad_tls" {
   source                = "../shared/modules/tls"
-  nomad_server_hostname = var.nomad_server_hostname
+  nomad_server_hostname = local.nomad_host_name_if_server
   nomad_server_port     = var.nomad_server_port
   count                 = var.enable_mtls ? 1 : 0
 }

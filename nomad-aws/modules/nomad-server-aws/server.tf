@@ -40,6 +40,9 @@ resource "aws_launch_template" "nomad-servers" {
       volume_size = var.disk_size_gb
     }
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_autoscaling_group" "autoscale" {
@@ -51,7 +54,7 @@ resource "aws_autoscaling_group" "autoscale" {
   health_check_type         = "EC2"
   termination_policies      = ["OldestInstance"]
 
-  target_group_arns = [aws_lb_target_group.target_group.arn]
+  target_group_arns = [aws_lb_target_group.target_group_4646.arn, aws_lb_target_group.target_group_4647.arn, aws_lb_target_group.target_group_4648.arn]
 
   launch_template {
     id      = aws_launch_template.nomad-servers.id

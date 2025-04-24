@@ -1,5 +1,9 @@
 output "lb_arn" {
-  value = aws_lb.internal_nlb.name
+  value = aws_lb.internal_nlb.arn
+}
+
+output "lb_url" {
+  value = aws_lb.internal_nlb.dns_name
 }
 
 output "role" {

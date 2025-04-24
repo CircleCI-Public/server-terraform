@@ -58,6 +58,10 @@ output "nomad_server_lb_arn" {
   value = var.nomad_server_enabled ? module.server[0].lb_arn : ""
 }
 
+output "nomad_server_lb_url" {
+  value = var.nomad_server_enabled ? module.server[0].lb_url : ""
+}
+
 output "nomad_server_autoscaling_role" {
   value = var.nomad_server_enabled ? module.server[0].role : ""
 }
@@ -69,6 +73,7 @@ output "nomad_server_sg_id" {
 output "nomad_server_autoscaling_group_arn" {
   value = var.nomad_server_enabled ? module.server[0].autoscaling_group_arn : ""
 }
+
 
 output "nomad_server_autoscaling_group_name" {
   value = var.nomad_server_enabled ? module.server[0].autoscaling_group_name : ""
