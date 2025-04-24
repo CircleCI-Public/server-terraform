@@ -2,6 +2,9 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+# if tmpfs is found then cgroups v1 has been configured to be used and the system does not need to be re-initialized
+sudo stat -fc %T /sys/fs/cgroup/ | grep "tmpfs" && exit 0 || echo "Cgroups V2 detected, running system initialization"
+
 log() {
 	msg=$1
 	color="\e[1;36m" # Bold, Cyan
@@ -219,6 +222,11 @@ setup_docker_gc() {
 	systemctl enable --now docker-gc
 }
 
+revert_cgroups(){
+   sudo sed -i '/^GRUB_CMDLINE_LINUX/ s/"$/ systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
+   sudo update-grub
+}
+
 tune_io_scheduler
 system_update
 add_docker_repo
@@ -251,3 +259,6 @@ docker_chain="DOCKER-USER"
 /sbin/iptables --wait --insert $docker_chain 5 -i docker+ --destination "${cidr_block}" --jump DROP
 /sbin/iptables --wait --insert $docker_chain 5 -i br+ --destination "${cidr_block}" --jump DROP
 %{ endfor ~}
+
+revert_cgroups
+reboot
