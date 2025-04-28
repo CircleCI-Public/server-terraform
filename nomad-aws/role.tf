@@ -26,9 +26,9 @@ data "aws_iam_policy_document" "assume_ec2_policy" {
   }
 }
 
-// Create the role if var.role_name is null and nomad server is enabled 
+// Create the role only if nomad server is enabled  and var.role_name is null
 resource "aws_iam_role" "nomad_instance_role" {
-  count = var.nomad_server_enabled && var.role_name != null ? 0 : 1
+  count = var.nomad_server_enabled && var.role_name == null ? 1 : 0
 
   name               = "${var.basename}-circleci-nomad-clients-instance-role"
   assume_role_policy = data.aws_iam_policy_document.assume_ec2_policy.json
@@ -36,7 +36,7 @@ resource "aws_iam_role" "nomad_instance_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_policy_to_role" {
-  count = var.nomad_server_enabled && var.role_name != null ? 0 : 1
+  count = var.nomad_server_enabled && var.role_name == null ? 1 : 0
 
   role       = aws_iam_role.nomad_instance_role[0].name
   policy_arn = aws_iam_policy.describe_ec2_policy[0].arn
