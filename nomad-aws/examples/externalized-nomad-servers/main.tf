@@ -57,7 +57,7 @@ module "nomad-aws" {
 
   # Externalized Nomad Servers
   nomad_server_enabled    = true
-  server_public_ip        = false
+  server_public_ip        = true
   allow_ssh               = true
   server_ssh_key          = "<your-public-key>"
   server_machine_type     = "t3a.micro"
