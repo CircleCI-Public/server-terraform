@@ -25,7 +25,6 @@ resource "aws_launch_template" "nomad-servers" {
   instance_type          = var.launch_template_instance_type
   tags                   = local.tags
   user_data              = data.cloudinit_config.nomad_server_user_data.rendered
-  vpc_security_group_ids = [aws_security_group.nomad_server_sg.id]
   update_default_version = true
   key_name               = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
   metadata_options {
@@ -33,6 +32,10 @@ resource "aws_launch_template" "nomad-servers" {
   }
   iam_instance_profile {
     name = aws_iam_instance_profile.nomad_instance_profile.name
+  }
+  network_interfaces {
+    security_groups             = [aws_security_group.nomad_server_sg.id]
+    associate_public_ip_address = var.public_ip
   }
   block_device_mappings {
     device_name = "/dev/sda1"
