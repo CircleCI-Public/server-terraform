@@ -34,7 +34,7 @@ resource "aws_launch_template" "nomad-servers" {
     name = aws_iam_instance_profile.nomad_instance_profile.name
   }
   network_interfaces {
-    security_groups = [aws_security_group.nomad_server_sg.id]
+    security_groups             = [aws_security_group.nomad_server_sg.id]
     associate_public_ip_address = var.public_ip
   }
   block_device_mappings {
