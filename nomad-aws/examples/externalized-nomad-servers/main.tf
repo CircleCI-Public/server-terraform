@@ -63,7 +63,7 @@ module "nomad-aws" {
   server_machine_type     = "t3a.micro"
   max_server_replicas     = 7
   desired_server_replicas = 3
-  aws_region = "us-east-1"
+  aws_region              = "us-east-1"
 }
 
 output "nomad_module" {
