@@ -84,13 +84,13 @@ variable "public_ip" {
 variable "machine_image_owners" {
   type        = list(string)
   description = "List of AWS account IDs that own the images to be used for nomad virtual machines."
-  default     = ["099720109477", "513442679011"]
+  default     = ["833371238208"]
 }
 
 variable "machine_image_names" {
   type        = list(string)
   description = "Strings to filter image names for nomad virtual machine images."
-  default     = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  default     = ["CircleCIServerNomad*"]
 }
 
 #
