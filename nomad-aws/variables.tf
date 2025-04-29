@@ -128,6 +128,16 @@ variable "role_name" {
   default     = null
 }
 
+variable "client_public_ip" {
+  type        = bool
+  default     = false
+  description = "Should the Nomad Client EC2 instances have a public IP?"
+  validation {
+    condition     = var.client_public_ip == true || var.client_public_ip == false
+    error_message = "The value for client_public_ip must be either true or false."
+  }
+}
+
 # Check for IRSA Role (more details)  - https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
 #   enable_irsa  = {
 #                  oidc_principal_id  = "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>"
@@ -243,10 +253,10 @@ variable "allow_ssh" {
 variable "server_public_ip" {
   type        = bool
   default     = false
-  description = "Should the EC2 instances have a public IP?"
+  description = "Should the Nomad Server EC2 instances have a public IP?"
   validation {
     condition     = var.server_public_ip == true || var.server_public_ip == false
-    error_message = "The value for public_ip must be either true or false."
+    error_message = "The value for server_public_ip must be either true or false."
   }
 }
 
