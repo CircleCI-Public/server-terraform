@@ -82,6 +82,12 @@ resource "aws_launch_template" "nomad_clients" {
   image_id      = data.aws_ami.ubuntu_focal.id
   key_name      = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
 
+  network_interfaces {
+    associate_public_ip_address = var.client_public_ip
+    security_groups             = length(var.security_group_id) != 0 ? var.security_group_id : local.nomad_security_groups
+  }
+
+
   metadata_options {
     http_tokens = var.enable_imdsv2
   }
@@ -102,8 +108,7 @@ resource "aws_launch_template" "nomad_clients" {
     }
   }
 
-  vpc_security_group_ids = length(var.security_group_id) != 0 ? var.security_group_id : local.nomad_security_groups
-  user_data              = data.cloudinit_config.nomad_user_data.rendered
+  user_data = data.cloudinit_config.nomad_user_data.rendered
 
   dynamic "tag_specifications" {
     for_each = ["instance", "volume"]
