@@ -18,15 +18,17 @@ resource "google_service_account" "nomad_as_service_account" {
 }
 
 resource "google_project_iam_member" "nomad_as_compute_autoscalers_get" {
-  count  = var.nomad_auto_scaler ? 1 : 0
-  role   = "roles/compute.admin"
-  member = "serviceAccount:${google_service_account.nomad_as_service_account[0].email}"
+  count   = var.nomad_auto_scaler ? 1 : 0
+  project = local.project_id
+  role    = "roles/compute.admin"
+  member  = "serviceAccount:${google_service_account.nomad_as_service_account[0].email}"
 }
 
 resource "google_project_iam_member" "nomad_as_work_identity" {
-  count  = var.nomad_auto_scaler && var.enable_workload_identity ? 1 : 0
-  role   = "roles/iam.workloadIdentityUser"
-  member = "serviceAccount:${google_service_account.nomad_as_service_account[0].email}"
+  count   = var.nomad_auto_scaler && var.enable_workload_identity ? 1 : 0
+  project = local.project_id
+  role    = "roles/iam.workloadIdentityUser"
+  member  = "serviceAccount:${google_service_account.nomad_as_service_account[0].email}"
 }
 
 resource "google_service_account_iam_binding" "nomad_as_work_identity_k8s" {
