@@ -192,7 +192,7 @@ variable "machine_image_family" {
 variable "nomad_version" {
   type        = string
   description = "The version of Nomad to install"
-  default     = "1.9.7-1"
+  default     = "1.6.1-1"
 }
 
 
