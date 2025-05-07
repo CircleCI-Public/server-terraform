@@ -84,7 +84,7 @@ variable "machine_image_family" {
   default     = "ubuntu-2004-lts"
 }
 
-variable "patched_nomad_version" {
+variable "nomad_version" {
   type        = string
   description = "The version of Nomad to install"
   default     = "latest"
@@ -187,4 +187,29 @@ variable "server_retry_join" {
 
 variable "nomad_server_ip_address" {
   type = string
+}
+
+variable "health_check_timeout_sec" {
+  description = "Nomad Server Heath Check Timeout in seconds"
+  type        = number
+  default     = 5
+}
+
+variable "health_check_interval_sec" {
+  description = "Nomad Server Heath Check Frequency in seconds"
+  type        = number
+  default     = 30
+}
+
+variable "health_check_healthy_threshold" {
+  description = "Number of health checks success in a row to determine healthy"
+  type        = number
+  default     = 2
+}
+
+
+variable "health_check_unhealthy_threshold" {
+  description = "Number of health checks failure in a row to determine unhealthy"
+  type        = number
+  default     = 5
 }

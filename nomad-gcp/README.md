@@ -88,6 +88,10 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_disk_type"></a> [disk\_type](#input\_disk\_type) | Root disk type. Can be 'pd-standard', 'pd-ssd', 'pd-balanced' or 'local-ssd' | `string` | `"pd-ssd"` | no |
 | <a name="input_docker_network_cidr"></a> [docker\_network\_cidr](#input\_docker\_network\_cidr) | IP CIDR block to be used in docker networks when running job on nomad client.<br/>This CIDR block should not be the same as your VPC CIDR block.<br/>i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16" | `string` | `"10.10.0.0/16"` | no |
 | <a name="input_enable_workload_identity"></a> [enable\_workload\_identity](#input\_enable\_workload\_identity) | If true, Workload Identity will be used rather than static credentials. Ensure Workload Identities are first enabled on your GKE cluster: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity | `bool` | `false` | no |
+| <a name="input_health_check_healthy_threshold"></a> [health\_check\_healthy\_threshold](#input\_health\_check\_healthy\_threshold) | Number of health checks success in a row to determine healthy | `number` | `2` | no |
+| <a name="input_health_check_interval_sec"></a> [health\_check\_interval\_sec](#input\_health\_check\_interval\_sec) | Nomad Server Heath Check Frequency in seconds | `number` | `30` | no |
+| <a name="input_health_check_timeout_sec"></a> [health\_check\_timeout\_sec](#input\_health\_check\_timeout\_sec) | Nomad Server Heath Check Timeout in seconds | `number` | `5` | no |
+| <a name="input_health_check_unhealthy_threshold"></a> [health\_check\_unhealthy\_threshold](#input\_health\_check\_unhealthy\_threshold) | Number of health checks failure in a row to determine unhealthy | `number` | `5` | no |
 | <a name="input_k8s_namespace"></a> [k8s\_namespace](#input\_k8s\_namespace) | If enable\_workload\_identity is true, provide application k8s namespace | `string` | `"circleci-server"` | no |
 | <a name="input_machine_image_family"></a> [machine\_image\_family](#input\_machine\_image\_family) | The family value used to retrieve the virtual machine image. | `string` | `"ubuntu-2004-lts"` | no |
 | <a name="input_machine_image_project"></a> [machine\_image\_project](#input\_machine\_image\_project) | The project value used to retrieve the virtual machine image. | `string` | `"ubuntu-os-cloud"` | no |
@@ -103,7 +107,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_nomad_server_enabled"></a> [nomad\_server\_enabled](#input\_nomad\_server\_enabled) | Set to true to enable nomad server | `bool` | `false` | no |
 | <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com) | `string` | n/a | yes |
 | <a name="input_nomad_server_port"></a> [nomad\_server\_port](#input\_nomad\_server\_port) | Port that the server endpoint listens on for nomad connections. | `number` | `4647` | no |
-| <a name="input_nomad_version"></a> [nomad\_version](#input\_nomad\_version) | The version of Nomad to install | `string` | `"1.6.1-1"` | no |
+| <a name="input_nomad_version"></a> [nomad\_version](#input\_nomad\_version) | The version of Nomad to install | `string` | `"1.7.7-1"` | no |
 | <a name="input_preemptible"></a> [preemptible](#input\_preemptible) | Whether or not to use preemptible nodes | `bool` | `false` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | GCP project ID to deploy resources into. By default uses the data sourced GCP project ID. | `string` | `""` | no |
 | <a name="input_region"></a> [region](#input\_region) | GCP region to deploy nomad clients into (e.g us-east1) | `string` | n/a | yes |

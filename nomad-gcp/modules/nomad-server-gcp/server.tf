@@ -44,10 +44,10 @@ resource "google_compute_autoscaler" "nomad" {
 resource "google_compute_health_check" "nomad" {
   name = "${var.name}-nomad-server-health-check"
 
-  timeout_sec         = 5
-  check_interval_sec  = 10
-  healthy_threshold   = 4
-  unhealthy_threshold = 5
+  timeout_sec         = var.health_check_timeout_sec
+  check_interval_sec  = var.health_check_interval_sec
+  healthy_threshold   = var.health_check_healthy_threshold
+  unhealthy_threshold = var.health_check_unhealthy_threshold
 
   http_health_check {
     port         = "4646"
@@ -80,14 +80,14 @@ resource "google_compute_instance_template" "nomad" {
   metadata_startup_script = templatefile(
     "${path.module}/templates/nomad-server-startup.sh.tpl",
     {
-      patched_nomad_version = var.patched_nomad_version
-      blocked_cidrs         = var.blocked_cidrs
-      tls_cert              = var.tls_cert
-      tls_key               = var.tls_key
-      tls_ca                = var.tls_ca
-      max_replicas          = var.max_server_replicas
-      min_replicas          = var.min_server_replicas
-      server_retry_join     = var.server_retry_join
+      nomad_version     = var.nomad_version
+      blocked_cidrs     = var.blocked_cidrs
+      tls_cert          = var.tls_cert
+      tls_key           = var.tls_key
+      tls_ca            = var.tls_ca
+      max_replicas      = var.max_server_replicas
+      min_replicas      = var.min_server_replicas
+      server_retry_join = var.server_retry_join
     }
   )
 

@@ -10,7 +10,9 @@ log() {
 }
 
 tune_io_scheduler() {
+	log "--------------------------------------"
 	log "Tuning kernel IO scheduler if needed"
+	log "--------------------------------------"
 	if [ -f /sys/block/nvme0n1/queue/scheduler ] && grep -q 'mq-deadline' /sys/block/nvme0n1/queue/scheduler
 	then
 		echo 'mq-deadline' > /sys/block/nvme0n1/queue/scheduler
@@ -20,13 +22,17 @@ tune_io_scheduler() {
 }
 
 system_update() {
+	log "--------------------------------------"
 	log "Updating system"
+	log "--------------------------------------"
 	apt-get update && apt-get -y upgrade
 }
 
 install() {
 	package=$@
+	log "--------------------------------------"
 	log "Installing $${package}"
+	log "--------------------------------------"
 	apt-get install -y $${package}
 }
 
@@ -37,7 +43,6 @@ add_docker_repo() {
 	add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 	install "linux-image-$(uname -r)"
 	apt-get update
-
 }
 
 enabled_docker_userns() {
@@ -65,6 +70,9 @@ enabled_docker_userns() {
 }
 
 configure_circleci() {
+	log "--------------------------------------"
+	log "Configuring CircleCI"
+	log "--------------------------------------"
 	public_ip="$(curl -H 'Metadata-Flavor: Google' http://169.254.169.254/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)"
 	private_ip="$(hostname --ip-address)"
 	if ! (echo $public_ip | grep -qP "^[\d.]+$"); then
@@ -74,19 +82,28 @@ configure_circleci() {
 		echo $private_ip | tee /etc/circleci/public-ipv4
 	fi
 
+	circleci version || ( echo "CircleCI CLI failed to install" && exit 1 )
+
 }
 
 install_nomad() {
+	log "--------------------------------------"
 	log "Installing Nomad"
+	log "--------------------------------------"
 	sudo apt-get update && \
 	sudo apt-get install wget gpg coreutils
 	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 	sudo apt-get update && sudo apt-get install nomad=${nomad_version}
+
+	nomad --version || ( echo "Nomad failed to install" && exit 1 )
 }
 
 configure_nomad() {
+	log "--------------------------------------"
 	log "Installing TLS Certificates"
+	log "--------------------------------------"
+
 	mkdir -p /etc/nomad/ssl
 	chmod 0700 /etc/nomad/ssl
 	cat <<-EOT > /etc/nomad/ssl/cert.pem
@@ -177,7 +194,10 @@ create_ci_network() {
 }
 
 setup_docker_gc() {
+	log "--------------------------------------"
 	log "setting up Docker garbage collection"
+	log "--------------------------------------"
+
 	cat <<-EOT > /etc/systemd/system/docker-gc.service
 	[Unit]
 	Description=Docker garbage collector

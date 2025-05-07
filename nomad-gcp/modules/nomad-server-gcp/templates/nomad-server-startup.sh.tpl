@@ -10,7 +10,9 @@ log() {
 }
 
 tune_io_scheduler() {
+	log "-----------------------------------------"
 	log "Tuning kernel IO scheduler if needed"
+	log "-----------------------------------------"
 	if [ -f /sys/block/nvme0n1/queue/scheduler ] && grep -q 'mq-deadline' /sys/block/nvme0n1/queue/scheduler
 	then
 		echo 'mq-deadline' > /sys/block/nvme0n1/queue/scheduler
@@ -20,19 +22,25 @@ tune_io_scheduler() {
 }
 
 system_update() {
+	log "-----------------------------------------"
 	log "Updating system"
+	log "-----------------------------------------"
 	apt-get update && apt-get -y upgrade
 }
 
 install() {
 	package=$@
+	log "-----------------------------------------"
 	log "Installing $${package}"
+	log "-----------------------------------------"
 	apt-get install -y $${package}
 }
 
 
 install_nomad() {
+	log "-----------------------------------------"
 	log "Installing Nomad Server"
+	log "-----------------------------------------"
 
 	install wget gpg coreutils zip
 	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
@@ -40,19 +48,20 @@ install_nomad() {
 	sudo apt-get update
 
 
-    if [ -z "$patched_nomad_version" ] || [ "$patched_nomad_version"=="latest" ]; then
+    if [ -z "$nomad_version" ] || [ "$nomad_version"=="latest" ]; then
 		install nomad
 	else
-		install nomad=${patched_nomad_version}
+		install nomad=${nomad_version}
 	fi
 }
 
 configure_nomad() {
 	
 	##########################################################################
+	log "-----------------------------------------"
 	log "Installing TLS Certificates"
+	log "-----------------------------------------"
 	
-	mkdir -p /etc/nomad/ssl
 	chmod 0700 /etc/nomad/ssl
 	
 	cat <<-EOT > /etc/nomad/ssl/cert.pem
@@ -70,7 +79,9 @@ configure_nomad() {
 
 
 	##########################################################################
+	log "-----------------------------------------"
 	log "Setting nomad configuration"
+	log "-----------------------------------------"
 	
 	mkdir -p /etc/nomad
 	
@@ -122,8 +133,9 @@ configure_nomad() {
 
 
 
-
+	log "-----------------------------------------"
 	log "Writing nomad systemd unit"
+	log "-----------------------------------------"
 	cat <<-EOT > /etc/systemd/system/nomad.service
 	[Unit]
 	Description="nomad server"

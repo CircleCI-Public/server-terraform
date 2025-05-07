@@ -47,10 +47,10 @@ resource "google_compute_autoscaler" "nomad" {
 resource "google_compute_health_check" "nomad" {
   name = "${var.name}-nomad-client-health-check"
 
-  timeout_sec         = 5
-  check_interval_sec  = 10
-  healthy_threshold   = 4
-  unhealthy_threshold = 5
+  timeout_sec         = var.health_check_timeout_sec
+  check_interval_sec  = var.health_check_interval_sec
+  healthy_threshold   = var.health_check_healthy_threshold
+  unhealthy_threshold = var.health_check_unhealthy_threshold
 
   http_health_check {
     port         = "4646"
