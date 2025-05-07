@@ -188,7 +188,7 @@ variable "machine_image_names" {
 variable "nomad_version" {
   type        = string
   description = "The version of Nomad to install"
-  default     = "1.6.1-1"
+  default     = "1.7.7-1"
 }
 
 variable "allowed_ips_retry_ssh" {
