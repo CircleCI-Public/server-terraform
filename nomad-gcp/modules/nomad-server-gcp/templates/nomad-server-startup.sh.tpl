@@ -6,7 +6,8 @@ log() {
 	msg=$1
 	color="\e[1;36m" # Bold, Cyan
 	reset="\e[0m"
-	echo -e "$${color}$${msg}$${reset}"
+	# echo -e "$${color}$${msg}$${reset}"
+	echo -e "$${msg}"
 }
 
 tune_io_scheduler() {
@@ -53,6 +54,8 @@ install_nomad() {
 	else
 		install nomad=${nomad_version}
 	fi
+
+	nomad --version || ( echo "Nomad failed to install" && exit 1 )
 }
 
 configure_nomad() {
@@ -164,5 +167,5 @@ system_update
 install ntp
 install jq
 
-install_nomad
+install_nomad || exit 1
 configure_nomad

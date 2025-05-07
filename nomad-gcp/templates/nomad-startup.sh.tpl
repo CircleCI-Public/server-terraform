@@ -6,7 +6,8 @@ log() {
 	msg=$1
 	color="\e[1;36m" # Bold, Cyan
 	reset="\e[0m"
-	echo -e "$${color}$${msg}$${reset}"
+	#echo -e "$${color}$${msg}$${reset}"
+	echo -e "$${msg}"
 }
 
 tune_io_scheduler() {
@@ -81,9 +82,6 @@ configure_circleci() {
 		mkdir -p /etc/circleci
 		echo $private_ip | tee /etc/circleci/public-ipv4
 	fi
-
-	circleci version || ( echo "CircleCI CLI failed to install" && exit 1 )
-
 }
 
 install_nomad() {
@@ -250,7 +248,7 @@ install jq
 
 enabled_docker_userns
 configure_circleci
-install_nomad
+install_nomad || exit 1
 configure_nomad
 
 create_ci_network
