@@ -89,12 +89,12 @@ variable "nomad_auto_scaler" {
 
 variable "autoscaling_mode" {
   type        = string
-  default     = "ONLY_UP"
+  default     = "ONLY_SCALE_OUT"
   description = <<-EOF
     Autoscaler mode. Can be
     - "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules
     - "OFF": Autoscaler will never scale up or down
-    - "ONLY_UP": Autoscaler will only scale up (default)
+    - "ONLY_SCALE_OUT": Autoscaler will only scale out (default)
     Warning: jobs may be interrupted on scale down. Only select "ON" if
     interruptions are acceptible for your use case.
   EOF
