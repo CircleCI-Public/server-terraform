@@ -186,7 +186,7 @@ variable "machine_image_project" {
 variable "machine_image_family" {
   type        = string
   description = "The family value used to retrieve the virtual machine image."
-  default     = "ubuntu-2024-lts"
+  default     = "ubuntu-2404-lts-amd64"
 }
 
 variable "nomad_version" {
