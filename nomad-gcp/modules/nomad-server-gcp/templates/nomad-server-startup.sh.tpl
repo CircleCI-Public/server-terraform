@@ -64,7 +64,8 @@ configure_nomad() {
 	log "-----------------------------------------"
 	log "Installing TLS Certificates"
 	log "-----------------------------------------"
-	
+
+	mkdir -p /etc/nomad/ssl
 	chmod 0700 /etc/nomad/ssl
 	
 	cat <<-EOT > /etc/nomad/ssl/cert.pem
