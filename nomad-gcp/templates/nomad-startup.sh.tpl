@@ -250,8 +250,8 @@ system_update
 add_docker_repo
 
 install ntp
-install docker-ce=5:28.1.1-1~ubuntu.24.04~noble
-install docker-ce-cli=5:28.1.1-1~ubuntu.24.04~noble
+install docker-ce=5:28.1.1-1~ubuntu.22.04~jammy
+install docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy
 install jq
 
 enabled_docker_userns
