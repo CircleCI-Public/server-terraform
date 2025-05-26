@@ -3,6 +3,11 @@ locals {
   server_retry_join              = "provider=gce project_name=${var.project_id} zone_pattern=${var.zone} tag_value=circleci-${var.name}-nomad-servers"
 }
 
+data "google_compute_subnetwork" "nomad" {
+  name   = var.subnetwork ? var.subnetwork : var.network
+  region = var.region
+}
+
 module "tls" {
   source                = "./../shared/modules/tls"
   nomad_server_hostname = var.nomad_server_hostname
@@ -170,9 +175,32 @@ resource "google_compute_firewall" "default" {
 
   allow {
     protocol = "tcp"
-    ports    = ["0-65535"]
+    ports    = ["64535-65535"]
   }
 
   source_ranges = var.retry_with_ssh_allowed_cidr_blocks #tfsec:ignore:google-compute-no-public-ingress
+  target_tags   = ["nomad", "circleci-server", var.name]
+}
+
+resource "google_compute_firewall" "nomad-traffic" {
+  name    = "allow-nomad-traffic-circleci-server-${var.name}"
+  network = var.network
+  project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
+
+  allow {
+    protocol = "icmp"
+  }
+
+  allow {
+    protocol = "tcp"
+    ports    = ["4646-4647"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["4646-4748"]
+  }
+
+  source_ranges = data.google_compute_subnetwork.nomad.ip_cidr_range #tfsec:ignore:google-compute-no-public-ingress
   target_tags   = ["nomad", "circleci-server", var.name]
 }
