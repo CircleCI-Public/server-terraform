@@ -30,6 +30,10 @@ data "aws_ami" "ubuntu_focal" {
   owners = var.machine_image_owners
 }
 
+data "aws_vpc" "nomad" {
+  id = var.vpc_id
+}
+
 module "nomad_tls" {
   source                = "../shared/modules/tls"
   nomad_server_hostname = local.nomad_host_name_if_server
@@ -42,6 +46,7 @@ locals {
   # Will include SSH SG if var.ssh_key is not null.
   nomad_security_groups = compact([
     aws_security_group.nomad_sg.id,
+    aws_security_group.nomad_traffic_sg.id,
     var.ssh_key != null ? aws_security_group.ssh_sg[0].id : "",
   ])
 }
