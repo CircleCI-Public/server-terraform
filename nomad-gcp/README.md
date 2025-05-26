@@ -62,6 +62,7 @@ There are more examples in the [examples](./examples/) directory.
 | [google_compute_address.nomad_server](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_address) | resource |
 | [google_compute_autoscaler.nomad](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_autoscaler) | resource |
 | [google_compute_firewall.default](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_firewall.nomad-traffic](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_firewall) | resource |
 | [google_compute_health_check.nomad](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_health_check) | resource |
 | [google_compute_instance_group_manager.nomad](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_instance_group_manager) | resource |
 | [google_compute_instance_template.nomad](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_instance_template) | resource |
@@ -73,6 +74,7 @@ There are more examples in the [examples](./examples/) directory.
 | [google_service_account_key.nomad-as-key](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/service_account_key) | resource |
 | [local_file.nomad-as-key-file](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [google_compute_image.machine_image](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/data-sources/compute_image) | data source |
+| [google_compute_subnetwork.nomad](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/data-sources/compute_subnetwork) | data source |
 | [google_project.project](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/data-sources/project) | data source |
 
 ## Inputs

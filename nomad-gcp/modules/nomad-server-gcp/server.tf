@@ -3,6 +3,11 @@ data "google_compute_image" "machine_image" {
   project = var.machine_image_project
 }
 
+data "google_compute_subnetwork" "nomad" {
+  name   = var.subnetwork ? var.subnetwork : var.network
+  region = var.region
+}
+
 locals {
   tags = ["nomad-server", "circleci-nomad-server", "circleci-${var.name}-nomad-servers", "nomad"]
 }
@@ -149,7 +154,7 @@ resource "google_compute_instance_group_manager" "nomad" {
 }
 
 resource "google_compute_firewall" "nomad" {
-  name    = "allow-connection-nomad-clients-to-nomad-server-for-${var.name}"
+  name    = "allow-nomad-client-traffic-circleci-server-${var.name}"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
@@ -167,12 +172,7 @@ resource "google_compute_firewall" "nomad" {
     ports    = ["4646-4748"]
   }
 
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
-  }
-
-  source_ranges = var.retry_with_ssh_allowed_cidr_blocks #tfsec:ignore:google-compute-no-public-ingress
+  source_ranges = data.google_compute_subnetwork.nomad.ip_cidr_range #tfsec:ignore:google-compute-no-public-ingress
   target_tags   = local.tags
 }
 
