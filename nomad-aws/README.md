@@ -80,9 +80,9 @@ There are more examples in the [examples](./examples/) directory.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.98.0 |
-| <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | 2.3.7 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.7.2 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5 |
+| <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | >=2.3 |
+| <a name="provider_random"></a> [random](#provider\_random) | n/a |
 
 ## Modules
 
