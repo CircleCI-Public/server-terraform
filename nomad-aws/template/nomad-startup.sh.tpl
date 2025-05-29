@@ -140,7 +140,7 @@ EOT
 if [ "${client_tls_cert}" ]; then
 cat <<EOT >> /etc/nomad/client.hcl
 tls {
-    http = true
+http = false
     rpc  = true
      # This verifies the CN ([role].[region].nomad) in the certificate,
     # not the hostname or DNS name of the of the remote party.
