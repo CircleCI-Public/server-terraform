@@ -13,6 +13,17 @@ resource "random_string" "key_suffix" {
   special = false
 }
 
+locals {
+
+  tag_value_for_discover = "${var.tag_value_for_discover}-${random_string.key_suffix.result}"
+  nomad_host_name_if_server      = var.var.deploy_nomad_server_instances && var.nomad_server_hostname == "" ? "${var.basename}-circleci-nomad-server-nlb-*.elb.${var.aws_region}.amazonaws.com" : var.nomad_server_hostname
+  nomad_server_hostname_and_port = "${local.nomad_host_name_if_server}:${var.nomad_server_port}"
+  server_retry_join              = "provider=aws tag_key=${var.tag_key_for_discover} tag_value=${local.tag_value_for_discover} addr_type=${var.addr_type} region=${var.aws_region}"
+  nomad_client_instance_role     = var.role_name != null ? var.role_name : (var.var.deploy_nomad_server_instances ? aws_iam_role.nomad_instance_role[0].name : null)
+
+  instance_tags = merge(var.instance_tags, { "type" = "nomad-client" })
+}
+
 resource "aws_key_pair" "ssh_key" {
   count      = var.ssh_key != null ? 1 : 0
   key_name   = "${var.basename}-circleci-server-nomad-client-ssh-key-${random_string.key_suffix.result}"

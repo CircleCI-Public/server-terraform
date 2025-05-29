@@ -170,6 +170,10 @@ cat <<EOT > /etc/systemd/system/nomad.service
 [Unit]
 Description="nomad"
 [Service]
+Environment="NOMAD_ADDR=https://localhost:4646"
+Environment="NOMAD_CACERT=/etc/ssl/nomad/ca.pem"
+Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem"
+Environment="NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem"
 Restart=always
 RestartSec=30
 TimeoutStartSec=1m

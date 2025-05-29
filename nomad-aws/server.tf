@@ -17,7 +17,7 @@ module "server" {
   desired_capacity              = var.desired_server_instances
   server_retry_join             = local.server_retry_join
   tag_key_for_discover          = var.tag_key_for_discover
-  tag_value_for_discover        = var.tag_value_for_discover
+  tag_value_for_discover        = local.tag_value_for_discover
   disk_size_gb                  = var.server_disk_size_gb
   launch_template_instance_type = var.server_machine_type
   tags                          = var.instance_tags
