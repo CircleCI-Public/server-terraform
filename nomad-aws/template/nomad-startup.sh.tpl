@@ -16,6 +16,14 @@ INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
 echo "INSTANCE_ID: $INSTANCE_ID"
 
+echo "--------------------------------------"
+echo "      Setting environment variables"
+echo "--------------------------------------"
+echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
+echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem' >> /etc/environment
+echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
+echo "export NOMAD_ADDR=https://${nomad_server_host}:4646" >> /etc/environment
+
 
 echo "----------------------------------------"
 echo "        Tuning kernel parameters"
@@ -91,7 +99,9 @@ sudo apt-get update && \
 sudo apt-get install wget gpg coreutils
 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt-get update && sudo apt-get install nomad=${nomad_version}
+sudo apt-get update
+sudo apt-get install nomad=${nomad_version} -y
+sudo nomad version
 
 
 echo "--------------------------------------"
@@ -107,6 +117,7 @@ EOT
 cat <<EOT > /etc/ssl/nomad/ca.pem
 ${tls_ca}
 EOT
+ls -l /etc/ssl/nomad
 
 echo "--------------------------------------"
 echo "      Creating client.hcl"
@@ -114,7 +125,7 @@ echo "--------------------------------------"
 
 mkdir -p /etc/nomad
 cat <<EOT > /etc/nomad/client.hcl
-log_level = "DEBUG"
+log_level = "${log_level}"
 name = "$INSTANCE_ID"
 data_dir = "/opt/nomad"
 datacenter = "default"
@@ -147,29 +158,33 @@ telemetry {
 }
 EOT
 
-if [ "${client_tls_cert}" ]; then
 cat <<EOT >> /etc/nomad/client.hcl
 tls {
-http = false
+    http = true
     rpc  = true
      # This verifies the CN ([role].[region].nomad) in the certificate,
     # not the hostname or DNS name of the of the remote party.
     # https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
     verify_server_hostname = true
+    verify_https_client = false
     ca_file   = "/etc/ssl/nomad/ca.pem"
     cert_file = "/etc/ssl/nomad/cert.pem"
     key_file  = "/etc/ssl/nomad/key.pem"
 }
 EOT
-fi
+ls -l /etc/nomad
 
 echo "--------------------------------------"
-echo "      Creating nomad.conf"
+echo "      Creating nomad.service"
 echo "--------------------------------------"
 cat <<EOT > /etc/systemd/system/nomad.service
 [Unit]
 Description="nomad"
 [Service]
+Environment="NOMAD_CACERT=/etc/ssl/nomad/ca.pem"
+Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem"
+Environment="NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem"
+Environment="NOMAD_ADDR=https://${nomad_server_host}:4646"
 Restart=always
 RestartSec=30
 TimeoutStartSec=1m
@@ -187,6 +202,8 @@ echo "--------------------------------------"
 echo "      Starting Nomad service"
 echo "--------------------------------------"
 systemctl enable --now nomad
+systemctl status nomad
+
 
 echo "--------------------------------------"
 echo "  Set Up Docker Garbage Collection"
@@ -234,6 +251,7 @@ echo "--------------------------------------"
 echo "  Start Docker Garbage Collection"
 echo "--------------------------------------"
 systemctl enable --now docker-gc
+systemctl status docker-gc
 
 echo "--------------------------------------"
 echo "  Securing Docker network interfaces"

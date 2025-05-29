@@ -51,11 +51,11 @@ output "nomad_role" {
 }
 
 output "nomad_server_lb_arn" {
-  value = var.deploy_nomad_server_instances ? module.server[0].lb_arn : ""
+  value = var.deploy_nomad_server_instances ? aws_lb.internal_nlb[0].arn : ""
 }
 
 output "nomad_server_lb_url" {
-  value = var.deploy_nomad_server_instances ? module.server[0].lb_url : ""
+  value = var.deploy_nomad_server_instances ? aws_lb.internal_nlb[0].dns_name : ""
 }
 
 output "nomad_server_autoscaling_role" {

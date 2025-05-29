@@ -8,12 +8,6 @@ variable "vpc_id" {
   description = "VPC ID of VPC used for Nomad resources"
 }
 
-variable "subnet" {
-  type        = string
-  description = "Subnet ID"
-  default     = ""
-}
-
 variable "subnets" {
   type        = list(string)
   description = "Subnet IDs"
@@ -23,7 +17,6 @@ variable "subnets" {
 variable "basename" {
   type        = string
   description = "Name used as prefix for AWS resources"
-  default     = ""
 }
 
 variable "nomad_server_hostname" {
@@ -53,7 +46,7 @@ variable "enable_imdsv2" {
 variable "launch_template_instance_type" {
   type        = string
   description = "The instance type of the EC2 Nomad Servers."
-  default     = "t2.micro"
+  default     = "t3a.medium"
 }
 
 variable "ssh_key" {
@@ -122,6 +115,11 @@ variable "max_size" {
   default     = 7
 }
 
+variable "nomad_version" {
+  type        = string
+  description = "The version of Nomad to install"
+  default     = "1.7.7-1"
+}
 #
 #Tags and Names
 #
@@ -186,4 +184,19 @@ variable "server_retry_join" {
   description = "Server Identifier to join the cluster"
   default     = ""
   type        = string
+}
+
+variable "server_nlb_arn" {
+  description = "AWS NLB arn for nomad servers"
+  type        = string
+}
+
+variable "log_level" {
+  type        = string
+  default     = "INFO"
+  description = "Nomad Server and Client Log level"
+  validation {
+    condition     = contains(["INFO", "DEBUG", "TRACE"], var.log_level)
+    error_message = "The value for log_level must be 'INFO', 'DEBUG', or 'TRACE'."
+  }
 }

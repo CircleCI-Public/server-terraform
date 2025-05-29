@@ -107,6 +107,7 @@ There are more examples in the [examples](./examples/) directory.
 | [aws_iam_user_policy.nomad_asg_user](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_user_policy) | resource |
 | [aws_key_pair.ssh_key](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/key_pair) | resource |
 | [aws_launch_template.nomad_clients](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
+| [aws_lb.internal_nlb](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb) | resource |
 | [aws_security_group.nomad_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.nomad_traffic_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 | [aws_security_group.ssh_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
@@ -126,8 +127,8 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_allow_ssh"></a> [allow\_ssh](#input\_allow\_ssh) | Enable SSH access inbound (true/false) | `bool` | `false` | no |
 | <a name="input_allowed_ips_circleci_server_nomad_access"></a> [allowed\_ips\_circleci\_server\_nomad\_access](#input\_allowed\_ips\_circleci\_server\_nomad\_access) | List of IPv4 ranges that are permitted to access nomad nodes; used for circleci-server-to-nomad communication | `list(string)` | <pre>[<br/>  "0.0.0.0/0"<br/>]</pre> | no |
 | <a name="input_allowed_ips_retry_ssh"></a> [allowed\_ips\_retry\_ssh](#input\_allowed\_ips\_retry\_ssh) | List of IPv4 ranges that are permitted to access nomad nodes for the retry-with-ssh feature | `list(string)` | <pre>[<br/>  "0.0.0.0/0"<br/>]</pre> | no |
-| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | The AWS region | `string` | `""` | no |
-| <a name="input_basename"></a> [basename](#input\_basename) | Name used as prefix for AWS resources | `string` | `""` | no |
+| <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | The AWS region | `string` | n/a | yes |
+| <a name="input_basename"></a> [basename](#input\_basename) | Name used as prefix for AWS resources | `string` | n/a | yes |
 | <a name="input_blocked_cidrs"></a> [blocked\_cidrs](#input\_blocked\_cidrs) | List of CIDR blocks to block access to from within jobs, e.g. your K8s nodes.<br/>You won't want to block access to external VMs here.<br/>It's okay when your dns\_server is within a blocked CIDR block, you can use var.dns\_server to create an exemption. | `list(string)` | n/a | yes |
 | <a name="input_client_public_ip"></a> [client\_public\_ip](#input\_client\_public\_ip) | Should the Nomad Client EC2 instances have a public IP? | `bool` | `false` | no |
 | <a name="input_deploy_nomad_server_instances"></a> [deploy\_nomad\_server\_instances](#input\_deploy\_nomad\_server\_instances) | When true, nomad server instances will be deployed along with nomad clients | `bool` | `false` | no |
@@ -138,8 +139,9 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_enable_imdsv2"></a> [enable\_imdsv2](#input\_enable\_imdsv2) | Enable or Disable IMDSv2 on Nomad clients. Optional or Required. This is only supported on, or after, CircleCI Server 4.6.0 | `string` | `"optional"` | no |
 | <a name="input_enable_irsa"></a> [enable\_irsa](#input\_enable\_irsa) | If passed a valid OIDC MAP, terraform will create K8s Service Account Role to be used by nomad autoscaler. | `map(any)` | `{}` | no |
 | <a name="input_instance_tags"></a> [instance\_tags](#input\_instance\_tags) | n/a | `map(string)` | <pre>{<br/>  "vendor": "circleci"<br/>}</pre> | no |
-| <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | AWS Node type for instance. Must be Intel linux type | `string` | `"t3.2xlarge"` | no |
+| <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | AWS Node type for nomad client instance. Must be Intel linux type | `string` | `"t3a.2xlarge"` | no |
 | <a name="input_launch_template_version"></a> [launch\_template\_version](#input\_launch\_template\_version) | Specific version of the instance template | `string` | `"$Latest"` | no |
+| <a name="input_log_level"></a> [log\_level](#input\_log\_level) | Nomad Server and Client Log level | `string` | `"INFO"` | no |
 | <a name="input_machine_image_names"></a> [machine\_image\_names](#input\_machine\_image\_names) | Strings to filter image names for nomad virtual machine images. | `list(string)` | <pre>[<br/>  "CircleCIServerNomad*"<br/>]</pre> | no |
 | <a name="input_machine_image_owners"></a> [machine\_image\_owners](#input\_machine\_image\_owners) | List of AWS account IDs that own the images to be used for nomad virtual machines. | `list(string)` | <pre>[<br/>  "833371238208",<br/>  "535726571669"<br/>]</pre> | no |
 | <a name="input_max_nodes"></a> [max\_nodes](#input\_max\_nodes) | Maximum number of nomad clients to create. Must be greater than or equal to nodes | `number` | `5` | no |
@@ -152,13 +154,11 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the role to add to the instance profile | `string` | `null` | no |
 | <a name="input_security_group_id"></a> [security\_group\_id](#input\_security\_group\_id) | ID for the security group for Nomad clients.<br/>See security documentation for recommendations. | `list(string)` | `[]` | no |
 | <a name="input_server_disk_size_gb"></a> [server\_disk\_size\_gb](#input\_server\_disk\_size\_gb) | Disk size for nomad server instances | `number` | `20` | no |
-| <a name="input_server_machine_type"></a> [server\_machine\_type](#input\_server\_machine\_type) | The instance type of the EC2 Nomad Servers. | `string` | `"m4.xlarge"` | no |
+| <a name="input_server_machine_type"></a> [server\_machine\_type](#input\_server\_machine\_type) | The instance type of the EC2 Nomad Servers. | `string` | `"t3a.medium"` | no |
 | <a name="input_server_public_ip"></a> [server\_public\_ip](#input\_server\_public\_ip) | Should the Nomad Server EC2 instances have a public IP? | `bool` | `false` | no |
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes. Both clients and servers when deployed | `string` | `null` | no |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet ID | `string` | `""` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Subnet IDs | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
-| <a name="input_tag_key_for_discover"></a> [tag\_key\_for\_discover](#input\_tag\_key\_for\_discover) | The tag key placed on each EC2 instance for Nomad Server discoverability. | `string` | `"identifier"` | no |
-| <a name="input_tag_value_for_discover"></a> [tag\_value\_for\_discover](#input\_tag\_value\_for\_discover) | The tag value placed on each EC2 instance for Nomad Server discoverability. | `string` | `"circleci-nomad-server-instance"` | no |
 | <a name="input_volume_type"></a> [volume\_type](#input\_volume\_type) | The EBS volume type of the node. If gp3 is not available in your desired region, switch to gp2 | `string` | `"gp3"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |
 

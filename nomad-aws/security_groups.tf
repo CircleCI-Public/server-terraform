@@ -1,5 +1,5 @@
 resource "aws_security_group" "nomad_sg" {
-  name        = "${var.basename}-nomad_sg"
+  name        = "${var.basename}-nomad-sg"
   description = "Security group that allows external users to SSH into nomad instances for CircleCI Retry with SSH feature"
   vpc_id      = var.vpc_id
 
@@ -21,7 +21,7 @@ resource "aws_security_group" "nomad_sg" {
 }
 
 resource "aws_security_group" "nomad_traffic_sg" {
-  name        = "${var.basename}-nomad_traffic_sg"
+  name        = "${var.basename}-nomad-traffic-sg"
   description = "Security group that restrict Nomad Client Server communication within VPC CIDR"
   vpc_id      = var.vpc_id
 
@@ -45,7 +45,7 @@ resource "aws_security_group" "nomad_traffic_sg" {
 resource "aws_security_group" "ssh_sg" {
   description = "Security group that permits CircleCI Server to SSH into nomad instances"
   count       = var.ssh_key != null ? 1 : 0
-  name        = "${var.basename}-circleci-nomad_ssh"
+  name        = "${var.basename}-circleci-nomad-ssh"
   vpc_id      = var.vpc_id
 
   ingress {
