@@ -30,7 +30,7 @@ resource "aws_security_group" "nomad_traffic_sg" {
     from_port   = 4646
     to_port     = 4648
     protocol    = "tcp"
-    cidr_blocks = data.aws_vpc.nomad.cidr_block
+    cidr_blocks = [data.aws_vpc.nomad.cidr_block]
   }
 
   egress {
