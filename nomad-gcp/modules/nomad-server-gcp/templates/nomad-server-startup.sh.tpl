@@ -121,7 +121,7 @@ configure_nomad() {
 	if [ "${tls_cert}" ]; then
 		cat <<-EOT >> /etc/nomad/config.hcl
 		tls {
-		  http = false
+		  http = true
 		  rpc  = true
 		  # This verifies the CN ([role].[region].nomad) in the certificate,
 		  # not the hostname or DNS name of the of the remote party.
