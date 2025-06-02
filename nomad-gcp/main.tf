@@ -4,7 +4,7 @@ locals {
 }
 
 data "google_compute_subnetwork" "nomad" {
-  name   = var.subnetwork ? var.subnetwork : var.network
+  name   = var.subnetwork != "" ? var.subnetwork : var.network
   region = var.region
 }
 
