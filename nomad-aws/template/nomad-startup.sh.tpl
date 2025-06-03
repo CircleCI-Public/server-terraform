@@ -126,7 +126,11 @@ client {
         retry_interval = "30s"
     }
     node_class = "linux-64bit"
-    options = {"driver.raw_exec.enable" = "1"}
+}
+plugin "raw_exec" {
+  config {
+    enabled = true
+  }
 }
 telemetry {
     collection_interval = "1s"
