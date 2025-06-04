@@ -9,7 +9,7 @@ data "google_compute_subnetwork" "nomad" {
 }
 
 locals {
-  tags = ["nomad-server", "circleci-nomad-server", "circleci-${var.name}-nomad-servers", "nomad"]
+  tags = ["nomad-server", "circleci-nomad-server", "${var.name}-nomad-servers", "nomad"]
 }
 
 resource "google_compute_autoscaler" "nomad" {
@@ -151,39 +151,4 @@ resource "google_compute_instance_group_manager" "nomad" {
     health_check      = google_compute_health_check.nomad.id
     initial_delay_sec = 300
   }
-}
-
-resource "google_compute_firewall" "nomad" {
-  name    = "allow-nomad-client-traffic-circleci-server-${var.name}"
-  network = var.network
-  project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
-
-  allow {
-    protocol = "icmp"
-  }
-
-  allow {
-    protocol = "tcp"
-    ports    = ["4646-4748"]
-  }
-
-  allow {
-    protocol = "udp"
-    ports    = ["4646-4748"]
-  }
-
-  source_ranges = data.google_compute_subnetwork.nomad.ip_cidr_range #tfsec:ignore:google-compute-no-public-ingress
-  target_tags   = local.tags
-}
-
-
-# Only External type Load balancer is supported for target pool
-resource "google_compute_forwarding_rule" "nomad" {
-  region                = var.region
-  name                  = "${var.name}-nomad-server-forwarding-rule"
-  target                = google_compute_target_pool.nomad.self_link
-  load_balancing_scheme = "EXTERNAL"
-  port_range            = "4646-4748"
-  ip_protocol           = "TCP"
-  ip_address            = var.nomad_server_ip_address
 }
