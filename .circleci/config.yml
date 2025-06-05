@@ -25,73 +25,50 @@ workflows:
            - shellcheck/check
 
 executors:
+  deploy:
+    resource_class: small
+    docker:
+      - image: cimg/deploy:2025.01
   tfsec:
     resource_class: small
     docker:
-      - image: cimg/base:current
-  default:
-    resource_class: small
-    docker:
-      - image: hashicorp/terraform:1.4.6
+      - image: aquasec/tfsec:v1.28
+  linux-vm:
+    machine:
+      image: ubuntu-2004:current
+      resource_class: small
+
 jobs:
   validate:
-    executor: default
+    executor: deploy
     parameters:
       tf_path:
         type: string
+    working_directory: << parameters.tf_path >>
     steps:
       - checkout
-
-      - run:
-          name: terraform init
-          working_directory: << parameters.tf_path >>
-          command: terraform init
-
-      - run:
-          name: terraform validate
-          working_directory: << parameters.tf_path >>
-          command: terraform validate
+      - run: terraform init
+      - run: terraform validate
 
   format:
-    executor: default
+    executor: deploy
     steps:
       - checkout
-
-      - run:
-          name: terraform fmt
-          command: terraform fmt -check -diff -recursive
+      - run: terraform fmt -check -diff -recursive
 
   tfsec:
     executor: tfsec
     steps:
       - checkout
-      - run:
-          name: install tfsec
-          command: curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install_linux.sh | bash
-      - run:
-          name: run tfsec
-          command: tfsec .
+      - run: tfsec .
 
   check_docs:
-    executor: default
+    executor: linux-vm
     steps:
       - checkout
       - run:
-          name: Install dependencies
-          command: apk add --update-cache --upgrade curl
-      - run:
-          name: Install terraform-docs
-          command: |
-            TERRAFORM_DOCS_VERSION="v0.19.0"
-            curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/$TERRAFORM_DOCS_VERSION/terraform-docs-$TERRAFORM_DOCS_VERSION-$(uname)-amd64.tar.gz
-            tar -xzf terraform-docs.tar.gz
-            chmod +x terraform-docs
-            mv terraform-docs /usr/local/bin/terraform-docs
-      - run:
           name: Generate Docs
-          command: |
-            cd scripts
-            sh generate-docs.sh
+          command: make docs
       - run:
           name: Check if docs need to be updated
           command: |
