@@ -62,6 +62,7 @@ There are more examples in the [examples](./examples/) directory.
 | [google_compute_address.nomad_server](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_address) | resource |
 | [google_compute_autoscaler.nomad](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_autoscaler) | resource |
 | [google_compute_firewall.default](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_firewall.nomad-ssh](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_firewall) | resource |
 | [google_compute_firewall.nomad-traffic](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_firewall) | resource |
 | [google_compute_health_check.nomad](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_health_check) | resource |
 | [google_compute_instance_group_manager.nomad](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/compute_instance_group_manager) | resource |
@@ -82,6 +83,7 @@ There are more examples in the [examples](./examples/) directory.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_add_server_join"></a> [add\_server\_join](#input\_add\_server\_join) | Includes the 'server\_join' block when setting up nomad clients. Should be disabled when the nomad server endpoint is not immediately known (eg, for dedicated nomad clients). | `bool` | `true` | no |
+| <a name="input_allowed_ips_nomad_ssh_access"></a> [allowed\_ips\_nomad\_ssh\_access](#input\_allowed\_ips\_nomad\_ssh\_access) | List of IPv4 CIDR ranges that are permitted SSH access nomad clients nodes | `list(string)` | `[]` | no |
 | <a name="input_assign_public_ip"></a> [assign\_public\_ip](#input\_assign\_public\_ip) | Assign public IP | `bool` | `true` | no |
 | <a name="input_autoscaling_mode"></a> [autoscaling\_mode](#input\_autoscaling\_mode) | Autoscaler mode. Can be<br/>- "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules<br/>- "OFF": Autoscaler will never scale up or down<br/>- "ONLY\_SCALE\_OUT": Autoscaler will only scale out (default)<br/>Warning: jobs may be interrupted on scale down. Only select "ON" if<br/>interruptions are acceptible for your use case. | `string` | `"ONLY_SCALE_OUT"` | no |
 | <a name="input_autoscaling_schedules"></a> [autoscaling\_schedules](#input\_autoscaling\_schedules) | Autoscaler scaling schedules. Accepts the same arguments are documented<br/>upstream here: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_autoscaler#scaling_schedules | <pre>list(object({<br/>    name                  = string<br/>    min_required_replicas = number<br/>    schedule              = string<br/>    time_zone             = string<br/>    duration_sec          = number<br/>    disabled              = bool<br/>    description           = string<br/>  }))</pre> | `[]` | no |
