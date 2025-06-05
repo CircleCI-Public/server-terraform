@@ -1,7 +1,7 @@
 resource "google_compute_address" "nomad_server" {
   count = var.nomad_server_enabled ? 1 : 0
 
-  name         = "${var.name}-nomad-server-ip-address"
+  name         = "${var.name}-nomad-server-lb-ip"
   address_type = "EXTERNAL"
   region       = var.region
 }
@@ -31,7 +31,7 @@ module "server" {
   server_disk_type                 = var.server_disk_type
   server_machine_type              = var.server_machine_type
   server_retry_join                = local.server_retry_join
-  nomad_server_ip_address          = google_compute_address.nomad_server[0].address
+  nomad_server_lb_ip               = google_compute_address.nomad_server[0].address
   health_check_timeout_sec         = var.health_check_timeout_sec
   health_check_interval_sec        = var.health_check_interval_sec
   health_check_healthy_threshold   = var.health_check_healthy_threshold

@@ -1,11 +1,13 @@
 locals {
   nomad_server_hostname_and_port = "${var.nomad_server_hostname}:${var.nomad_server_port}"
   server_retry_join              = "provider=gce project_name=${var.project_id} zone_pattern=${var.zone} tag_value=circleci-${var.name}-nomad-servers"
+  tags                           = ["nomad", "circleci-server", "${var.name}-nomad-clients"]
 }
 
 data "google_compute_subnetwork" "nomad" {
-  name   = var.subnetwork != "" ? var.subnetwork : var.network
-  region = var.region
+  name    = var.subnetwork != "" ? var.subnetwork : var.network
+  project = var.project_id
+  region  = var.region
 }
 
 module "tls" {
@@ -71,7 +73,7 @@ resource "google_compute_instance_template" "nomad" {
   machine_type   = var.machine_type
   can_ip_forward = false
 
-  tags = ["nomad", "circleci-server", "${var.name}-nomad-clients"]
+  tags = local.tags
 
   disk {
     source_image = data.google_compute_image.machine_image.self_link
@@ -161,46 +163,4 @@ resource "google_compute_instance_group_manager" "nomad" {
 data "google_compute_image" "machine_image" {
   family  = var.machine_image_family
   project = var.machine_image_project
-}
-
-
-resource "google_compute_firewall" "default" {
-  name    = "allow-retry-with-ssh-circleci-server-${var.name}"
-  network = var.network
-  project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
-
-  allow {
-    protocol = "icmp"
-  }
-
-  allow {
-    protocol = "tcp"
-    ports    = ["64535-65535"]
-  }
-
-  source_ranges = var.retry_with_ssh_allowed_cidr_blocks #tfsec:ignore:google-compute-no-public-ingress
-  target_tags   = ["nomad", "circleci-server", var.name]
-}
-
-resource "google_compute_firewall" "nomad-traffic" {
-  name    = "allow-nomad-traffic-circleci-server-${var.name}"
-  network = var.network
-  project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
-
-  allow {
-    protocol = "icmp"
-  }
-
-  allow {
-    protocol = "tcp"
-    ports    = ["4646-4647"]
-  }
-
-  allow {
-    protocol = "udp"
-    ports    = ["4646-4748"]
-  }
-
-  source_ranges = [data.google_compute_subnetwork.nomad.ip_cidr_range] #tfsec:ignore:google-compute-no-public-ingress
-  target_tags   = ["nomad", "circleci-server", var.name]
 }

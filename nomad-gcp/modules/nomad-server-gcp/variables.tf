@@ -182,11 +182,13 @@ variable "server_target_cpu_utilization" {
 }
 
 variable "server_retry_join" {
-  type = string
+  description = "Retry join address for nomad server"
+  type        = string
 }
 
-variable "nomad_server_ip_address" {
-  type = string
+variable "nomad_server_lb_ip" {
+  description = "IP address for the nomad server load balancer"
+  type        = string
 }
 
 variable "health_check_timeout_sec" {
