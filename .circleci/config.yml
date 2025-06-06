@@ -12,21 +12,23 @@ workflows:
       - check_docs
       - tfsec
       - validate:
-          name: Nomad AWS basic
-          tf_path: nomad-aws/examples/basic
+          matrix:
+            parameters:
+              root: [nomad-aws, nomad-gcp]
           requires:
             - format
             - shellcheck/check
-      - validate:
-          name: Nomad GCP basic
-          tf_path: nomad-gcp/examples/basic
+      - test:
+          matrix:
+            parameters:
+              root: [nomad-aws, nomad-gcp]
           requires:
-           - format
-           - shellcheck/check
+            - format
+            - shellcheck/check
 
 executors:
   deploy:
-    resource_class: small
+    resource_class: medium
     docker:
       - image: cimg/deploy:2025.01
   tfsec:
@@ -42,13 +44,45 @@ jobs:
   validate:
     executor: deploy
     parameters:
-      tf_path:
+      root:
         type: string
-    working_directory: << parameters.tf_path >>
+    environment:
+      TF_LOG: info
     steps:
       - checkout
-      - run: terraform init
-      - run: terraform validate
+      - run:
+          name: "Terraform validate"
+          command: |
+            for dir in ./examples/*/; do
+              if [ -d "$dir" ]; then
+                echo "Processing $dir"
+                cd "$dir"
+                terraform init
+                terraform validate
+                cd - > /dev/null
+              fi
+            done
+          working_directory: << parameters.root >>
+
+  test:
+    executor: deploy
+    parameters:
+      root:
+        type: string
+    environment:
+      TF_LOG: info
+    steps:
+      - checkout
+      - run:
+          name: "Terraform test"
+          command: |
+            terraform init -backend=false
+
+            # Required by the nomad-gcp tests to have some dummy credentials...
+            export GOOGLE_PROJECT="dummy-project" GOOGLE_CREDENTIALS='{"type": "service_account"}'
+
+            terraform test
+          working_directory: << parameters.root >>
 
   format:
     executor: deploy

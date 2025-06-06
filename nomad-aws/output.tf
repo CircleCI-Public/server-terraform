@@ -39,7 +39,8 @@ output "nomad_asg_user_access_key" {
 }
 
 output "nomad_asg_user_secret_key" {
-  value = local.autoscaler_type == "user" ? aws_iam_access_key.nomad_asg_user[0].secret : ""
+  sensitive = true
+  value     = local.autoscaler_type == "user" ? aws_iam_access_key.nomad_asg_user[0].secret : ""
 }
 
 output "nomad_asg_name" {

@@ -4,7 +4,7 @@ data "google_compute_image" "machine_image" {
 }
 
 data "google_compute_subnetwork" "nomad" {
-  name   = var.subnetwork ? var.subnetwork : var.network
+  name   = var.subnetwork != "" ? var.subnetwork : var.network
   region = var.region
 }
 
