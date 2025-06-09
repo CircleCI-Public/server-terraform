@@ -56,7 +56,7 @@ module "nomad-aws" {
   max_nodes         = 5     # the max number of clients to scale to. Must be greater than our equal to the nodes set above.
 
   # Externalized Nomad Servers
-  nomad_server_enabled    = true
+  deploy_nomad_server_instances    = true
   server_public_ip        = true
   allow_ssh               = true
   server_ssh_key          = "<your-public-key>"

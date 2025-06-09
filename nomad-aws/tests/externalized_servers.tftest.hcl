@@ -92,7 +92,7 @@ run "test_server_launch_template" {
     nodes                 = 2
     vpc_id                = "vpc-12345678"
     subnets               = ["subnet-12345678"]
-    nomad_server_enabled  = true
+    deploy_nomad_server_instances  = true
     server_machine_type   = "m5.xlarge"
     server_disk_size_gb   = 50
   }
@@ -122,7 +122,7 @@ run "test_server_autoscaling_group" {
     nodes                   = 2
     vpc_id                  = "vpc-12345678"
     subnets                 = ["subnet-12345678"]
-    nomad_server_enabled    = true
+    deploy_nomad_server_instances    = true
     desired_server_replicas = 3
     max_server_replicas     = 7
   }
@@ -147,7 +147,7 @@ run "test_load_balancer_configuration" {
     nodes                 = 2
     vpc_id                = "vpc-12345678"
     subnets               = ["subnet-12345678"]
-    nomad_server_enabled  = true
+    deploy_nomad_server_instances  = true
   }
 
   assert {

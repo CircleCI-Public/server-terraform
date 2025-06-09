@@ -1,7 +1,7 @@
 module "server" {
   source = "./modules/nomad-server-aws"
 
-  count = var.nomad_server_enabled ? 1 : 0
+  count = var.deploy_nomad_server_instances ? 1 : 0
 
   basename                      = var.basename
   vpc_id                        = var.vpc_id

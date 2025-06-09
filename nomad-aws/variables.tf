@@ -209,7 +209,7 @@ variable "enable_imdsv2" {
   default     = "optional"
 }
 
-variable "nomad_server_enabled" {
+variable "deploy_nomad_server_instances" {
   type        = bool
   default     = false
   description = "Set to true to enable nomad server"

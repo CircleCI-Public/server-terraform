@@ -1,9 +1,9 @@
 locals {
 
-  nomad_host_name_if_server      = var.nomad_server_enabled && var.nomad_server_hostname == "" ? "${var.basename}-circleci-nomad-server-nlb-*.elb.${var.aws_region}.amazonaws.com" : var.nomad_server_hostname
+  nomad_host_name_if_server      = var.deploy_nomad_server_instances && var.nomad_server_hostname == "" ? "${var.basename}-circleci-nomad-server-nlb-*.elb.${var.aws_region}.amazonaws.com" : var.nomad_server_hostname
   nomad_server_hostname_and_port = "${local.nomad_host_name_if_server}:${var.nomad_server_port}"
   server_retry_join              = "provider=aws tag_key=${var.tag_key_for_discover} tag_value=${var.tag_value_for_discover} addr_type=${var.addr_type} region=${var.aws_region}"
-  nomad_client_instance_role     = var.role_name != null ? var.role_name : (var.nomad_server_enabled ? aws_iam_role.nomad_instance_role[0].name : null)
+  nomad_client_instance_role     = var.role_name != null ? var.role_name : (var.deploy_nomad_server_instances ? aws_iam_role.nomad_instance_role[0].name : null)
 
   instance_tags = merge(var.instance_tags, { "type" = "nomad-client" })
 }
@@ -68,7 +68,7 @@ data "cloudinit_config" "nomad_user_data" {
         blocked_cidrs         = var.blocked_cidrs
         docker_network_cidr   = var.docker_network_cidr
         dns_server            = var.dns_server
-        server_retry_join     = var.nomad_server_enabled ? local.server_retry_join : local.nomad_server_hostname_and_port
+        server_retry_join     = var.deploy_nomad_server_instances ? local.server_retry_join : local.nomad_server_hostname_and_port
       }
     )
   }
