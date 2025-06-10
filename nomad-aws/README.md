@@ -147,7 +147,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_max_server_instances"></a> [max\_server\_instances](#input\_max\_server\_instances) | Maximum number of Nomad Server instances | `number` | `7` | no |
 | <a name="input_nodes"></a> [nodes](#input\_nodes) | Desired Number of nomad clients to create | `number` | n/a | yes |
 | <a name="input_nomad_auto_scaler"></a> [nomad\_auto\_scaler](#input\_nomad\_auto\_scaler) | If set to true, A Nomad User or A Role will be created based on enable\_irsa variable values | `bool` | `false` | no |
-| <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com) | `string` | n/a | yes |
+| <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com). This can be ignored if deploy\_nomad\_server\_instances is true | `string` | n/a | yes |
 | <a name="input_nomad_server_port"></a> [nomad\_server\_port](#input\_nomad\_server\_port) | Port that the server endpoint listens on for nomad connections. | `number` | `4647` | no |
 | <a name="input_nomad_version"></a> [nomad\_version](#input\_nomad\_version) | The version of Nomad to install | `string` | `"1.7.7-1"` | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the role to add to the instance profile | `string` | `null` | no |
@@ -159,7 +159,6 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet ID | `string` | `""` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Subnet IDs | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
 | <a name="input_tag_key_for_discover"></a> [tag\_key\_for\_discover](#input\_tag\_key\_for\_discover) | The tag key placed on each EC2 instance for Nomad Server discoverability. | `string` | `"identifier"` | no |
-| <a name="input_tag_key_name_value"></a> [tag\_key\_name\_value](#input\_tag\_key\_name\_value) | Value fo the name you want to name the EC2 instance. | `string` | `"circleci-nomad-server"` | no |
 | <a name="input_tag_value_for_discover"></a> [tag\_value\_for\_discover](#input\_tag\_value\_for\_discover) | The tag value placed on each EC2 instance for Nomad Server discoverability. | `string` | `"circleci-nomad-server-instance"` | no |
 | <a name="input_volume_type"></a> [volume\_type](#input\_volume\_type) | The EBS volume type of the node. If gp3 is not available in your desired region, switch to gp2 | `string` | `"gp3"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |
