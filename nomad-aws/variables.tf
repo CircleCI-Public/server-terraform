@@ -88,7 +88,7 @@ variable "instance_type" {
 
 variable "ssh_key" {
   type        = string
-  description = "SSH Public key to access nomad nodes"
+  description = "SSH Public key to access nomad nodes. Both clients and servers when deployed"
   default     = null
 }
 
@@ -236,12 +236,6 @@ variable "server_machine_type" {
   type        = string
   description = "The instance type of the EC2 Nomad Servers."
   default     = "m4.xlarge"
-}
-
-variable "server_ssh_key" {
-  type        = string
-  description = "An SSH key you wish to attach to SSH into the nomad-server instances. Must allow port 22"
-  default     = null
 }
 
 variable "allow_ssh" {

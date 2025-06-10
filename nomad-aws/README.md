@@ -155,8 +155,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_server_disk_size_gb"></a> [server\_disk\_size\_gb](#input\_server\_disk\_size\_gb) | Disk size for nomad server instances | `number` | `20` | no |
 | <a name="input_server_machine_type"></a> [server\_machine\_type](#input\_server\_machine\_type) | The instance type of the EC2 Nomad Servers. | `string` | `"m4.xlarge"` | no |
 | <a name="input_server_public_ip"></a> [server\_public\_ip](#input\_server\_public\_ip) | Should the Nomad Server EC2 instances have a public IP? | `bool` | `false` | no |
-| <a name="input_server_ssh_key"></a> [server\_ssh\_key](#input\_server\_ssh\_key) | An SSH key you wish to attach to SSH into the nomad-server instances. Must allow port 22 | `string` | `null` | no |
-| <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes | `string` | `null` | no |
+| <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes. Both clients and servers when deployed | `string` | `null` | no |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet ID | `string` | `""` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Subnet IDs | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
 | <a name="input_tag_key_for_discover"></a> [tag\_key\_for\_discover](#input\_tag\_key\_for\_discover) | The tag key placed on each EC2 instance for Nomad Server discoverability. | `string` | `"identifier"` | no |

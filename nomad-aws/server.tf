@@ -21,7 +21,7 @@ module "server" {
   disk_size_gb                  = var.server_disk_size_gb
   launch_template_instance_type = var.server_machine_type
   tags                          = var.instance_tags
-  ssh_key                       = var.server_ssh_key
+  ssh_key                       = var.ssh_key
   allow_ssh                     = var.allow_ssh
   public_ip                     = var.server_public_ip
   random_string_suffix          = random_string.key_suffix.result
