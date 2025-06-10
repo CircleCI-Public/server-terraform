@@ -138,18 +138,18 @@ variable "client_public_ip" {
   }
 }
 
-# Check for IRSA Role (more details)  - https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
-#   enable_irsa  = {
-#                  oidc_principal_id  = "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>"
-#                  oidc_eks_variable  = "oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>:sub"
-#                  k8s_service_account = "system:serviceaccount:<NAMESPACE>:nomad-autoscaler"
-#                  }
 variable "nomad_auto_scaler" {
   type        = bool
   default     = false
   description = "If set to true, A Nomad User or A Role will be created based on enable_irsa variable values"
 }
 
+# Example for IRSA Role format (more details) - https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
+#   enable_irsa  = {
+#                  oidc_principal_id  = "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>"
+#                  oidc_eks_variable  = "oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>:sub"
+#                  k8s_service_account = "system:serviceaccount:<NAMESPACE>:nomad-autoscaler"
+#                  }
 variable "enable_irsa" {
   type        = map(any)
   default     = {}
