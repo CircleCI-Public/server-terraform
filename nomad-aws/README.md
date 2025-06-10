@@ -130,7 +130,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_basename"></a> [basename](#input\_basename) | Name used as prefix for AWS resources | `string` | `""` | no |
 | <a name="input_blocked_cidrs"></a> [blocked\_cidrs](#input\_blocked\_cidrs) | List of CIDR blocks to block access to from within jobs, e.g. your K8s nodes.<br/>You won't want to block access to external VMs here.<br/>It's okay when your dns\_server is within a blocked CIDR block, you can use var.dns\_server to create an exemption. | `list(string)` | n/a | yes |
 | <a name="input_client_public_ip"></a> [client\_public\_ip](#input\_client\_public\_ip) | Should the Nomad Client EC2 instances have a public IP? | `bool` | `false` | no |
-| <a name="input_desired_server_replicas"></a> [desired\_server\_replicas](#input\_desired\_server\_replicas) | Desired number of Nomad Server instances | `number` | `3` | no |
+| <a name="input_desired_server_instances"></a> [desired\_server\_replicas](#input\_desired\_server\_replicas) | Desired number of Nomad Server instances | `number` | `3` | no |
 | <a name="input_disk_size_gb"></a> [disk\_size\_gb](#input\_disk\_size\_gb) | The volume size, in GB to each nomad client's /dev/sda1 disk. | `number` | `100` | no |
 | <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | If the IP address of your VPC DNS server is within one of the blocked CIDR blocks you can create an exemption by entering the IP address for it here | `string` | n/a | yes |
 | <a name="input_docker_network_cidr"></a> [docker\_network\_cidr](#input\_docker\_network\_cidr) | IP CIDR to be used in docker networks when running job on nomad client.<br/>This CIDR block should not be the same as your VPC CIDR block.<br/>i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16" | `string` | `"10.10.0.0/16"` | no |
@@ -143,7 +143,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_machine_image_names"></a> [machine\_image\_names](#input\_machine\_image\_names) | Strings to filter image names for nomad virtual machine images. | `list(string)` | <pre>[<br/>  "CircleCIServerNomad*"<br/>]</pre> | no |
 | <a name="input_machine_image_owners"></a> [machine\_image\_owners](#input\_machine\_image\_owners) | List of AWS account IDs that own the images to be used for nomad virtual machines. | `list(string)` | <pre>[<br/>  "833371238208",<br/>  "535726571669"<br/>]</pre> | no |
 | <a name="input_max_nodes"></a> [max\_nodes](#input\_max\_nodes) | Maximum number of nomad clients to create. Must be greater than or equal to nodes | `number` | `5` | no |
-| <a name="input_max_server_replicas"></a> [max\_server\_replicas](#input\_max\_server\_replicas) | Maximum number of Nomad Server instances | `number` | `7` | no |
+| <a name="input_max_server_instances"></a> [max\_server\_replicas](#input\_max\_server\_replicas) | Maximum number of Nomad Server instances | `number` | `7` | no |
 | <a name="input_nodes"></a> [nodes](#input\_nodes) | Desired Number of nomad clients to create | `number` | n/a | yes |
 | <a name="input_nomad_auto_scaler"></a> [nomad\_auto\_scaler](#input\_nomad\_auto\_scaler) | If set to true, A Nomad User or A Role will be created based on enable\_irsa variable values | `bool` | `false` | no |
 | <a name="input_deploy_nomad_server_instances"></a> [nomad\_server\_enabled](#input\_nomad\_server\_enabled) | Set to true to enable nomad server | `bool` | `false` | no |

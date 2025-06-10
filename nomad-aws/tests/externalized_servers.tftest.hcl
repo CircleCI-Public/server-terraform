@@ -123,8 +123,8 @@ run "test_server_autoscaling_group" {
     vpc_id                  = "vpc-12345678"
     subnets                 = ["subnet-12345678"]
     deploy_nomad_server_instances    = true
-    desired_server_replicas = 3
-    max_server_replicas     = 7
+    desired_server_instances = 3
+    max_server_instances     = 7
   }
 
   assert {

@@ -215,12 +215,12 @@ variable "deploy_nomad_server_instances" {
   description = "When true, nomad server instances will be deploy along with nomad clients"
 }
 
-variable "desired_server_replicas" {
+variable "desired_server_instances" {
   type        = number
   default     = 3
   description = "Desired number of Nomad Server instances"
 }
-variable "max_server_replicas" {
+variable "max_server_instances" {
   type        = number
   default     = 7
   description = "Maximum number of Nomad Server instances"

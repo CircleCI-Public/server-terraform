@@ -13,8 +13,8 @@ module "server" {
   tls_key                       = var.enable_mtls ? module.nomad_tls[0].nomad_server_key : ""
   tls_ca                        = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""
   min_size                      = 3
-  max_size                      = var.max_server_replicas
-  desired_capacity              = var.desired_server_replicas
+  max_size                      = var.max_server_instances
+  desired_capacity              = var.desired_server_instances
   server_retry_join             = local.server_retry_join
   tag_key_for_discover          = var.tag_key_for_discover
   tag_value_for_discover        = var.tag_value_for_discover
