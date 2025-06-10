@@ -13,6 +13,10 @@ resource "google_compute_firewall" "default" {
     ports    = ["64535-65535"]
   }
 
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+
   source_ranges = var.retry_with_ssh_allowed_cidr_blocks #tfsec:ignore:google-compute-no-public-ingress
   target_tags   = local.tags
 }
@@ -37,6 +41,10 @@ resource "google_compute_firewall" "nomad-traffic" {
     ports    = ["4646-4648"]
   }
 
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
+  }
+
   source_ranges = [data.google_compute_subnetwork.nomad.ip_cidr_range] #tfsec:ignore:google-compute-no-public-ingress
   target_tags   = local.tags
 }
@@ -55,6 +63,10 @@ resource "google_compute_firewall" "nomad-ssh" {
   allow {
     protocol = "tcp"
     ports    = ["22"]
+  }
+
+  log_config {
+    metadata = "INCLUDE_ALL_METADATA"
   }
 
   # List of IPv4 CIDR ranges that are permitted to SSH into nomad clients
