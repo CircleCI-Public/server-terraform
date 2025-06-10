@@ -26,7 +26,7 @@ variable "security_group_id" {
 
 variable "nomad_server_hostname" {
   type        = string
-  description = "Hostname of RPC service of Nomad control plane (e.g circleci.example.com)"
+  description = "Hostname of RPC service of Nomad control plane (e.g circleci.example.com). This can be ignored if deploy_nomad_server_instances is true"
   validation {
     condition     = !can(regex(":", var.nomad_server_hostname))
     error_message = "Found ':' in hostname. Port cannot be specified."
