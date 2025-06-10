@@ -18,6 +18,13 @@ resource "google_compute_firewall" "nomad" {
     ports    = ["4646-4648"]
   }
 
+  dynamic "log_config" {
+    for_each = var.enable_firewall_logging ? [1] : []
+    content {
+      metadata = "INCLUDE_ALL_METADATA"
+    }
+  }
+
   source_ranges = [data.google_compute_subnetwork.nomad.ip_cidr_range] #tfsec:ignore:google-compute-no-public-ingress
   target_tags   = local.tags
 }

@@ -215,3 +215,9 @@ variable "health_check_unhealthy_threshold" {
   type        = number
   default     = 5
 }
+
+variable "enable_firewall_logging" {
+  type        = bool
+  default     = false
+  description = "If true, terraform will enable firewall logging for nomad server"
+}
