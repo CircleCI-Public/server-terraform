@@ -218,7 +218,7 @@ variable "deploy_nomad_server_instances" {
 variable "desired_server_instances" {
   type        = number
   default     = 3
-  description = "Desired number of Nomad Server instances"
+  description = "Desired number of Nomad Server instances. This should be an odd number so that a leader can be elected. Hashicorp recommends either 3, 5 or 7 instances."
 }
 variable "max_server_instances" {
   type        = number
