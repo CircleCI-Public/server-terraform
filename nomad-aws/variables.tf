@@ -254,11 +254,6 @@ variable "server_public_ip" {
   }
 }
 
-variable "tag_key_name_value" {
-  type        = string
-  description = "Value fo the name you want to name the EC2 instance."
-  default     = "circleci-nomad-server"
-}
 variable "tag_key_for_discover" {
   type        = string
   description = "The tag key placed on each EC2 instance for Nomad Server discoverability."
