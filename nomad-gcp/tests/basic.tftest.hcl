@@ -47,6 +47,35 @@ run "test_firewall_configuration" {
   }
 }
 
+run "test_firewall_logging_configuration" {
+  variables {
+    region                       = "us-west1"
+    zone                         = "us-west1-a"
+    nomad_server_hostname        = "example.com"
+    min_replicas                 = 2
+    max_replicas                 = 8
+    name                         = "test-nomad"
+    machine_type                 = "n2-standard-8"
+    enable_firewall_logging      = true
+    allowed_ips_nomad_ssh_access = ["1.2.3.4/32", "5.6.7.8/32"]
+  }
+
+  assert {
+    condition     = google_compute_firewall.default.log_config[0].metadata == "INCLUDE_ALL_METADATA"
+    error_message = "Default firewall should have logging enabled"
+  }
+
+  assert {
+    condition     = google_compute_firewall.nomad-traffic.log_config[0].metadata == "INCLUDE_ALL_METADATA"
+    error_message = "nomad-traffic firewall should have logging enabled"
+  }
+
+  assert {
+    condition     = google_compute_firewall.nomad-ssh[0].log_config[0].metadata == "INCLUDE_ALL_METADATA"
+    error_message = "nomad-ssh firewall should have logging enabled"
+  }
+}
+
 run "test_autoscaler_configuration" {
   variables {
     region                = "canada-central1"
