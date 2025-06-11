@@ -204,3 +204,52 @@ run "test_server_instance_group_configuration" {
     error_message = "Instance group manager name should match expected pattern"
   }
 }
+
+run "test_server_firewall_configuration" {
+  variables {
+    region                = "canada-central1"
+    zone                  = "canada-central1-b"
+    name                  = "test-server"
+    nomad_server_enabled  = true
+    nomad_server_hostname = "nomad.example.com"
+  }
+
+  assert {
+    condition     = module.server[0].nomad_server_firewall.name == "fw-test-server-allow-nomad-client-traffic-circleci-server"
+    error_message = "Instance group manager name should match expected pattern"
+  }
+
+  assert {
+    condition = anytrue([
+      for allow_block in module.server[0].nomad_server_firewall.allow :
+      contains(allow_block.ports, "4646-4648") if allow_block.protocol == "tcp"
+    ])
+    error_message = "Nomad traffic firewall should allow Nomad TCP ports 4646-4648"
+  }
+
+  assert {
+    condition = anytrue([
+      for allow_block in module.server[0].nomad_server_firewall.allow :
+      contains(allow_block.ports, "4646-4648") if allow_block.protocol == "udp"
+    ])
+    error_message = "Nomad traffic firewall should allow Nomad UDP port 4647"
+  }
+}
+
+
+
+run "test_firewall_logging_configuration" {
+  variables {
+    region                  = "canada-central1"
+    zone                    = "canada-central1-b"
+    name                    = "test-server"
+    nomad_server_enabled    = true
+    nomad_server_hostname   = "nomad.example.com"
+    enable_firewall_logging = true
+  }
+
+  assert {
+    condition     = module.server[0].nomad_server_firewall.log_config[0].metadata == "INCLUDE_ALL_METADATA"
+    error_message = "Default firewall should have logging enabled"
+  }
+}

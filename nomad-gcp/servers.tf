@@ -36,4 +36,5 @@ module "server" {
   health_check_interval_sec        = var.health_check_interval_sec
   health_check_healthy_threshold   = var.health_check_healthy_threshold
   health_check_unhealthy_threshold = var.health_check_unhealthy_threshold
+  enable_firewall_logging          = var.enable_firewall_logging
 }
