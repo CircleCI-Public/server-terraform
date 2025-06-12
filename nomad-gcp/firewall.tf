@@ -4,9 +4,6 @@ resource "google_compute_firewall" "default" {
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
-  allow {
-    protocol = "icmp"
-  }
 
   allow {
     protocol = "tcp"
@@ -31,9 +28,6 @@ resource "google_compute_firewall" "nomad-traffic" {
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
-  allow {
-    protocol = "icmp"
-  }
 
   allow {
     protocol = "tcp"
@@ -63,9 +57,6 @@ resource "google_compute_firewall" "nomad-ssh" {
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
-  allow {
-    protocol = "icmp"
-  }
 
   allow {
     protocol = "tcp"
