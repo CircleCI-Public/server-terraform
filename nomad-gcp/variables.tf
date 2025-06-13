@@ -226,6 +226,12 @@ variable "health_check_unhealthy_threshold" {
   default     = 5
 }
 
+variable "enable_firewall_logging" {
+  type        = bool
+  default     = false
+  description = "If true, terraform will enable firewall logging on the nomad client and server firewalls"
+}
+
 
 # Below are variables for nomad server
 # Only used if nomad server is enabled
@@ -306,10 +312,4 @@ variable "server_target_cpu_utilization" {
   type        = number
   default     = 0.8
   description = "Target CPU utilization to trigger autoscaling for nomad server cluster"
-}
-
-variable "enable_firewall_logging" {
-  type        = bool
-  default     = false
-  description = "If true, terraform will enable firewall logging for nomad server"
 }
