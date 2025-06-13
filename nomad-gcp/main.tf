@@ -93,7 +93,7 @@ resource "google_compute_instance_template" "nomad" {
       client_tls_key      = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_key
       tls_ca              = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_tls_ca
       docker_network_cidr = var.docker_network_cidr
-      server_retry_join   = var.nomad_server_enabled ? local.server_retry_join : local.nomad_server_hostname_and_port
+      server_retry_join   = var.deploy_nomad_server_instances ? local.server_retry_join : local.nomad_server_hostname_and_port
     }
   )
 

@@ -18,8 +18,8 @@ resource "google_compute_autoscaler" "nomad" {
   target = google_compute_instance_group_manager.nomad.id
 
   autoscaling_policy {
-    max_replicas = var.max_server_replicas
-    min_replicas = var.min_server_replicas
+    max_replicas = var.max_server_instances
+    min_replicas = var.min_server_instances
     mode         = var.server_autoscaling_mode
 
     # Wait 60s * 2 = 2 minutes for initialization before measuring CPU
@@ -90,8 +90,8 @@ resource "google_compute_instance_template" "nomad" {
       tls_cert          = var.tls_cert
       tls_key           = var.tls_key
       tls_ca            = var.tls_ca
-      max_replicas      = var.max_server_replicas
-      min_replicas      = var.min_server_replicas
+      max_replicas      = var.max_server_instances
+      min_replicas      = var.min_server_instances
       server_retry_join = var.server_retry_join
     }
   )
@@ -144,7 +144,7 @@ resource "google_compute_instance_group_manager" "nomad" {
   }
 
   target_pools       = [google_compute_target_pool.nomad.id]
-  target_size        = var.min_server_replicas
+  target_size        = var.min_server_instances
   base_instance_name = "${var.name}-nomad-server"
 
   auto_healing_policies {

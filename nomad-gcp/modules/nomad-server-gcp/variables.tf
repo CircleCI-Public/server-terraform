@@ -90,13 +90,13 @@ variable "nomad_version" {
   default     = "latest"
 }
 
-variable "min_server_replicas" {
+variable "min_server_instances" {
   type        = number
   default     = 3
   description = "Minimum number of nomad server when scaled down"
 }
 
-variable "max_server_replicas" {
+variable "max_server_instances" {
   type        = number
   default     = 7
   description = "Max number of nomad server when scaled up"
@@ -169,7 +169,7 @@ variable "server_autoscaling_schedules" {
   EOF
 }
 
-variable "nomad_server_auto_scaler" {
+variable "nomad_server_auto_scaling" {
   type        = bool
   default     = true
   description = "If true, terraform will create a service account to be used by nomad autoscaler."

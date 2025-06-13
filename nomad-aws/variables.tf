@@ -212,7 +212,7 @@ variable "enable_imdsv2" {
 variable "deploy_nomad_server_instances" {
   type        = bool
   default     = false
-  description = "When true, nomad server instances will be deploy along with nomad clients"
+  description = "When true, nomad server instances will be deployed along with nomad clients"
 }
 
 variable "desired_server_instances" {

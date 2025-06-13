@@ -119,15 +119,15 @@ mock_provider "google" {
 
 run "test_server_networking" {
   variables {
-    region                = "us-central1"
-    zone                  = "us-central1-a"
-    name                  = "test-server"
-    nomad_server_enabled  = true
-    nomad_server_hostname = "nomad.example.com"
+    region                        = "us-central1"
+    zone                          = "us-central1-a"
+    name                          = "test-server"
+    deploy_nomad_server_instances = true
+    nomad_server_hostname         = "nomad.example.com"
   }
 
   assert {
-    condition     = var.nomad_server_enabled == true
+    condition     = var.deploy_nomad_server_instances == true
     error_message = "Nomad server should be enabled for this test"
   }
 
@@ -142,10 +142,10 @@ run "test_server_autoscaler_configuration" {
     region                        = "europe-west1"
     zone                          = "europe-west1-b"
     name                          = "test-server"
-    min_server_replicas           = 5
-    max_server_replicas           = 15
+    min_server_instances          = 5
+    max_server_instances          = 15
     server_target_cpu_utilization = 0.7
-    nomad_server_enabled          = true
+    deploy_nomad_server_instances = true
     nomad_server_hostname         = "nomad.example.com"
   }
 
@@ -167,11 +167,11 @@ run "test_server_autoscaler_configuration" {
 
 run "test_server_health_check_configuration" {
   variables {
-    region                = "asia-southeast1"
-    zone                  = "asia-southeast1-a"
-    name                  = "test-server"
-    nomad_server_enabled  = true
-    nomad_server_hostname = "nomad.example.com"
+    region                        = "asia-southeast1"
+    zone                          = "asia-southeast1-a"
+    name                          = "test-server"
+    deploy_nomad_server_instances = true
+    nomad_server_hostname         = "nomad.example.com"
   }
 
   assert {
@@ -192,11 +192,11 @@ run "test_server_health_check_configuration" {
 
 run "test_server_instance_group_configuration" {
   variables {
-    region                = "canada-central1"
-    zone                  = "canada-central1-b"
-    name                  = "test-server"
-    nomad_server_enabled  = true
-    nomad_server_hostname = "nomad.example.com"
+    region                        = "canada-central1"
+    zone                          = "canada-central1-b"
+    name                          = "test-server"
+    deploy_nomad_server_instances = true
+    nomad_server_hostname         = "nomad.example.com"
   }
 
   assert {
@@ -207,11 +207,11 @@ run "test_server_instance_group_configuration" {
 
 run "test_server_firewall_configuration" {
   variables {
-    region                = "canada-central1"
-    zone                  = "canada-central1-b"
-    name                  = "test-server"
-    nomad_server_enabled  = true
-    nomad_server_hostname = "nomad.example.com"
+    region                        = "canada-central1"
+    zone                          = "canada-central1-b"
+    name                          = "test-server"
+    deploy_nomad_server_instances = true
+    nomad_server_hostname         = "nomad.example.com"
   }
 
   assert {
@@ -240,12 +240,12 @@ run "test_server_firewall_configuration" {
 
 run "test_firewall_logging_configuration" {
   variables {
-    region                  = "canada-central1"
-    zone                    = "canada-central1-b"
-    name                    = "test-server"
-    nomad_server_enabled    = true
-    nomad_server_hostname   = "nomad.example.com"
-    enable_firewall_logging = true
+    region                        = "canada-central1"
+    zone                          = "canada-central1-b"
+    name                          = "test-server"
+    deploy_nomad_server_instances = true
+    nomad_server_hostname         = "nomad.example.com"
+    enable_firewall_logging       = true
   }
 
   assert {

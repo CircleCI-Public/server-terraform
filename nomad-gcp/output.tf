@@ -57,9 +57,9 @@ output "service_account_email" {
 }
 
 output "managed_instance_group_nomad_server" {
-  value = var.nomad_server_enabled ? module.server[0].nomad_server_instance_group_manager : ""
+  value = var.deploy_nomad_server_instances ? module.server[0].nomad_server_instance_group_manager : ""
 }
 
 output "nomad_server_ip" {
-  value = var.nomad_server_enabled ? google_compute_address.nomad_server[0].address : ""
+  value = var.deploy_nomad_server_instances ? google_compute_address.nomad_server[0].address : ""
 }

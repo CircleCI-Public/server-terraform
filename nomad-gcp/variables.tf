@@ -230,22 +230,22 @@ variable "health_check_unhealthy_threshold" {
 # Below are variables for nomad server
 # Only used if nomad server is enabled
 
-variable "nomad_server_enabled" {
+variable "deploy_nomad_server_instances" {
   type        = bool
   default     = false
-  description = "Set to true to enable nomad server"
+  description = "When true, nomad server instances will be deployed along with nomad clients"
 }
 
-variable "min_server_replicas" {
+variable "min_server_instances" {
   type        = number
   default     = 3
-  description = "Minimum number of nomad server when scaled down"
+  description = "Minimum number of nomad server instances. This should be an odd number so that a leader can be elected. Hashicorp recommends either 3, 5 or 7 instances."
 }
 
-variable "max_server_replicas" {
+variable "max_server_instances" {
   type        = number
   default     = 7
-  description = "Max number of nomad server when scaled up"
+  description = "Maximum number of nomad server instances. This should be an odd number so that a leader can be elected. Hashicorp recommends either 3, 5 or 7 instances."
 }
 
 variable "server_machine_type" {
@@ -266,10 +266,10 @@ variable "server_disk_size_gb" {
   description = "Size of the root disk for nomad server in GB."
 }
 
-variable "nomad_server_auto_scaler" {
+variable "nomad_server_auto_scaling" {
   type        = bool
   default     = true
-  description = "If true, terraform will enable autoscaling for nomad server cluster"
+  description = "If true, terraform will enable auto-scaling for nomad server cluster"
 }
 
 variable "server_autoscaling_mode" {
