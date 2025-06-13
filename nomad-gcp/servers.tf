@@ -1,5 +1,5 @@
 resource "google_compute_address" "nomad_server" {
-  count = var.nomad_server_enabled ? 1 : 0
+  count = var.deploy_nomad_server_instances ? 1 : 0
 
   name         = "${var.name}-nomad-server-lb-ip"
   address_type = "EXTERNAL"
@@ -9,7 +9,7 @@ resource "google_compute_address" "nomad_server" {
 module "server" {
   source = "./modules/nomad-server-gcp"
 
-  count = var.nomad_server_enabled ? 1 : 0
+  count = var.deploy_nomad_server_instances ? 1 : 0
 
   zone                             = var.zone
   region                           = var.region
@@ -21,9 +21,9 @@ module "server" {
   tls_cert                         = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_server_cert
   tls_key                          = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_server_key
   tls_ca                           = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_tls_ca
-  min_server_replicas              = var.min_server_replicas
-  max_server_replicas              = var.max_server_replicas
-  nomad_server_auto_scaler         = var.nomad_server_auto_scaler
+  min_server_instances             = var.min_server_instances
+  max_server_instances             = var.max_server_instances
+  nomad_server_auto_scaling        = var.nomad_server_auto_scaling
   server_autoscaling_mode          = var.server_autoscaling_mode
   server_autoscaling_schedules     = var.server_autoscaling_schedules
   server_target_cpu_utilization    = var.server_target_cpu_utilization

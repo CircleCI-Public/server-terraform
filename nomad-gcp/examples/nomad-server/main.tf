@@ -85,9 +85,9 @@ module "nomad" {
   max_replicas     = var.max_replicas
   min_replicas     = var.min_replicas
 
-  nomad_server_enabled          = true
-  max_server_replicas           = 5
-  min_server_replicas           = 3
+  deploy_nomad_server_instances = true
+  max_server_instances          = 5
+  min_server_instances          = 3
   server_disk_size_gb           = 50
   server_target_cpu_utilization = 0.8
 }
