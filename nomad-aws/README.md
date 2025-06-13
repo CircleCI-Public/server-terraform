@@ -130,7 +130,8 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_basename"></a> [basename](#input\_basename) | Name used as prefix for AWS resources | `string` | `""` | no |
 | <a name="input_blocked_cidrs"></a> [blocked\_cidrs](#input\_blocked\_cidrs) | List of CIDR blocks to block access to from within jobs, e.g. your K8s nodes.<br/>You won't want to block access to external VMs here.<br/>It's okay when your dns\_server is within a blocked CIDR block, you can use var.dns\_server to create an exemption. | `list(string)` | n/a | yes |
 | <a name="input_client_public_ip"></a> [client\_public\_ip](#input\_client\_public\_ip) | Should the Nomad Client EC2 instances have a public IP? | `bool` | `false` | no |
-| <a name="input_desired_server_replicas"></a> [desired\_server\_replicas](#input\_desired\_server\_replicas) | Desired number of Nomad Server instances | `number` | `3` | no |
+| <a name="input_deploy_nomad_server_instances"></a> [deploy\_nomad\_server\_instances](#input\_deploy\_nomad\_server\_instances) | When true, nomad server instances will be deploy along with nomad clients | `bool` | `false` | no |
+| <a name="input_desired_server_instances"></a> [desired\_server\_instances](#input\_desired\_server\_instances) | Desired number of Nomad Server instances. This should be an odd number so that a leader can be elected. Hashicorp recommends either 3, 5 or 7 instances. | `number` | `3` | no |
 | <a name="input_disk_size_gb"></a> [disk\_size\_gb](#input\_disk\_size\_gb) | The volume size, in GB to each nomad client's /dev/sda1 disk. | `number` | `100` | no |
 | <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | If the IP address of your VPC DNS server is within one of the blocked CIDR blocks you can create an exemption by entering the IP address for it here | `string` | n/a | yes |
 | <a name="input_docker_network_cidr"></a> [docker\_network\_cidr](#input\_docker\_network\_cidr) | IP CIDR to be used in docker networks when running job on nomad client.<br/>This CIDR block should not be the same as your VPC CIDR block.<br/>i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16" | `string` | `"10.10.0.0/16"` | no |
@@ -143,11 +144,10 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_machine_image_names"></a> [machine\_image\_names](#input\_machine\_image\_names) | Strings to filter image names for nomad virtual machine images. | `list(string)` | <pre>[<br/>  "CircleCIServerNomad*"<br/>]</pre> | no |
 | <a name="input_machine_image_owners"></a> [machine\_image\_owners](#input\_machine\_image\_owners) | List of AWS account IDs that own the images to be used for nomad virtual machines. | `list(string)` | <pre>[<br/>  "833371238208",<br/>  "535726571669"<br/>]</pre> | no |
 | <a name="input_max_nodes"></a> [max\_nodes](#input\_max\_nodes) | Maximum number of nomad clients to create. Must be greater than or equal to nodes | `number` | `5` | no |
-| <a name="input_max_server_replicas"></a> [max\_server\_replicas](#input\_max\_server\_replicas) | Maximum number of Nomad Server instances | `number` | `7` | no |
+| <a name="input_max_server_instances"></a> [max\_server\_instances](#input\_max\_server\_instances) | Maximum number of Nomad Server instances | `number` | `7` | no |
 | <a name="input_nodes"></a> [nodes](#input\_nodes) | Desired Number of nomad clients to create | `number` | n/a | yes |
 | <a name="input_nomad_auto_scaler"></a> [nomad\_auto\_scaler](#input\_nomad\_auto\_scaler) | If set to true, A Nomad User or A Role will be created based on enable\_irsa variable values | `bool` | `false` | no |
-| <a name="input_nomad_server_enabled"></a> [nomad\_server\_enabled](#input\_nomad\_server\_enabled) | Set to true to enable nomad server | `bool` | `false` | no |
-| <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com) | `string` | n/a | yes |
+| <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com). This can be ignored if deploy\_nomad\_server\_instances is true | `string` | n/a | yes |
 | <a name="input_nomad_server_port"></a> [nomad\_server\_port](#input\_nomad\_server\_port) | Port that the server endpoint listens on for nomad connections. | `number` | `4647` | no |
 | <a name="input_nomad_version"></a> [nomad\_version](#input\_nomad\_version) | The version of Nomad to install | `string` | `"1.7.7-1"` | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the role to add to the instance profile | `string` | `null` | no |
@@ -155,12 +155,10 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_server_disk_size_gb"></a> [server\_disk\_size\_gb](#input\_server\_disk\_size\_gb) | Disk size for nomad server instances | `number` | `20` | no |
 | <a name="input_server_machine_type"></a> [server\_machine\_type](#input\_server\_machine\_type) | The instance type of the EC2 Nomad Servers. | `string` | `"m4.xlarge"` | no |
 | <a name="input_server_public_ip"></a> [server\_public\_ip](#input\_server\_public\_ip) | Should the Nomad Server EC2 instances have a public IP? | `bool` | `false` | no |
-| <a name="input_server_ssh_key"></a> [server\_ssh\_key](#input\_server\_ssh\_key) | An SSH key you wish to attach to SSH into the nomad-server instances. Must allow port 22 | `string` | `null` | no |
-| <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes | `string` | `null` | no |
+| <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes. Both clients and servers when deployed | `string` | `null` | no |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet ID | `string` | `""` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Subnet IDs | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
 | <a name="input_tag_key_for_discover"></a> [tag\_key\_for\_discover](#input\_tag\_key\_for\_discover) | The tag key placed on each EC2 instance for Nomad Server discoverability. | `string` | `"identifier"` | no |
-| <a name="input_tag_key_name_value"></a> [tag\_key\_name\_value](#input\_tag\_key\_name\_value) | Value fo the name you want to name the EC2 instance. | `string` | `"circleci-nomad-server"` | no |
 | <a name="input_tag_value_for_discover"></a> [tag\_value\_for\_discover](#input\_tag\_value\_for\_discover) | The tag value placed on each EC2 instance for Nomad Server discoverability. | `string` | `"circleci-nomad-server-instance"` | no |
 | <a name="input_volume_type"></a> [volume\_type](#input\_volume\_type) | The EBS volume type of the node. If gp3 is not available in your desired region, switch to gp2 | `string` | `"gp3"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |

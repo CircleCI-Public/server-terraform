@@ -85,16 +85,16 @@ mock_provider "aws" {
 
 run "test_server_launch_template" {
   variables {
-    basename              = "test"
-    nomad_server_hostname = "example.com"
-    blocked_cidrs         = ["192.168.1.0/24"]
-    dns_server            = "192.168.0.2"
-    nodes                 = 2
-    vpc_id                = "vpc-12345678"
-    subnets               = ["subnet-12345678"]
-    nomad_server_enabled  = true
-    server_machine_type   = "m5.xlarge"
-    server_disk_size_gb   = 50
+    basename                      = "test"
+    nomad_server_hostname         = "example.com"
+    blocked_cidrs                 = ["192.168.1.0/24"]
+    dns_server                    = "192.168.0.2"
+    nodes                         = 2
+    vpc_id                        = "vpc-12345678"
+    subnets                       = ["subnet-12345678"]
+    deploy_nomad_server_instances = true
+    server_machine_type           = "m5.xlarge"
+    server_disk_size_gb           = 50
   }
 
   assert {
@@ -115,16 +115,16 @@ run "test_server_launch_template" {
 
 run "test_server_autoscaling_group" {
   variables {
-    basename                = "test"
-    nomad_server_hostname   = "example.com"
-    blocked_cidrs           = ["192.168.1.0/24"]
-    dns_server              = "192.168.0.2"
-    nodes                   = 2
-    vpc_id                  = "vpc-12345678"
-    subnets                 = ["subnet-12345678"]
-    nomad_server_enabled    = true
-    desired_server_replicas = 3
-    max_server_replicas     = 7
+    basename                      = "test"
+    nomad_server_hostname         = "example.com"
+    blocked_cidrs                 = ["192.168.1.0/24"]
+    dns_server                    = "192.168.0.2"
+    nodes                         = 2
+    vpc_id                        = "vpc-12345678"
+    subnets                       = ["subnet-12345678"]
+    deploy_nomad_server_instances = true
+    desired_server_instances      = 3
+    max_server_instances          = 7
   }
 
   assert {
@@ -140,14 +140,14 @@ run "test_server_autoscaling_group" {
 
 run "test_load_balancer_configuration" {
   variables {
-    basename              = "test"
-    nomad_server_hostname = "example.com"
-    blocked_cidrs         = ["192.168.1.0/24"]
-    dns_server            = "192.168.0.2"
-    nodes                 = 2
-    vpc_id                = "vpc-12345678"
-    subnets               = ["subnet-12345678"]
-    nomad_server_enabled  = true
+    basename                      = "test"
+    nomad_server_hostname         = "example.com"
+    blocked_cidrs                 = ["192.168.1.0/24"]
+    dns_server                    = "192.168.0.2"
+    nodes                         = 2
+    vpc_id                        = "vpc-12345678"
+    subnets                       = ["subnet-12345678"]
+    deploy_nomad_server_instances = true
   }
 
   assert {

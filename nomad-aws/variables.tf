@@ -26,7 +26,7 @@ variable "security_group_id" {
 
 variable "nomad_server_hostname" {
   type        = string
-  description = "Hostname of RPC service of Nomad control plane (e.g circleci.example.com)"
+  description = "Hostname of RPC service of Nomad control plane (e.g circleci.example.com). This can be ignored if deploy_nomad_server_instances is true"
   validation {
     condition     = !can(regex(":", var.nomad_server_hostname))
     error_message = "Found ':' in hostname. Port cannot be specified."
@@ -88,7 +88,7 @@ variable "instance_type" {
 
 variable "ssh_key" {
   type        = string
-  description = "SSH Public key to access nomad nodes"
+  description = "SSH Public key to access nomad nodes. Both clients and servers when deployed"
   default     = null
 }
 
@@ -138,18 +138,18 @@ variable "client_public_ip" {
   }
 }
 
-# Check for IRSA Role (more details)  - https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
-#   enable_irsa  = {
-#                  oidc_principal_id  = "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>"
-#                  oidc_eks_variable  = "oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>:sub"
-#                  k8s_service_account = "system:serviceaccount:<NAMESPACE>:nomad-autoscaler"
-#                  }
 variable "nomad_auto_scaler" {
   type        = bool
   default     = false
   description = "If set to true, A Nomad User or A Role will be created based on enable_irsa variable values"
 }
 
+# Example for IRSA Role format (more details) - https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
+#   enable_irsa  = {
+#                  oidc_principal_id  = "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>"
+#                  oidc_eks_variable  = "oidc.eks.<REGION>.amazonaws.com/id/<OIDC_ID>:sub"
+#                  k8s_service_account = "system:serviceaccount:<NAMESPACE>:nomad-autoscaler"
+#                  }
 variable "enable_irsa" {
   type        = map(any)
   default     = {}
@@ -209,18 +209,18 @@ variable "enable_imdsv2" {
   default     = "optional"
 }
 
-variable "nomad_server_enabled" {
+variable "deploy_nomad_server_instances" {
   type        = bool
   default     = false
-  description = "Set to true to enable nomad server"
+  description = "When true, nomad server instances will be deploy along with nomad clients"
 }
 
-variable "desired_server_replicas" {
+variable "desired_server_instances" {
   type        = number
   default     = 3
-  description = "Desired number of Nomad Server instances"
+  description = "Desired number of Nomad Server instances. This should be an odd number so that a leader can be elected. Hashicorp recommends either 3, 5 or 7 instances."
 }
-variable "max_server_replicas" {
+variable "max_server_instances" {
   type        = number
   default     = 7
   description = "Maximum number of Nomad Server instances"
@@ -236,12 +236,6 @@ variable "server_machine_type" {
   type        = string
   description = "The instance type of the EC2 Nomad Servers."
   default     = "m4.xlarge"
-}
-
-variable "server_ssh_key" {
-  type        = string
-  description = "An SSH key you wish to attach to SSH into the nomad-server instances. Must allow port 22"
-  default     = null
 }
 
 variable "allow_ssh" {
@@ -260,11 +254,6 @@ variable "server_public_ip" {
   }
 }
 
-variable "tag_key_name_value" {
-  type        = string
-  description = "Value fo the name you want to name the EC2 instance."
-  default     = "circleci-nomad-server"
-}
 variable "tag_key_for_discover" {
   type        = string
   description = "The tag key placed on each EC2 instance for Nomad Server discoverability."
