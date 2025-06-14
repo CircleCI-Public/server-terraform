@@ -26,5 +26,4 @@ resource "google_compute_firewall" "nomad" {
   }
 
   source_ranges = [data.google_compute_subnetwork.nomad.ip_cidr_range] #tfsec:ignore:google-compute-no-public-ingress
-  target_tags   = local.tags
 }
