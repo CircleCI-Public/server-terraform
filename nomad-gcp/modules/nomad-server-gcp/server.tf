@@ -9,7 +9,7 @@ data "google_compute_subnetwork" "nomad" {
 }
 
 locals {
-  tags = ["nomad-server", "circleci-nomad-server", "${var.name}-nomad-servers", "nomad"]
+  tags = ["circleci-server", "nomad-server", "circleci-nomad-server", "${var.name}-nomad-server", "circleci-${var.name}-nomad-servers"]
 }
 
 resource "google_compute_autoscaler" "nomad" {
