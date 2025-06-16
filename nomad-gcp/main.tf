@@ -1,7 +1,7 @@
 locals {
   nomad_server_hostname_and_port = "${var.nomad_server_hostname}:${var.nomad_server_port}"
   server_retry_join              = "provider=gce project_name=${var.project_id} zone_pattern=${var.zone} tag_value=circleci-${var.name}-nomad-servers"
-  tags                           = ["nomad", "circleci-server", "${var.name}-nomad-clients"]
+  tags                           = ["circleci-server", "nomad-clients", "circleci-nomad-client", "${var.name}-nomad-client"]
 }
 
 data "google_compute_subnetwork" "nomad" {
