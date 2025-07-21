@@ -16,7 +16,8 @@ provider "aws" {
 # server in a preexisting VPC and want your nomad clients to run there,
 # In that case, you should make the appropriate changes in this file.
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 5.21.0"
 
   name                 = "nomad-vpc"
   cidr                 = "192.168.0.0/16"
