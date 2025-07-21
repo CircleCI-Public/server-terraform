@@ -1,14 +1,21 @@
 #!/bin/bash
 
-PRIVATE_IP="$(hostname --ip-address)"
-export PRIVATE_IP
-
 export DEBIAN_FRONTEND=noninteractive
 UNAME="$(uname -r)"
 export UNAME
 
+export aws_instance_metadata_url="http://169.254.169.254"
+export TOKEN="$(curl -X PUT "$aws_instance_metadata_url/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 180")"
+export PUBLIC_IP="$(curl -H "X-aws-ec2-metadata-token: $TOKEN" $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
+export PRIVATE_IP="$(curl -H "X-aws-ec2-metadata-token: $TOKEN" $aws_instance_metadata_url/latest/meta-data/local-ipv4)"
+
+echo "PUBLIC_IP: $PUBLIC_IP"
+echo "PRIVATE_IP: $PRIVATE_IP"
+
 INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
+echo "INSTANCE_ID: $INSTANCE_ID"
+
 
 echo "----------------------------------------"
 echo "        Tuning kernel parameters"
@@ -68,14 +75,13 @@ sleep 5
 echo "--------------------------------------"
 echo " Populating /etc/circleci/public-ipv4"
 echo "--------------------------------------"
-export aws_instance_metadata_url="http://169.254.169.254"
-export PUBLIC_IP="$(curl $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
-export PRIVATE_IP="$(curl $aws_instance_metadata_url/latest/meta-data/local-ipv4)"
+echo "Setting the IPv4 address below in /etc/circleci/public-ipv4."
+echo "This address will be used in builds with \"Rebuild with SSH\"."
+mkdir -p /etc/circleci
 if ! (echo $PUBLIC_IP | grep -qP "^[\d.]+$"); then
-    echo "Setting the IPv4 address below in /etc/circleci/public-ipv4."
-    echo "This address will be used in builds with \"Rebuild with SSH\"."
-    mkdir -p /etc/circleci
     echo $PRIVATE_IP | tee /etc/circleci/public-ipv4
+else
+    echo $PUBLIC_IP | tee /etc/circleci/public-ipv4
 fi
 
 echo "--------------------------------------"
