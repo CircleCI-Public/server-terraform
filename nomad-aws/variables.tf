@@ -92,12 +92,6 @@ variable "ssh_key" {
   default     = null
 }
 
-variable "enable_mtls" {
-  type        = bool
-  default     = true
-  description = "MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended."
-}
-
 variable "basename" {
   type        = string
   description = "Name used as prefix for AWS resources"

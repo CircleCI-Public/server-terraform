@@ -38,7 +38,6 @@ module "nomad_tls" {
   source                = "../shared/modules/tls"
   nomad_server_hostname = local.nomad_host_name_if_server
   nomad_server_port     = var.nomad_server_port
-  count                 = var.enable_mtls ? 1 : 0
 }
 
 locals {
@@ -62,9 +61,9 @@ data "cloudinit_config" "nomad_user_data" {
       {
         nomad_version         = var.nomad_version
         nomad_server_endpoint = local.nomad_server_hostname_and_port
-        client_tls_cert       = var.enable_mtls ? module.nomad_tls[0].nomad_client_cert : ""
-        client_tls_key        = var.enable_mtls ? module.nomad_tls[0].nomad_client_key : ""
-        tls_ca                = var.enable_mtls ? module.nomad_tls[0].nomad_tls_ca : ""
+        client_tls_cert       = module.nomad_tls.nomad_client_cert
+        client_tls_key        = module.nomad_tls.nomad_client_key
+        tls_ca                = module.nomad_tls.nomad_tls_ca
         blocked_cidrs         = var.blocked_cidrs
         docker_network_cidr   = var.docker_network_cidr
         dns_server            = var.dns_server
