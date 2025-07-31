@@ -137,3 +137,29 @@ run "test_ssh_key_conditional" {
     error_message = "SSH security group should allow port 22"
   }
 }
+
+run "test_mtls_configuration" {
+  variables {
+    nomad_server_hostname = "example.com"
+    blocked_cidrs         = ["192.168.1.0/24"]
+    dns_server            = "192.168.0.2"
+    nodes                 = 2
+    vpc_id                = "vpc-12345678"
+    ssh_key               = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ..."
+  }
+
+  assert {
+    condition     = module.nomad_tls.nomad_client_cert != ""
+    error_message = "Nomad Client cert should not be empty"
+  }
+
+  assert {
+    condition     = module.nomad_tls.nomad_client_key != ""
+    error_message = "Nomad Client key should not be empty"
+  }
+
+  assert {
+    condition     = module.nomad_tls.nomad_tls_ca != ""
+    error_message = "Nomad CA should not be empty"
+  }
+}
