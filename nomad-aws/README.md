@@ -137,7 +137,6 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_docker_network_cidr"></a> [docker\_network\_cidr](#input\_docker\_network\_cidr) | IP CIDR to be used in docker networks when running job on nomad client.<br/>This CIDR block should not be the same as your VPC CIDR block.<br/>i.e - "10.10.0.0/16" or "172.32.0.0/16" or "192.168.0.0/16" | `string` | `"10.10.0.0/16"` | no |
 | <a name="input_enable_imdsv2"></a> [enable\_imdsv2](#input\_enable\_imdsv2) | Enable or Disable IMDSv2 on Nomad clients. Optional or Required. This is only supported on, or after, CircleCI Server 4.6.0 | `string` | `"optional"` | no |
 | <a name="input_enable_irsa"></a> [enable\_irsa](#input\_enable\_irsa) | If passed a valid OIDC MAP, terraform will create K8s Service Account Role to be used by nomad autoscaler. | `map(any)` | `{}` | no |
-| <a name="input_enable_mtls"></a> [enable\_mtls](#input\_enable\_mtls) | MTLS support for Nomad traffic. Modifying this can be dangerous and is not recommended. | `bool` | `true` | no |
 | <a name="input_instance_tags"></a> [instance\_tags](#input\_instance\_tags) | n/a | `map(string)` | <pre>{<br/>  "vendor": "circleci"<br/>}</pre> | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | AWS Node type for instance. Must be Intel linux type | `string` | `"t3.2xlarge"` | no |
 | <a name="input_launch_template_version"></a> [launch\_template\_version](#input\_launch\_template\_version) | Specific version of the instance template | `string` | `"$Latest"` | no |
@@ -167,7 +166,6 @@ There are more examples in the [examples](./examples/) directory.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_mtls_enabled"></a> [mtls\_enabled](#output\_mtls\_enabled) | set this value for the `nomad.server.rpc.mTLS.enabled` key in the CircleCI Server's Helm values.yaml |
 | <a name="output_nomad_asg_arn"></a> [nomad\_asg\_arn](#output\_nomad\_asg\_arn) | n/a |
 | <a name="output_nomad_asg_name"></a> [nomad\_asg\_name](#output\_nomad\_asg\_name) | n/a |
 | <a name="output_nomad_asg_user_access_key"></a> [nomad\_asg\_user\_access\_key](#output\_nomad\_asg\_user\_access\_key) | n/a |
