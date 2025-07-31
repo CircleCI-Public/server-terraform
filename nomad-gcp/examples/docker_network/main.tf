@@ -107,7 +107,6 @@ module "nomad" {
   machine_type          = var.machine_type
   docker_network_cidr   = var.docker_network_cidr
 
-  unsafe_disable_mtls    = false
   assign_public_ip       = true
   preemptible            = true
   target_cpu_utilization = 0.50

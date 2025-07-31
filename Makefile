@@ -10,7 +10,13 @@ format:
 .PHONY: test
 test:
 	@make tfsec
+	@make tftest-gcp
 
 .PHONY: tfsec
 tfsec:
 	@tfsec .
+
+.PHONY: tftest-gcp
+tftest-gcp:
+	@export GOOGLE_PROJECT="dummy-project" GOOGLE_CREDENTIALS='{"type": "service_account"}'
+	@cd nomad-gcp && terraform init -backend=false && terraform test

@@ -14,7 +14,6 @@ module "tls" {
   source                = "./../shared/modules/tls"
   nomad_server_hostname = var.nomad_server_hostname
   nomad_server_port     = var.nomad_server_port
-  count                 = var.unsafe_disable_mtls ? 0 : 1
 }
 
 resource "google_compute_autoscaler" "nomad" {
@@ -89,9 +88,9 @@ resource "google_compute_instance_template" "nomad" {
       nomad_version       = var.nomad_version
       add_server_join     = var.add_server_join ? var.add_server_join : ""
       blocked_cidrs       = var.blocked_cidrs
-      client_tls_cert     = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_cert
-      client_tls_key      = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_client_key
-      tls_ca              = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_tls_ca
+      client_tls_cert     = module.tls.nomad_client_cert
+      client_tls_key      = module.tls.nomad_client_key
+      tls_ca              = module.tls.nomad_tls_ca
       docker_network_cidr = var.docker_network_cidr
       server_retry_join   = var.deploy_nomad_server_instances ? local.server_retry_join : local.nomad_server_hostname_and_port
     }

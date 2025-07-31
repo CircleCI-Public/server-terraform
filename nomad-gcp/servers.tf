@@ -18,9 +18,9 @@ module "server" {
   nomad_server_hostname            = var.nomad_server_hostname
   name                             = var.name
   project_id                       = var.project_id
-  tls_cert                         = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_server_cert
-  tls_key                          = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_server_key
-  tls_ca                           = var.unsafe_disable_mtls ? "" : module.tls[0].nomad_tls_ca
+  tls_cert                         = module.tls.nomad_server_cert
+  tls_key                          = module.tls.nomad_server_key
+  tls_ca                           = module.tls.nomad_tls_ca
   min_server_instances             = var.min_server_instances
   max_server_instances             = var.max_server_instances
   nomad_server_auto_scaling        = var.nomad_server_auto_scaling

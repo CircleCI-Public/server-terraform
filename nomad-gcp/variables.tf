@@ -26,12 +26,6 @@ variable "subnetwork" {
   description = "Subnetwork to deploy nomad clients into. NB. This is required if using custom subnets"
 }
 
-variable "unsafe_disable_mtls" {
-  type        = bool
-  default     = false
-  description = "Disables mTLS between nomad client and servers. Compromises the authenticity and confidentiality of client-server communication. Should not be set to true in any production setting"
-}
-
 variable "retry_with_ssh_allowed_cidr_blocks" {
   type        = list(string)
   default     = ["0.0.0.0/0"]

@@ -124,3 +124,30 @@ run "test_health_check_configuration" {
     error_message = "Health check should use correct Nomad health endpoint"
   }
 }
+
+run "test_mtls_configuration" {
+  variables {
+    region                = "canada-east1"
+    zone                  = "canada-east1-a"
+    nomad_server_hostname = "example.com"
+    min_replicas          = 2
+    max_replicas          = 8
+    name                  = "test-nomad"
+    machine_type          = "n2-standard-8"
+  }
+
+  assert {
+    condition     = module.tls.nomad_client_cert != ""
+    error_message = "Nomad Client cert should not be empty"
+  }
+
+  assert {
+    condition     = module.tls.nomad_client_key != ""
+    error_message = "Nomad Client key should not be empty"
+  }
+
+  assert {
+    condition     = module.tls.nomad_tls_ca != ""
+    error_message = "Nomad CA should not be empty"
+  }
+}
