@@ -1,7 +1,6 @@
 variable "aws_region" {
   type        = string
   description = "The AWS region"
-  default     = ""
 }
 variable "subnet" {
   type        = string

@@ -90,6 +90,7 @@ data "cloudinit_config" "nomad_server_user_data" {
         tls_ca            = var.tls_ca
         bootstrap_expect  = var.desired_capacity
         server_retry_join = var.server_retry_join
+        nomad_version     = var.nomad_version
       }
     )
   }

@@ -36,7 +36,9 @@ echo "--------------------------------------"
 apt-get update && apt-get install wget gpg coreutils
 wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt-get update && sudo apt-get install nomad
+sudo apt-get update
+sudo apt-get install nomad=${nomad_version} -y
+nomad version
 
 echo "--------------------------------------"
 echo "       Installling TLS certs"
@@ -51,6 +53,7 @@ EOT
 cat <<-EOT > /etc/ssl/nomad/ca.pem
 ${tls_ca}
 EOT
+ls -l /etc/ssl/nomad/
 
 echo "--------------------------------------"
 echo "      Creating server.hcl"
@@ -94,7 +97,7 @@ EOT
 if [ "${tls_cert}" ]; then
 cat <<-EOT >> /etc/nomad/server.hcl
 tls {
-    http = false
+    http = true
     rpc  = true
     # This verifies the CN ([role].[region].nomad) in the certificate,
     # not the hostname or DNS name of the of the remote party.
@@ -106,9 +109,10 @@ tls {
 }
 EOT
 fi
+ls -l /etc/nomad/
 
 echo "--------------------------------------"
-echo "      Creating nomad.conf"
+echo "      Creating nomad.service"
 echo "--------------------------------------"
 cat <<EOT > /etc/systemd/system/nomad.service
 [Unit]
@@ -130,3 +134,12 @@ echo "--------------------------------------"
 echo "      Starting Nomad service"
 echo "--------------------------------------"
 systemctl enable --now nomad
+systemctl status nomad
+
+echo "--------------------------------------"
+echo "      Setting up the environment!"
+echo "--------------------------------------"
+echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
+echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem' >> /etc/environment
+echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
+echo 'export NOMAD_ADDR=https://localhost:4646' >> /etc/environment
