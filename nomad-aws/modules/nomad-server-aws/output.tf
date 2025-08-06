@@ -1,11 +1,3 @@
-output "lb_arn" {
-  value = aws_lb.internal_nlb.arn
-}
-
-output "lb_url" {
-  value = aws_lb.internal_nlb.dns_name
-}
-
 output "role" {
   value = aws_iam_role.nomad_role.arn
 }
@@ -22,10 +14,6 @@ output "autoscaling_group_arn" {
   value = aws_autoscaling_group.autoscale.arn
 }
 
-output "load_balancer" {
-  value = aws_lb.internal_nlb
-}
-
 output "autoscaling_group" {
   value = aws_autoscaling_group.autoscale
 }
@@ -37,7 +25,6 @@ output "launch_template" {
 output "security_group" {
   value = aws_security_group.nomad_server_sg
 }
-
 
 output "target_group_4646" {
   value = aws_lb_target_group.target_group_4646

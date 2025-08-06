@@ -16,6 +16,14 @@ INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
 echo "INSTANCE_ID: $INSTANCE_ID"
 
+echo "--------------------------------------"
+echo "      Setting environment variables"
+echo "--------------------------------------"
+echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
+echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem' >> /etc/environment
+echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
+echo "export NOMAD_ADDR=https://${nomad_server_host}:4646" >> /etc/environment
+
 
 echo "----------------------------------------"
 echo "        Tuning kernel parameters"
@@ -117,7 +125,7 @@ echo "--------------------------------------"
 
 mkdir -p /etc/nomad
 cat <<EOT > /etc/nomad/client.hcl
-log_level = "DEBUG"
+log_level = "${log_level}"
 name = "$INSTANCE_ID"
 data_dir = "/opt/nomad"
 datacenter = "default"
@@ -150,7 +158,6 @@ telemetry {
 }
 EOT
 
-if [ "${client_tls_cert}" ]; then
 cat <<EOT >> /etc/nomad/client.hcl
 tls {
     http = true
@@ -165,7 +172,6 @@ tls {
     key_file  = "/etc/ssl/nomad/key.pem"
 }
 EOT
-fi
 ls -l /etc/nomad
 
 echo "--------------------------------------"
@@ -197,15 +203,6 @@ echo "      Starting Nomad service"
 echo "--------------------------------------"
 systemctl enable --now nomad
 systemctl status nomad
-
-
-echo "--------------------------------------"
-echo "      Setting up the environment!"
-echo "--------------------------------------"
-echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
-echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem' >> /etc/environment
-echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
-echo "export NOMAD_ADDR=https://${nomad_server_host}:4646" >> /etc/environment
 
 
 echo "--------------------------------------"

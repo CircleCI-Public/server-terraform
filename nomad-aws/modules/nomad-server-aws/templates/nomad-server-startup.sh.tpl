@@ -7,8 +7,24 @@ export DEBIAN_FRONTEND=noninteractive
 UNAME="$(uname -r)"
 export UNAME
 
+export aws_instance_metadata_url="http://169.254.169.254"
+export TOKEN="$(curl -X PUT "$aws_instance_metadata_url/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 180")"
+export PUBLIC_IP="$(curl -H "X-aws-ec2-metadata-token: $TOKEN" $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
+export PRIVATE_IP="$(curl -H "X-aws-ec2-metadata-token: $TOKEN" $aws_instance_metadata_url/latest/meta-data/local-ipv4)"
+
+echo "PUBLIC_IP: $PUBLIC_IP"
+echo "PRIVATE_IP: $PRIVATE_IP"
+
 INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
+
+echo "--------------------------------------"
+echo "      Setting environment variables"
+echo "--------------------------------------"
+echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
+echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem' >> /etc/environment
+echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
+echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
 
 echo "----------------------------------------"
 echo "        Tuning kernel parameters"
@@ -78,7 +94,7 @@ consul {
     server_auto_join = false
 }
 
-log_level = "DEBUG"
+log_level = "${log_level}"
 leave_on_interrupt = false
 leave_on_terminate = true # Leave cluster on SIGTERM
 disable_update_check = true 
@@ -94,7 +110,6 @@ client {
 }
 EOT
 
-if [ "${tls_cert}" ]; then
 cat <<-EOT >> /etc/nomad/server.hcl
 tls {
     http = true
@@ -108,7 +123,6 @@ tls {
     key_file  = "/etc/ssl/nomad/key.pem"
 }
 EOT
-fi
 ls -l /etc/nomad/
 
 echo "--------------------------------------"
@@ -135,11 +149,3 @@ echo "      Starting Nomad service"
 echo "--------------------------------------"
 systemctl enable --now nomad
 systemctl status nomad
-
-echo "--------------------------------------"
-echo "      Setting up the environment!"
-echo "--------------------------------------"
-echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
-echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem' >> /etc/environment
-echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
-echo 'export NOMAD_ADDR=https://localhost:4646' >> /etc/environment

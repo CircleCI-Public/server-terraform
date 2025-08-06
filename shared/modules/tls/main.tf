@@ -61,7 +61,8 @@ resource "tls_cert_request" "nomad_client" {
     "client.global.nomad",
     "localhost",
     "nomad-server",
-    "nomad-server-*.global"
+    "nomad-server-*.global",
+    "${var.nomad_server_hostname}"
   ]
 
   ip_addresses = [
@@ -103,7 +104,8 @@ resource "tls_cert_request" "nomad_server" {
     "server.global.nomad",
     "localhost",
     "nomad-server",
-    "nomad-server-*.global"
+    "nomad-server-*.global",
+    "${var.nomad_server_hostname}"
   ]
 
   ip_addresses = [
