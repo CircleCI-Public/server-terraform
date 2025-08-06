@@ -37,6 +37,8 @@ run "test_launch_template_configuration" {
     vpc_id                = "vpc-12345678"
     instance_type         = "m5.large"
     disk_size_gb          = 100
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
   }
 
   assert {
@@ -64,6 +66,8 @@ run "test_autoscaling_group_configuration" {
     max_nodes             = 10
     vpc_id                = "vpc-12345678"
     nomad_auto_scaler     = true
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
   }
 
   assert {
@@ -90,6 +94,8 @@ run "test_security_group_configuration" {
     nodes                 = 2
     vpc_id                = "vpc-12345678"
     allowed_ips_retry_ssh = ["10.0.0.0/8"]
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
   }
 
   assert {
@@ -117,6 +123,8 @@ run "test_ssh_key_conditional" {
     nodes                 = 2
     vpc_id                = "vpc-12345678"
     ssh_key               = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ..."
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
   }
 
   assert {
@@ -146,6 +154,8 @@ run "test_mtls_configuration" {
     nodes                 = 2
     vpc_id                = "vpc-12345678"
     ssh_key               = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ..."
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
   }
 
   assert {
