@@ -16,6 +16,21 @@ INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
 echo "INSTANCE_ID: $INSTANCE_ID"
 
+retry() {
+    local -r -i max_attempts=5
+    local -i attempt_num=1
+
+    until "$@"; do
+        if (( attempt_num == max_attempts )); then
+            echo "Attempt $attempt_num failed and there are no more attempts left!"
+            exit 1
+        else
+            echo "Attempt $attempt_num failed! Trying again..."
+            ((attempt_num++))
+            sleep 5
+        fi
+    done
+}
 
 echo "----------------------------------------"
 echo "        Tuning kernel parameters"
@@ -30,26 +45,26 @@ fi
 echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
-apt-get update && apt-get -y upgrade
+apt-get update && retry apt-get -y upgrade
 
 echo "--------------------------------------"
 echo "        Installing NTP"
 echo "--------------------------------------"
-apt-get install -y ntp
+retry apt-get install -y ntp
 
 echo "--------------------------------------"
 echo "        Installing Docker"
 echo "--------------------------------------"
-apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-apt-get install -y "linux-image-$UNAME"
+retry apt-get install -y "linux-image-$UNAME"
 apt-get update
-apt-get -y install docker-ce=5:28.1.1-1~ubuntu.22.04~jammy \
-                   docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy
+retry apt-get -y install docker-ce=5:28.1.1-1~ubuntu.22.04~jammy \
+                   docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy \
+                   jq
 
 # force docker to use userns-remap to mitigate CVE 2019-5736
-apt-get -y install jq
 mkdir -p /etc/docker
 [ -f /etc/docker/daemon.json ] || echo '{}' > /etc/docker/daemon.json
 tmp=$(mktemp)
@@ -87,11 +102,11 @@ fi
 echo "--------------------------------------"
 echo "         Installing nomad"
 echo "--------------------------------------"
-sudo apt-get update && \
-sudo apt-get install wget gpg coreutils
+retry sudo apt-get update && \
+retry sudo apt-get install wget gpg coreutils
 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt-get update && sudo apt-get install nomad=${nomad_version}
+sudo apt-get update && retry sudo apt-get install nomad=${nomad_version}
 
 
 echo "--------------------------------------"
