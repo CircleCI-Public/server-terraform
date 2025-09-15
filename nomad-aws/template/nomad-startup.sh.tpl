@@ -16,13 +16,17 @@ INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
 echo "INSTANCE_ID: $INSTANCE_ID"
 
+# Setting up PS1
+# PS1 = ubuntu@ip-172-16-4-15-client
+export PS1="\[\033[01;32m\]\u@\h-client\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+
 echo "--------------------------------------"
 echo "      Setting environment variables"
 echo "--------------------------------------"
 echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
-echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem' >> /etc/environment
+echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/client.pem' >> /etc/environment
 echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
-echo "export NOMAD_ADDR=https://${nomad_server_host}:4646" >> /etc/environment
+echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
 
 
 echo "----------------------------------------"
@@ -108,7 +112,7 @@ echo "--------------------------------------"
 echo "       Installling TLS certs"
 echo "--------------------------------------"
 mkdir -p /etc/ssl/nomad
-cat <<EOT > /etc/ssl/nomad/cert.pem
+cat <<EOT > /etc/ssl/nomad/client.pem
 ${client_tls_cert}
 EOT
 cat <<EOT > /etc/ssl/nomad/key.pem
@@ -168,7 +172,7 @@ tls {
     verify_server_hostname = true
     verify_https_client = false
     ca_file   = "/etc/ssl/nomad/ca.pem"
-    cert_file = "/etc/ssl/nomad/cert.pem"
+    cert_file = "/etc/ssl/nomad/client.pem"
     key_file  = "/etc/ssl/nomad/key.pem"
 }
 EOT
@@ -182,9 +186,9 @@ cat <<EOT > /etc/systemd/system/nomad.service
 Description="nomad"
 [Service]
 Environment="NOMAD_CACERT=/etc/ssl/nomad/ca.pem"
-Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem"
+Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/client.pem"
 Environment="NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem"
-Environment="NOMAD_ADDR=https://${nomad_server_host}:4646"
+Environment="NOMAD_ADDR=https://localhost:4646"
 Restart=always
 RestartSec=30
 TimeoutStartSec=1m

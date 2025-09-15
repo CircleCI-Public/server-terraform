@@ -24,12 +24,6 @@ variable "nomad_server_hostname" {
   description = "Hostname of the nomad server."
 }
 
-variable "nomad_server_port" {
-  type        = number
-  description = "Port that the nomad server endpoint listens on."
-  default     = 4647
-}
-
 #
 #Variables for Launch Template
 #
@@ -169,12 +163,6 @@ variable "tls_key" {
   description = "TLS key for nomad server"
 }
 
-variable "allow_ssh" {
-  description = "Enable SSH access inbound (true/false)"
-  type        = bool
-  default     = false
-}
-
 variable "random_string_suffix" {
   description = "Random String"
   type        = string
@@ -199,4 +187,10 @@ variable "log_level" {
     condition     = contains(["INFO", "DEBUG", "TRACE"], var.log_level)
     error_message = "The value for log_level must be 'INFO', 'DEBUG', or 'TRACE'."
   }
+}
+
+variable "security_group_id" {
+  description = "Security Group for Nomad Server NLB"
+  type        = string
+  default     = ""
 }

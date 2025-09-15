@@ -103,13 +103,3 @@ resource "aws_autoscaling_attachment" "asg_attachment_4648" {
   autoscaling_group_name = aws_autoscaling_group.autoscale.name
   lb_target_group_arn    = aws_lb_target_group.target_group_4648.arn
 }
-
-
-resource "aws_vpc_security_group_ingress_rule" "allow-ssh-ipv4" {
-  count             = var.allow_ssh ? 1 : 0
-  security_group_id = aws_security_group.nomad_server_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 22
-  ip_protocol       = "tcp"
-  to_port           = 22
-}

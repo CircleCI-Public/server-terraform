@@ -18,11 +18,15 @@ echo "PRIVATE_IP: $PRIVATE_IP"
 INSTANCE_ID=$(cloud-init query local_hostname)
 export INSTANCE_ID
 
+# Setting up PS1
+# PS1 = ubuntu@ip-172-16-4-15-server
+export PS1="\[\033[01;32m\]\u@\h-server\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+
 echo "--------------------------------------"
 echo "      Setting environment variables"
 echo "--------------------------------------"
 echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
-echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem' >> /etc/environment
+echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/server.pem' >> /etc/environment
 echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
 echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
 
@@ -60,7 +64,7 @@ echo "--------------------------------------"
 echo "       Installling TLS certs"
 echo "--------------------------------------"
 mkdir -p /etc/ssl/nomad
-cat <<-EOT > /etc/ssl/nomad/cert.pem
+cat <<-EOT > /etc/ssl/nomad/server.pem
 ${tls_cert}
 EOT
 cat <<-EOT > /etc/ssl/nomad/key.pem
@@ -103,7 +107,7 @@ data_dir = "/var/lib/nomad/"
 advertise {
     http = "$PRIVATE_IP:4646" 
     rpc  = "$PRIVATE_IP:4647"
-    serf = "$PRIVATE_IP:4648" 
+    serf = "$PRIVATE_IP:4648"
 }
 client {
   enabled = false
@@ -118,8 +122,9 @@ tls {
     # not the hostname or DNS name of the of the remote party.
     # https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
     verify_server_hostname = true
+    verify_https_client = false
     ca_file   = "/etc/ssl/nomad/ca.pem"
-    cert_file = "/etc/ssl/nomad/cert.pem"
+    cert_file = "/etc/ssl/nomad/server.pem"
     key_file  = "/etc/ssl/nomad/key.pem"
 }
 EOT
@@ -134,7 +139,7 @@ Description="nomad"
 [Service]
 Environment="NOMAD_ADDR=https://localhost:4646"
 Environment="NOMAD_CACERT=/etc/ssl/nomad/ca.pem"
-Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem"
+Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/server.pem"
 Environment="NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem"
 Restart=always
 RestartSec=30

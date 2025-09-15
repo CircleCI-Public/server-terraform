@@ -5,13 +5,11 @@ resource "random_string" "key_suffix" {
 
 locals {
 
-  subnet_ids                     = var.subnet != "" ? [var.subnet] : var.subnets
-  tag_key_for_discover           = "identifier"
-  tag_value_for_discover         = "${var.basename}-circleci-nomad-server-instances-${random_string.key_suffix.result}"
-  nomad_host_name_if_server      = var.deploy_nomad_server_instances ? aws_lb.internal_nlb[0].dns_name : var.nomad_server_hostname
-  nomad_server_hostname_and_port = "${local.nomad_host_name_if_server}:${var.nomad_server_port}"
-  server_retry_join              = "provider=aws tag_key=${local.tag_key_for_discover} tag_value=${local.tag_value_for_discover} addr_type=${var.addr_type} region=${var.aws_region}"
-  nomad_client_instance_role     = var.role_name != null ? var.role_name : (var.deploy_nomad_server_instances ? aws_iam_role.nomad_instance_role[0].name : null)
+  subnet_ids                 = var.subnet != "" ? [var.subnet] : var.subnets
+  tag_key_for_discover       = "identifier"
+  tag_value_for_discover     = "${var.basename}-circleci-nomad-server-instances-${random_string.key_suffix.result}"
+  server_retry_join          = "provider=aws tag_key=${local.tag_key_for_discover} tag_value=${local.tag_value_for_discover} addr_type=${var.addr_type} region=${var.aws_region}"
+  nomad_client_instance_role = var.role_name != null ? var.role_name : (var.deploy_nomad_server_instances ? aws_iam_role.nomad_instance_role[0].name : null)
 
   instance_tags = merge(var.instance_tags, { "type" = "circleci-nomad-client" })
 }
@@ -39,18 +37,8 @@ data "aws_vpc" "nomad" {
 
 module "nomad_tls" {
   source                = "../shared/modules/tls"
-  nomad_server_hostname = local.nomad_host_name_if_server
+  nomad_server_hostname = var.deploy_nomad_server_instances ? "nomad-server.${var.nomad_server_hostname}" : var.nomad_server_hostname
   nomad_server_port     = var.nomad_server_port
-}
-
-locals {
-  # Creates the Nomad Security Group(SG) list for the Instances.
-  # Will include SSH SG if var.ssh_key is not null.
-  nomad_security_groups = compact([
-    aws_security_group.nomad_sg.id,
-    aws_security_group.nomad_traffic_sg.id,
-    var.ssh_key != null ? aws_security_group.ssh_sg[0].id : "",
-  ])
 }
 
 data "cloudinit_config" "nomad_user_data" {
@@ -62,17 +50,15 @@ data "cloudinit_config" "nomad_user_data" {
     content = templatefile(
       "${path.module}/template/nomad-startup.sh.tpl",
       {
-        nomad_version         = var.nomad_version
-        nomad_server_endpoint = local.nomad_server_hostname_and_port
-        client_tls_cert       = module.nomad_tls.nomad_client_cert
-        client_tls_key        = module.nomad_tls.nomad_client_key
-        tls_ca                = module.nomad_tls.nomad_tls_ca
-        blocked_cidrs         = var.blocked_cidrs
-        docker_network_cidr   = var.docker_network_cidr
-        dns_server            = var.dns_server
-        server_retry_join     = var.deploy_nomad_server_instances ? local.server_retry_join : local.nomad_server_hostname_and_port
-        nomad_server_host     = var.deploy_nomad_server_instances ? aws_lb.internal_nlb[0].dns_name : local.nomad_host_name_if_server
-        log_level             = var.log_level
+        nomad_version       = var.nomad_version
+        client_tls_cert     = module.nomad_tls.nomad_client_cert
+        client_tls_key      = module.nomad_tls.nomad_client_key
+        tls_ca              = module.nomad_tls.nomad_tls_ca
+        blocked_cidrs       = var.blocked_cidrs
+        docker_network_cidr = var.docker_network_cidr
+        dns_server          = var.dns_server
+        server_retry_join   = var.deploy_nomad_server_instances ? local.server_retry_join : var.nomad_server_hostname
+        log_level           = var.log_level
       }
     )
   }
@@ -93,9 +79,8 @@ resource "aws_launch_template" "nomad_clients" {
 
   network_interfaces {
     associate_public_ip_address = var.client_public_ip
-    security_groups             = length(var.security_group_id) != 0 ? var.security_group_id : local.nomad_security_groups
+    security_groups             = length(var.security_group_id) != 0 ? var.security_group_id : [aws_security_group.nomad_sg.id]
   }
-
 
   metadata_options {
     http_tokens = var.enable_imdsv2
