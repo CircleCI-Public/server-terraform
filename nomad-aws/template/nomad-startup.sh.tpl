@@ -18,7 +18,7 @@ echo "INSTANCE_ID: $INSTANCE_ID"
 
 # Setting up PS1
 # PS1 = ubuntu@ip-172-16-4-15-client
-export PS1="\[\033[01;32m\]\u@\h-client\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+echo 'export PS1="\[\033[01;32m\]\u@\h-client\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /home/ubuntu/.bashrc
 
 echo "--------------------------------------"
 echo "      Setting environment variables"
@@ -162,11 +162,12 @@ telemetry {
 }
 EOT
 
+if [ "${external_nomad_server}" == "true" ]; then
 cat <<EOT >> /etc/nomad/client.hcl
 tls {
     http = true
     rpc  = true
-     # This verifies the CN ([role].[region].nomad) in the certificate,
+    # This verifies the CN ([role].[region].nomad) in the certificate,
     # not the hostname or DNS name of the of the remote party.
     # https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
     verify_server_hostname = true
@@ -176,6 +177,23 @@ tls {
     key_file  = "/etc/ssl/nomad/key.pem"
 }
 EOT
+else
+cat <<EOT >> /etc/nomad/client.hcl
+tls {
+    http = false
+    rpc  = true
+    # This verifies the CN ([role].[region].nomad) in the certificate,
+    # not the hostname or DNS name of the of the remote party.
+    # https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
+    verify_server_hostname = true
+    verify_https_client = false
+    ca_file   = "/etc/ssl/nomad/ca.pem"
+    cert_file = "/etc/ssl/nomad/client.pem"
+    key_file  = "/etc/ssl/nomad/key.pem"
+}
+EOT
+fi
+
 ls -l /etc/nomad
 
 echo "--------------------------------------"

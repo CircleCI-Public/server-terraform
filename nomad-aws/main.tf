@@ -50,15 +50,16 @@ data "cloudinit_config" "nomad_user_data" {
     content = templatefile(
       "${path.module}/template/nomad-startup.sh.tpl",
       {
-        nomad_version       = var.nomad_version
-        client_tls_cert     = module.nomad_tls.nomad_client_cert
-        client_tls_key      = module.nomad_tls.nomad_client_key
-        tls_ca              = module.nomad_tls.nomad_tls_ca
-        blocked_cidrs       = var.blocked_cidrs
-        docker_network_cidr = var.docker_network_cidr
-        dns_server          = var.dns_server
-        server_retry_join   = var.deploy_nomad_server_instances ? local.server_retry_join : var.nomad_server_hostname
-        log_level           = var.log_level
+        nomad_version         = var.nomad_version
+        client_tls_cert       = module.nomad_tls.nomad_client_cert
+        client_tls_key        = module.nomad_tls.nomad_client_key
+        tls_ca                = module.nomad_tls.nomad_tls_ca
+        blocked_cidrs         = var.blocked_cidrs
+        docker_network_cidr   = var.docker_network_cidr
+        dns_server            = var.dns_server
+        server_retry_join     = var.deploy_nomad_server_instances ? local.server_retry_join : var.nomad_server_hostname
+        log_level             = var.log_level
+        external_nomad_server = var.deploy_nomad_server_instances
       }
     )
   }

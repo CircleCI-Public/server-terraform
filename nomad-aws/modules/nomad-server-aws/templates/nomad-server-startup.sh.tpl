@@ -20,7 +20,7 @@ export INSTANCE_ID
 
 # Setting up PS1
 # PS1 = ubuntu@ip-172-16-4-15-server
-export PS1="\[\033[01;32m\]\u@\h-server\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "
+echo 'export PS1="\[\033[01;32m\]\u@\h-server\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /home/ubuntu/.bashrc
 
 echo "--------------------------------------"
 echo "      Setting environment variables"
