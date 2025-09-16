@@ -21,7 +21,7 @@ output "nomad_server_key_base64" {
 }
 
 output "nomad_tls_ca_base64" {
-  description = "set this value for the `nomad.server.rpc.mTLS.CACertificate` key in the CircleCI Server's Helm values.yaml"
+  description = "set this value for the `nomad.server.rpc.mTLS.CACertificate` and `nomad.client.mTLS.CACertificate` key in the CircleCI Server's Helm values.yaml"
   value       = base64encode(module.nomad_tls.nomad_tls_ca)
 }
 
@@ -77,4 +77,9 @@ output "nomad_server_autoscaling_group_name" {
 
 output "nomad_server_lb_zone_id" {
   value = var.deploy_nomad_server_instances ? aws_lb.internal_nlb[0].zone_id : ""
+}
+
+output "nomad_client_cert_base64" {
+  description = "set this value for the `nomad.client.mTLS.certificate` key in the CircleCI Server's Helm values.yaml"
+  value       = base64encode(module.nomad_tls.nomad_client_cert)
 }
