@@ -51,11 +51,11 @@ output "nomad_role" {
 }
 
 output "nomad_server_lb_arn" {
-  value = var.deploy_nomad_server_instances ? module.server[0].lb_arn : ""
+  value = var.deploy_nomad_server_instances ? aws_lb.internal_nlb[0].arn : ""
 }
 
 output "nomad_server_lb_url" {
-  value = var.deploy_nomad_server_instances ? module.server[0].lb_url : ""
+  value = var.deploy_nomad_server_instances ? aws_lb.internal_nlb[0].dns_name : ""
 }
 
 output "nomad_server_autoscaling_role" {
@@ -63,7 +63,7 @@ output "nomad_server_autoscaling_role" {
 }
 
 output "nomad_server_sg_id" {
-  value = var.deploy_nomad_server_instances ? module.server[0].nomad_sg_id : ""
+  value = var.deploy_nomad_server_instances ? aws_security_group.nomad_server_sg[0].id : ""
 }
 
 output "nomad_server_autoscaling_group_arn" {
@@ -73,4 +73,8 @@ output "nomad_server_autoscaling_group_arn" {
 
 output "nomad_server_autoscaling_group_name" {
   value = var.deploy_nomad_server_instances ? module.server[0].autoscaling_group_name : ""
+}
+
+output "nomad_server_lb_zone_id" {
+  value = var.deploy_nomad_server_instances ? aws_lb.internal_nlb[0].zone_id : ""
 }

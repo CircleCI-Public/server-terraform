@@ -31,10 +31,12 @@ module "nomad-aws" {
   source = "../.."
 
   # Number of nomad clients to run
-  nodes = 4
+  nodes    = 4
+  basename = "cci"
 
-  subnet = module.vpc.public_subnets[0]
-  vpc_id = module.vpc.vpc_id
+  subnet     = module.vpc.public_subnets[0]
+  vpc_id     = module.vpc.vpc_id
+  aws_region = "us-east-1"
 
   # Location of your Nomad server endpoint. This should be exposed from your
   # server installation via a load balancer service.

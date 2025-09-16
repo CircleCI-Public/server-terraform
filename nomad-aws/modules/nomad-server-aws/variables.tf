@@ -8,12 +8,6 @@ variable "vpc_id" {
   description = "VPC ID of VPC used for Nomad resources"
 }
 
-variable "subnet" {
-  type        = string
-  description = "Subnet ID"
-  default     = ""
-}
-
 variable "subnets" {
   type        = list(string)
   description = "Subnet IDs"
@@ -23,18 +17,11 @@ variable "subnets" {
 variable "basename" {
   type        = string
   description = "Name used as prefix for AWS resources"
-  default     = ""
 }
 
 variable "nomad_server_hostname" {
   type        = string
   description = "Hostname of the nomad server."
-}
-
-variable "nomad_server_port" {
-  type        = number
-  description = "Port that the nomad server endpoint listens on."
-  default     = 4647
 }
 
 #
@@ -53,7 +40,7 @@ variable "enable_imdsv2" {
 variable "launch_template_instance_type" {
   type        = string
   description = "The instance type of the EC2 Nomad Servers."
-  default     = "t2.micro"
+  default     = "t3a.medium"
 }
 
 variable "ssh_key" {
@@ -122,6 +109,11 @@ variable "max_size" {
   default     = 7
 }
 
+variable "nomad_version" {
+  type        = string
+  description = "The version of Nomad to install"
+  default     = "1.7.7-1"
+}
 #
 #Tags and Names
 #
@@ -171,12 +163,6 @@ variable "tls_key" {
   description = "TLS key for nomad server"
 }
 
-variable "allow_ssh" {
-  description = "Enable SSH access inbound (true/false)"
-  type        = bool
-  default     = false
-}
-
 variable "random_string_suffix" {
   description = "Random String"
   type        = string
@@ -186,4 +172,25 @@ variable "server_retry_join" {
   description = "Server Identifier to join the cluster"
   default     = ""
   type        = string
+}
+
+variable "server_nlb_arn" {
+  description = "AWS NLB arn for nomad servers"
+  type        = string
+}
+
+variable "log_level" {
+  type        = string
+  default     = "INFO"
+  description = "Nomad Server and Client Log level"
+  validation {
+    condition     = contains(["INFO", "DEBUG", "TRACE"], var.log_level)
+    error_message = "The value for log_level must be 'INFO', 'DEBUG', or 'TRACE'."
+  }
+}
+
+variable "security_group_id" {
+  description = "Security Group for Nomad Server NLB"
+  type        = string
+  default     = ""
 }

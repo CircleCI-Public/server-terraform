@@ -1,6 +1,5 @@
 locals {
-  subnet_ids = var.subnet != "" ? [var.subnet] : var.subnets
-  tags       = merge(var.tags, { "type" = "nomad-server" })
+  tags = merge(var.tags, { "type" = "circleci-nomad-server" })
 }
 
 data "aws_ami" "ubuntu_focal" {
@@ -34,7 +33,7 @@ resource "aws_launch_template" "nomad-servers" {
     name = aws_iam_instance_profile.nomad_instance_profile.name
   }
   network_interfaces {
-    security_groups             = [aws_security_group.nomad_server_sg.id]
+    security_groups             = [var.security_group_id]
     associate_public_ip_address = var.public_ip
   }
   block_device_mappings {
@@ -49,7 +48,7 @@ resource "aws_launch_template" "nomad-servers" {
 }
 
 resource "aws_autoscaling_group" "autoscale" {
-  name                      = "${var.basename}_circleci_nomad_servers_asg"
+  name                      = "${var.basename}-circleci-nomad-servers-asg"
   health_check_grace_period = 300
   desired_capacity          = var.desired_capacity
   max_size                  = var.max_size
@@ -63,7 +62,7 @@ resource "aws_autoscaling_group" "autoscale" {
     id      = aws_launch_template.nomad-servers.id
     version = var.launch_template_version
   }
-  vpc_zone_identifier = local.subnet_ids
+  vpc_zone_identifier = var.subnets
   tag {
     key                 = "Name"
     value               = "${var.basename}-nomad-server"
@@ -90,37 +89,9 @@ data "cloudinit_config" "nomad_server_user_data" {
         tls_ca            = var.tls_ca
         bootstrap_expect  = var.desired_capacity
         server_retry_join = var.server_retry_join
+        nomad_version     = var.nomad_version
+        log_level         = var.log_level
       }
     )
   }
-
-}
-
-resource "aws_security_group" "nomad_server_sg" {
-  name        = "${var.basename}_nomad_server_sg"
-  description = "SG for Nomad Server ASG"
-  vpc_id      = var.vpc_id
-  tags = merge(
-    local.tags,
-    {
-      "Name" = "${var.basename}_nomad_server_sg"
-    },
-  )
-}
-
-resource "aws_vpc_security_group_ingress_rule" "allow-nomad-server-communication-ipv4" {
-  security_group_id = aws_security_group.nomad_server_sg.id
-  cidr_ipv4         = data.aws_vpc.nomad.cidr_block
-  from_port         = 4646
-  to_port           = 4648
-  ip_protocol       = "tcp"
-}
-
-resource "aws_security_group_rule" "allow_all_egress_ipv4" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.nomad_server_sg.id
 }

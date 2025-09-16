@@ -37,6 +37,8 @@ run "test_launch_template_configuration" {
     vpc_id                = "vpc-12345678"
     instance_type         = "m5.large"
     disk_size_gb          = 100
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
   }
 
   assert {
@@ -64,6 +66,8 @@ run "test_autoscaling_group_configuration" {
     max_nodes             = 10
     vpc_id                = "vpc-12345678"
     nomad_auto_scaler     = true
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
   }
 
   assert {
@@ -90,33 +94,42 @@ run "test_security_group_configuration" {
     nodes                 = 2
     vpc_id                = "vpc-12345678"
     allowed_ips_retry_ssh = ["10.0.0.0/8"]
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
   }
 
   assert {
-    condition = anytrue([
-      for ingress in aws_security_group.nomad_sg.ingress :
-      ingress.from_port == 64535 && ingress.to_port == 65535
-    ])
-    error_message = "Nomad SG should allow retry-with-ssh port range 64535-65535"
+    condition     = aws_security_group_rule.nomad_retry_ssh_ingress.from_port == 64535
+    error_message = "From port should be 64535"
   }
 
   assert {
-    condition = anytrue([
-      for ingress in aws_security_group.nomad_traffic_sg.ingress :
-      ingress.from_port == 4646 && ingress.to_port == 4648
-    ])
-    error_message = "Nomad traffic SG should allow Nomad ports 4646-4648"
+    condition     = aws_security_group_rule.nomad_retry_ssh_ingress.to_port == 65535
+    error_message = "To port should be 65535"
+  }
+
+  assert {
+    condition     = aws_security_group_rule.nomad_traffic_sg.from_port == 4646
+    error_message = "From port should be 4646"
+  }
+
+  assert {
+    condition     = aws_security_group_rule.nomad_traffic_sg.to_port == 4648
+    error_message = "To port should be 4648"
   }
 }
 
 run "test_ssh_key_conditional" {
   variables {
-    nomad_server_hostname = "example.com"
-    blocked_cidrs         = ["192.168.1.0/24"]
-    dns_server            = "192.168.0.2"
-    nodes                 = 2
-    vpc_id                = "vpc-12345678"
-    ssh_key               = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ..."
+    nomad_server_hostname                    = "example.com"
+    blocked_cidrs                            = ["192.168.1.0/24"]
+    dns_server                               = "192.168.0.2"
+    nodes                                    = 2
+    vpc_id                                   = "vpc-12345678"
+    ssh_key                                  = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ..."
+    aws_region                               = "us-east-1"
+    basename                                 = "cci-nomad"
+    allowed_ips_circleci_server_nomad_access = ["44.0.0.123/32"]
   }
 
   assert {
@@ -125,16 +138,18 @@ run "test_ssh_key_conditional" {
   }
 
   assert {
-    condition     = length(aws_security_group.ssh_sg) == 1
-    error_message = "SSH security group should be created when ssh_key is provided"
+    condition     = aws_security_group_rule.nomad_ssh_sg[0].to_port == 22
+    error_message = "To port should be 22"
   }
 
   assert {
-    condition = anytrue([
-      for ingress in aws_security_group.ssh_sg[0].ingress :
-      ingress.from_port == 22 && ingress.to_port == 22
-    ])
-    error_message = "SSH security group should allow port 22"
+    condition     = aws_security_group_rule.nomad_ssh_sg[0].from_port == 22
+    error_message = "From port should be 22"
+  }
+
+  assert {
+    condition     = aws_security_group_rule.nomad_ssh_sg[0].cidr_blocks[0] == "44.0.0.123/32"
+    error_message = "CIDR blocks should be 44.0.0.123/32"
   }
 }
 
@@ -146,6 +161,8 @@ run "test_mtls_configuration" {
     nodes                 = 2
     vpc_id                = "vpc-12345678"
     ssh_key               = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ..."
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
   }
 
   assert {

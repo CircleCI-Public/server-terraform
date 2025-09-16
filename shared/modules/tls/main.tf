@@ -9,12 +9,13 @@ terraform {
 }
 
 locals {
-  cert_validity_period  = 876600 # 100 years, basically doesn't expire
-  nomad_server_endpoint = "${var.nomad_server_hostname}:${var.nomad_server_port}"
+  cert_validity_period  = 876600                    # 100 years, basically doesn't expire
+  nomad_server_endpoint = var.nomad_server_hostname #:${var.nomad_server_port}"
 }
 
 resource "tls_private_key" "nomad_ca" {
   algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "tls_self_signed_cert" "nomad_ca" {
@@ -36,6 +37,8 @@ resource "tls_self_signed_cert" "nomad_ca" {
   allowed_uses = [
     "cert_signing",
     "crl_signing",
+    "key_encipherment",
+    "digital_signature"
   ]
 
   is_ca_certificate = true
@@ -43,6 +46,7 @@ resource "tls_self_signed_cert" "nomad_ca" {
 
 resource "tls_private_key" "nomad_client" {
   algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "tls_cert_request" "nomad_client" {
@@ -56,6 +60,9 @@ resource "tls_cert_request" "nomad_client" {
   dns_names = [
     "client.global.nomad",
     "localhost",
+    "nomad-server",
+    "nomad-server-*.global",
+    "${var.nomad_server_hostname}"
   ]
 
   ip_addresses = [
@@ -81,6 +88,7 @@ resource "tls_locally_signed_cert" "nomad_client" {
 
 resource "tls_private_key" "nomad_server" {
   algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "tls_cert_request" "nomad_server" {
@@ -91,9 +99,13 @@ resource "tls_cert_request" "nomad_server" {
     organization = "nomad:client"
   }
 
+
   dns_names = [
     "server.global.nomad",
     "localhost",
+    "nomad-server",
+    "nomad-server-*.global",
+    "${var.nomad_server_hostname}"
   ]
 
   ip_addresses = [
@@ -116,3 +128,4 @@ resource "tls_locally_signed_cert" "nomad_server" {
     "server_auth",
   ]
 }
+
