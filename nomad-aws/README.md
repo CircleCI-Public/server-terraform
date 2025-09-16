@@ -177,6 +177,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="output_nomad_asg_name"></a> [nomad\_asg\_name](#output\_nomad\_asg\_name) | n/a |
 | <a name="output_nomad_asg_user_access_key"></a> [nomad\_asg\_user\_access\_key](#output\_nomad\_asg\_user\_access\_key) | n/a |
 | <a name="output_nomad_asg_user_secret_key"></a> [nomad\_asg\_user\_secret\_key](#output\_nomad\_asg\_user\_secret\_key) | n/a |
+| <a name="output_nomad_client_cert_base64"></a> [nomad\_client\_cert\_base64](#output\_nomad\_client\_cert\_base64) | set this value for the `nomad.client.mTLS.certificate` key in the CircleCI Server's Helm values.yaml |
 | <a name="output_nomad_role"></a> [nomad\_role](#output\_nomad\_role) | n/a |
 | <a name="output_nomad_server_autoscaling_group_arn"></a> [nomad\_server\_autoscaling\_group\_arn](#output\_nomad\_server\_autoscaling\_group\_arn) | n/a |
 | <a name="output_nomad_server_autoscaling_group_name"></a> [nomad\_server\_autoscaling\_group\_name](#output\_nomad\_server\_autoscaling\_group\_name) | n/a |
@@ -191,6 +192,6 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="output_nomad_server_sg_id"></a> [nomad\_server\_sg\_id](#output\_nomad\_server\_sg\_id) | n/a |
 | <a name="output_nomad_sg_id"></a> [nomad\_sg\_id](#output\_nomad\_sg\_id) | n/a |
 | <a name="output_nomad_tls_ca"></a> [nomad\_tls\_ca](#output\_nomad\_tls\_ca) | n/a |
-| <a name="output_nomad_tls_ca_base64"></a> [nomad\_tls\_ca\_base64](#output\_nomad\_tls\_ca\_base64) | set this value for the `nomad.server.rpc.mTLS.CACertificate` key in the CircleCI Server's Helm values.yaml |
+| <a name="output_nomad_tls_ca_base64"></a> [nomad\_tls\_ca\_base64](#output\_nomad\_tls\_ca\_base64) | set this value for the `nomad.server.rpc.mTLS.CACertificate` and `nomad.client.mTLS.CACertificate` key in the CircleCI Server's Helm values.yaml |
 | <a name="output_update_nomad_profile_role"></a> [update\_nomad\_profile\_role](#output\_update\_nomad\_profile\_role) | n/a |
 <!-- END_TF_DOCS -->
