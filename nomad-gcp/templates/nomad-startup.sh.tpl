@@ -32,14 +32,29 @@ system_update() {
 	apt-get update && apt-get -y upgrade
 }
 
+retry() {
+    local -r -i max_attempts=5
+    local -i attempt_num=1
+
+    until "$@"; do
+        if (( attempt_num == max_attempts )); then
+            echo "Attempt $attempt_num failed and there are no more attempts left!"
+            exit 1
+        else
+            echo "Attempt $attempt_num failed! Trying again..."
+            ((attempt_num++))
+            sleep 5
+        fi
+    done
+}
+
 install() {
 	package=$@
 	log "--------------------------------------"
 	log "Installing $${package}"
 	log "--------------------------------------"
-	apt-get install -y $${package}
+	retry apt-get install -y $${package}
 }
-
 
 add_docker_repo() {
 	apt-get install -y apt-transport-https ca-certificates curl software-properties-common
