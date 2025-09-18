@@ -5,10 +5,6 @@ resource "google_compute_firewall" "nomad" {
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
   allow {
-    protocol = "icmp"
-  }
-
-  allow {
     protocol = "tcp"
     ports    = ["4646-4648"]
   }
