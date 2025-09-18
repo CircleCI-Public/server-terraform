@@ -38,10 +38,6 @@ mock_provider "google" {
       name = "allow-nomad-client-traffic-circleci-server-test-server"
       allow = [
         {
-          protocol = "icmp"
-          ports    = []
-        },
-        {
           protocol = "tcp"
           ports    = ["4646-4648"]
         },
