@@ -30,6 +30,7 @@ module "server" {
   server_disk_size_gb              = var.server_disk_size_gb
   server_disk_type                 = var.server_disk_type
   server_machine_type              = var.server_machine_type
+  machine_image_family             = var.server_machine_image_family
   server_retry_join                = local.server_retry_join
   nomad_server_lb_ip               = google_compute_address.nomad_server[0].address
   health_check_timeout_sec         = var.health_check_timeout_sec

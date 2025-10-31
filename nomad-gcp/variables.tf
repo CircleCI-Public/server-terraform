@@ -254,6 +254,12 @@ variable "server_machine_type" {
   description = "Instance type for nomad server"
 }
 
+variable "server_machine_image_family" {
+  type        = string
+  description = "The family value used to retrieve the virtual machine image for nomad server."
+  default     = "ubuntu-2204-lts"
+}
+
 variable "server_disk_type" {
   type        = string
   default     = "pd-ssd"
