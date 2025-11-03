@@ -24,7 +24,7 @@ resource "google_compute_firewall" "default" {
 
 
 resource "google_compute_firewall" "nomad-traffic" {
-  name    = "fw-${var.name}-allow-nomad-traffic-circleci-server"
+  name    = "fw-${var.name}-allow-nomad-client-traffic-circleci-server"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
