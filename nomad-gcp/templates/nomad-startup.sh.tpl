@@ -269,13 +269,13 @@ system_update
 add_docker_repo
 
 install ntp
-install docker-ce=5:28.1.1-1~ubuntu.22.04~jammy
-install docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy
+install docker-ce=5:28.5.1-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
+install docker-ce-cli=5:28.5.1-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce-cli\n==================\n" && exit 1)
 install jq
 
 enabled_docker_userns
 configure_circleci
-install_nomad || exit 1
+install_nomad || (echo "=================\nFailed to install nomad\n==================\n" && exit 1)
 configure_nomad
 
 create_ci_network
