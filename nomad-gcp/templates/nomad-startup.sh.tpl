@@ -269,8 +269,8 @@ system_update
 add_docker_repo
 
 install ntp
-install docker-ce=5:28.5.1-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
-install docker-ce-cli=5:28.5.1-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce-cli\n==================\n" && exit 1)
+install docker-ce=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
+install docker-ce-cli=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce-cli\n==================\n" && exit 1)
 install jq
 
 enabled_docker_userns
