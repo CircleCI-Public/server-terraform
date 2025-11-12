@@ -274,11 +274,7 @@ echo "----------------------------------------"
 sudo apt-get -y purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
 
 install ntp
-install docker-ce=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
-install docker-ce-cli=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce-cli\n==================\n" && exit 1)
-install containerd.io 
-install docker-buildx-plugin 
-install docker-compose-plugin
+apt-get install -y docker-ce=5:28.5.2-1~ubuntu.22.04~jammy docker-ce-cli=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
 install jq
 
 enabled_docker_userns
