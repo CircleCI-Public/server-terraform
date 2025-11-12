@@ -271,7 +271,7 @@ add_docker_repo
 echo "----------------------------------------"
 echo "	Removing Docker If Already Installed  "
 echo "----------------------------------------"
-sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
+sudo apt-get -y purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
 
 install ntp
 install docker-ce=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
