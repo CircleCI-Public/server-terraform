@@ -280,7 +280,8 @@ docker run \
   --network=ci-privileged \
   --network-alias=docker-gc.internal.circleci.com \
   "circleci/docker-gc:2.0" \
-  -threshold-percent 50
+  -threshold-percent 50 \
+  -o11y-format text
 EOT
 chmod 0700 /etc/docker-gc-start.rc
 
