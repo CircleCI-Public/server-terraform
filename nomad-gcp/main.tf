@@ -3,7 +3,7 @@ locals {
   server_retry_join              = "provider=gce project_name=${var.project_id} zone_pattern=${var.zone} tag_value=circleci-${var.name}-nomad-servers"
   tags                           = ["circleci-server", "nomad-clients", "circleci-nomad-client", "${var.name}-nomad-client"]
   subnet_or_network              = var.subnetwork != "" ? var.subnetwork : var.network
-  is_subnet_a_self_link          = can(regex("^https://", local.subnet_or_network))
+  is_subnet_a_self_link          = can(regex("^https://www\\.googleapis\\.com/compute/", local.subnet_or_network))
 }
 
 data "google_compute_subnetwork" "nomad" {
