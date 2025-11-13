@@ -2,12 +2,15 @@ locals {
   nomad_server_hostname_and_port = "${var.nomad_server_hostname}:${var.nomad_server_port}"
   server_retry_join              = "provider=gce project_name=${var.project_id} zone_pattern=${var.zone} tag_value=circleci-${var.name}-nomad-servers"
   tags                           = ["circleci-server", "nomad-clients", "circleci-nomad-client", "${var.name}-nomad-client"]
+  subnet_or_network              = var.subnetwork != "" ? var.subnetwork : var.network
+  is_subnet_a_self_link          = can(regex("^https://", local.subnet_or_network))
 }
 
 data "google_compute_subnetwork" "nomad" {
-  name    = var.subnetwork != "" ? var.subnetwork : var.network
-  project = var.project_id
-  region  = var.region
+  self_link = local.is_subnet_a_self_link ? local.subnet_or_network : null
+  name      = local.is_subnet_a_self_link ? null : local.subnet_or_network
+  project   = local.is_subnet_a_self_link ? null : var.project_id
+  region    = local.is_subnet_a_self_link ? null : var.region
 }
 
 module "tls" {
