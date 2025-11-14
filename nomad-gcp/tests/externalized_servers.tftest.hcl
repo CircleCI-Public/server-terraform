@@ -133,6 +133,35 @@ run "test_server_networking" {
   }
 }
 
+run "test_default_subnetwork" {
+  variables {
+    region                = "us-east1"
+    zone                  = "us-east1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+  }
+
+  assert {
+    condition     = data.google_compute_subnetwork.nomad.name == "default"
+    error_message = "nomad subnetwork should be the default"
+  }
+}
+
+run "test_when_subnetwork_is_a_self_link" {
+  variables {
+    region                = "us-west1"
+    zone                  = "us-west1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+    subnetwork            = "https://www.googleapis.com/compute/v1/projects/my-parent-project/regions/us-west1/subnetworks/default"
+  }
+
+  assert {
+    condition     = data.google_compute_subnetwork.nomad.self_link == "https://www.googleapis.com/compute/v1/projects/my-parent-project/regions/us-west1/subnetworks/default"
+    error_message = "nomad subnetwork should be a self link"
+  }
+}
+
 run "test_server_autoscaler_configuration" {
   variables {
     region                        = "europe-west1"
