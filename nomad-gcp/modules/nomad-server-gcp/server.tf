@@ -4,12 +4,16 @@ data "google_compute_image" "machine_image" {
 }
 
 data "google_compute_subnetwork" "nomad" {
-  name   = var.subnetwork != "" ? var.subnetwork : var.network
-  region = var.region
+  self_link = local.is_subnet_a_self_link ? local.subnet_or_network : null
+  name      = local.is_subnet_a_self_link ? null : local.subnet_or_network
+  project   = local.is_subnet_a_self_link ? null : var.project_id
+  region    = local.is_subnet_a_self_link ? null : var.region
 }
 
 locals {
-  tags = ["circleci-server", "nomad-server", "circleci-nomad-server", "${var.name}-nomad-server", "circleci-${var.name}-nomad-servers"]
+  tags                  = ["circleci-server", "nomad-server", "circleci-nomad-server", "${var.name}-nomad-server", "circleci-${var.name}-nomad-servers"]
+  subnet_or_network     = var.subnetwork != "" ? var.subnetwork : var.network
+  is_subnet_a_self_link = can(regex("^https://www\\.googleapis\\.com/compute/", local.subnet_or_network))
 }
 
 resource "google_compute_autoscaler" "nomad" {
