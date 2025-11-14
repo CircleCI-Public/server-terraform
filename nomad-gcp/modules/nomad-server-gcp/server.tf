@@ -11,9 +11,9 @@ data "google_compute_subnetwork" "nomad" {
 }
 
 locals {
-  tags = ["circleci-server", "nomad-server", "circleci-nomad-server", "${var.name}-nomad-server", "circleci-${var.name}-nomad-servers"]
-  subnet_or_network              = var.subnetwork != "" ? var.subnetwork : var.network
-  is_subnet_a_self_link          = can(regex("^https://www\\.googleapis\\.com/compute/", local.subnet_or_network))
+  tags                  = ["circleci-server", "nomad-server", "circleci-nomad-server", "${var.name}-nomad-server", "circleci-${var.name}-nomad-servers"]
+  subnet_or_network     = var.subnetwork != "" ? var.subnetwork : var.network
+  is_subnet_a_self_link = can(regex("^https://www\\.googleapis\\.com/compute/", local.subnet_or_network))
 }
 
 resource "google_compute_autoscaler" "nomad" {
