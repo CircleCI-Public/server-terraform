@@ -87,14 +87,16 @@ resource "google_compute_instance_template" "nomad" {
   metadata_startup_script = templatefile(
     "${path.module}/templates/nomad-startup.sh.tpl",
     {
-      nomad_version       = var.nomad_version
-      add_server_join     = var.add_server_join ? var.add_server_join : ""
-      blocked_cidrs       = var.blocked_cidrs
-      client_tls_cert     = module.tls.nomad_client_cert
-      client_tls_key      = module.tls.nomad_client_key
-      tls_ca              = module.tls.nomad_tls_ca
-      docker_network_cidr = var.docker_network_cidr
-      server_retry_join   = var.deploy_nomad_server_instances ? local.server_retry_join : local.nomad_server_hostname_and_port
+      nomad_version         = var.nomad_version
+      add_server_join       = var.add_server_join ? var.add_server_join : ""
+      blocked_cidrs         = var.blocked_cidrs
+      client_tls_cert       = module.tls.nomad_client_cert
+      client_tls_key        = module.tls.nomad_client_key
+      tls_ca                = module.tls.nomad_tls_ca
+      docker_network_cidr   = var.docker_network_cidr
+      server_retry_join     = var.deploy_nomad_server_instances ? local.server_retry_join : local.nomad_server_hostname_and_port
+      log_level             = var.log_level
+      external_nomad_server = var.deploy_nomad_server_instances
     }
   )
 

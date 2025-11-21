@@ -313,3 +313,13 @@ variable "server_target_cpu_utilization" {
   default     = 0.8
   description = "Target CPU utilization to trigger autoscaling for nomad server cluster"
 }
+
+variable "log_level" {
+  type        = string
+  default     = "INFO"
+  description = "Nomad Server and Client Log level"
+  validation {
+    condition     = contains(["INFO", "DEBUG", "TRACE"], var.log_level)
+    error_message = "The value for log_level must be 'INFO', 'DEBUG', or 'TRACE'."
+  }
+}
