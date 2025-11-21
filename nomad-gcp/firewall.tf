@@ -1,9 +1,8 @@
 
 resource "google_compute_firewall" "default" {
-  name    = "fw-${var.name}-allow-retry-with-ssh-circleci-server"
+  name    = "fw-${var.name}-circleci-allow-retry-with-ssh"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
-
 
   allow {
     protocol = "tcp"
@@ -24,7 +23,7 @@ resource "google_compute_firewall" "default" {
 
 
 resource "google_compute_firewall" "nomad-traffic" {
-  name    = "fw-${var.name}-allow-nomad-traffic-circleci-server"
+  name    = "fw-${var.name}-circleci-allow-nomad-traffic-into-nomad-clients"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
@@ -53,7 +52,7 @@ resource "google_compute_firewall" "nomad-traffic" {
 resource "google_compute_firewall" "nomad-ssh" {
   count = length(var.allowed_ips_nomad_ssh_access) > 0 ? 1 : 0
 
-  name    = "fw-${var.name}-allow-ssh-into-nomad-clients-circleci-server"
+  name    = "fw-${var.name}-circleci-allow-ssh-into-nomad-clients"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 

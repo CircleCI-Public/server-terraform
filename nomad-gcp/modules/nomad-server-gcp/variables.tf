@@ -38,6 +38,12 @@ variable "retry_with_ssh_allowed_cidr_blocks" {
   description = "List of source IP CIDR blocks that can use the 'retry with SSH' feature of CircleCI jobs"
 }
 
+variable "allowed_ips_nomad_ssh_access" {
+  type        = list(string)
+  description = "List of IPv4 CIDR ranges that are permitted SSH access nomad clients nodes"
+  default     = []
+}
+
 variable "nomad_server_hostname" {
   type        = string
   description = "Hostname of RPC service of Nomad control plane (e.g circleci.example.com)"
