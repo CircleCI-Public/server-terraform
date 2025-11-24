@@ -2,8 +2,10 @@ resource "google_compute_address" "nomad_server" {
   count = var.deploy_nomad_server_instances ? 1 : 0
 
   name         = "${var.name}-nomad-server-lb-ip"
-  address_type = "EXTERNAL"
+  address_type = "INTERNAL"
   region       = var.region
+  subnetwork   = var.subnetwork
+  purpose      = "GCE_ENDPOINT"
 }
 
 module "server" {

@@ -136,7 +136,6 @@ resource "google_compute_instance_template" "nomad" {
 resource "google_compute_target_pool" "nomad" {
   name   = "${var.name}-nomad-server-pool"
   region = var.region
-
 }
 
 resource "google_compute_instance_group_manager" "nomad" {
@@ -155,5 +154,29 @@ resource "google_compute_instance_group_manager" "nomad" {
   auto_healing_policies {
     health_check      = google_compute_health_check.nomad.id
     initial_delay_sec = 300
+  }
+}
+
+
+resource "google_compute_forwarding_rule" "nomad" {
+  name                  = "${var.name}-circleci-nomad-server-forwarding-rule"
+  region                = var.region
+  load_balancing_scheme = "INTERNAL"
+  ip_address            = var.nomad_server_lb_ip
+  ip_protocol           = "TCP"
+  network               = var.network
+  subnetwork            = var.subnetwork
+  backend_service       = google_compute_region_backend_service.nomad.id
+  all_ports             = true
+}
+
+resource "google_compute_region_backend_service" "nomad" {
+  name          = "${var.name}-circleci-nomad-backend-service"
+  region        = var.region
+  health_checks = [google_compute_health_check.nomad.id]
+
+  backend {
+    group          = google_compute_instance_group_manager.nomad.instance_group
+    balancing_mode = "CONNECTION"
   }
 }
