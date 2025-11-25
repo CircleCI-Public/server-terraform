@@ -104,6 +104,14 @@ configure_circleci() {
 
 install_nomad() {
 	log "--------------------------------------"
+	log "      Setting environment variables"
+	log "--------------------------------------"
+	log 'export NOMAD_CACERT=/etc/nomad/ssl/ca.pem' >> /etc/environment
+	log 'export NOMAD_CLIENT_CERT=/etc/nomad/ssl/cert.pem' >> /etc/environment
+	log 'export NOMAD_CLIENT_KEY=/etc/nomad/ssl/key.pem' >> /etc/environment
+	log "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
+	
+	log "--------------------------------------"
 	log "Installing Nomad"
 	log "--------------------------------------"
 	sudo apt-get update && \
