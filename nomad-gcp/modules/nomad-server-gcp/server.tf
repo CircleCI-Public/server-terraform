@@ -60,7 +60,6 @@ resource "google_compute_health_check" "nomad" {
 
   http_health_check {
     port         = "4646"
-    host         = "127.0.0.1"
     request_path = "/v1/agent/health?type=server"
     proxy_header = "NONE"
     response     = "{\"server\":{\"message\":\"ok\",\"ok\":true}}"
