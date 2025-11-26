@@ -46,14 +46,7 @@ install_nomad() {
 	install wget gpg coreutils zip
 	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-	sudo apt-get update
-
-
-    if [ -z "$nomad_version" ] || [ "$nomad_version"=="latest" ]; then
-		install nomad
-	else
-		install nomad=${nomad_version}
-	fi
+	sudo apt-get update && sudo apt-get install nomad=${nomad_version}
 
 	nomad --version || ( echo "Nomad failed to install" && exit 1 )
 }
@@ -68,7 +61,7 @@ configure_nomad() {
 	mkdir -p /etc/ssl/nomad/
 	chmod 0700 /etc/ssl/nomad/
 	
-	cat <<-EOT > /etc/ssl/nomad/cert.pem
+	cat <<-EOT > /etc/ssl/nomad/server.pem
 	${tls_cert}
 	EOT
 	
@@ -84,7 +77,7 @@ configure_nomad() {
 	echo "      Setting environment variables"
 	echo "--------------------------------------"
 	echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
-	echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/cert.pem' >> /etc/environment
+	echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/server.pem' >> /etc/environment
 	echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
 	echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment	
 	##########################################################################
@@ -135,7 +128,7 @@ configure_nomad() {
 		# https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
 		verify_server_hostname = false
 		ca_file	= "/etc/ssl/nomad/ca.pem"
-		cert_file = "/etc/ssl/nomad/cert.pem"
+		cert_file = "/etc/ssl/nomad/server.pem"
 		key_file	= "/etc/ssl/nomad/key.pem"
 	}
 	EOT
@@ -151,7 +144,7 @@ configure_nomad() {
 	Description="nomad server"
 	[Service]
 	Environment="NOMAD_CACERT=/etc/ssl/nomad/ca.pem"
-	Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/client.pem"
+	Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/server.pem"
 	Environment="NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem"
 	Environment="NOMAD_ADDR=https://localhost:4646"	
 	Restart=always

@@ -35,7 +35,7 @@ variable "retry_with_ssh_allowed_cidr_blocks" {
 variable "allowed_ips_nomad_ssh_access" {
   type        = list(string)
   description = "List of IPv4 CIDR ranges that are permitted SSH access nomad clients nodes"
-  default     = []
+  default     = ["35.235.240.0/20"] # GCP IAP CIDR block
 }
 
 variable "nomad_server_hostname" {
@@ -321,5 +321,23 @@ variable "log_level" {
   validation {
     condition     = contains(["INFO", "DEBUG", "TRACE"], var.log_level)
     error_message = "The value for log_level must be 'INFO', 'DEBUG', or 'TRACE'."
+  }
+}
+
+variable "k8s_cluster_name" {
+  type        = string
+  description = "Kubernetes Cluster Name"
+  validation {
+    condition     = var.deploy_nomad_server_instances && var.k8s_cluster_name != ""
+    error_message = "Kubernetes Cluster Name is required if using external nomad server"
+  }
+}
+
+variable "k8s_cluster_location" {
+  type        = string
+  description = "Kubernetes Cluster Location, Either Region or Zone"
+  validation {
+    condition     = var.deploy_nomad_server_instances && var.k8s_cluster_location != ""
+    error_message = "Kubernetes Cluster Location is required if using external nomad server"
   }
 }

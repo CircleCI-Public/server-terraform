@@ -40,7 +40,7 @@ variable "retry_with_ssh_allowed_cidr_blocks" {
 
 variable "allowed_ips_nomad_ssh_access" {
   type        = list(string)
-  description = "List of IPv4 CIDR ranges that are permitted SSH access nomad clients nodes"
+  description = "List of IPv4 CIDR ranges that are permitted SSH access nomad server nodes"
   default     = []
 }
 
@@ -226,4 +226,19 @@ variable "enable_firewall_logging" {
   type        = bool
   default     = false
   description = "If true, terraform will enable firewall logging for nomad server"
+}
+
+variable "nomad_clients_tags" {
+  type        = list(string)
+  description = "Tags for nomad clients"
+}
+
+variable "gcp_cluster_ipv4_cidr" {
+  type        = string
+  description = "GCP Cluster IPv4 CIDR, use command - gcloud container clusters describe CLUSTER_NAME --region=REGION --format=\"value(clusterIpv4Cidr)\""
+}
+
+variable "gcp_cluster_network_cidr" {
+  type        = string
+  description = "GCP Cluster Networking CIDR"
 }
