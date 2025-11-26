@@ -111,6 +111,18 @@ mock_provider "google" {
       load_balancing_scheme = "EXTERNAL"
     }
   }
+
+  override_resource {
+    target = module.server[0].google_compute_region_backend_service.nomad
+    values = {
+      name                  = "test-server-nomad-backend-service"
+      protocol              = "TCP"
+      load_balancing_scheme = "EXTERNAL"
+      timeout_sec           = 10
+      port_name             = "nomad"
+      region                = "us-central1"
+    }
+  }
 }
 
 run "test_server_networking" {
@@ -200,17 +212,17 @@ run "test_server_health_check_configuration" {
   }
 
   assert {
-    condition     = module.server[0].nomad_server_health_check.http_health_check[0].port == 4646
+    condition     = module.server[0].nomad_server_health_check.https_health_check[0].port == 4646
     error_message = "Server health check should use Nomad port 4646"
   }
 
   assert {
-    condition     = module.server[0].nomad_server_health_check.http_health_check[0].request_path == "/v1/agent/health?type=server"
+    condition     = module.server[0].nomad_server_health_check.https_health_check[0].request_path == "/v1/agent/health?type=server"
     error_message = "Server health check should use server health endpoint"
   }
 
   assert {
-    condition     = module.server[0].nomad_server_health_check.http_health_check[0].response == "{\"server\":{\"message\":\"ok\",\"ok\":true}}"
+    condition     = module.server[0].nomad_server_health_check.https_health_check[0].response == "{\"server\":{\"message\":\"ok\",\"ok\":true}}"
     error_message = "Server health check should expect server response format"
   }
 }
@@ -240,7 +252,7 @@ run "test_server_firewall_configuration" {
   }
 
   assert {
-    condition     = module.server[0].nomad_server_firewall.name == "fw-test-server-allow-nomad-client-traffic-circleci-server"
+    condition     = module.server[0].nomad_server_firewall.name == "test-server-circleci-allow-nomad-client-traffic-nomad-servers"
     error_message = "Instance group manager name should match expected pattern"
   }
 

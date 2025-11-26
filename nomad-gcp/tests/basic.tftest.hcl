@@ -26,7 +26,7 @@ run "test_firewall_configuration" {
   }
 
   assert {
-    condition     = google_compute_firewall.default.name == "fw-test-nomad-circleci-allow-retry-with-ssh"
+    condition     = google_compute_firewall.default.name == "test-nomad-circleci-allow-retry-with-ssh"
     error_message = "Default firewall rule name should match expected pattern"
   }
 
@@ -144,12 +144,12 @@ run "test_health_check_configuration" {
   }
 
   assert {
-    condition     = google_compute_health_check.nomad.https_health_check[0].port == 4646
+    condition     = google_compute_health_check.nomad.http_health_check[0].port == 4646
     error_message = "Health check should use Nomad port 4646"
   }
 
   assert {
-    condition     = google_compute_health_check.nomad.https_health_check[0].request_path == "/v1/agent/health?type=client"
+    condition     = google_compute_health_check.nomad.http_health_check[0].request_path == "/v1/agent/health?type=client"
     error_message = "Health check should use correct Nomad health endpoint"
   }
 }

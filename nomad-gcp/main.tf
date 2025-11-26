@@ -61,11 +61,24 @@ resource "google_compute_health_check" "nomad" {
   healthy_threshold   = var.health_check_healthy_threshold
   unhealthy_threshold = var.health_check_unhealthy_threshold
 
-  https_health_check {
-    port         = "4646"
-    request_path = "/v1/agent/health?type=client"
-    proxy_header = "NONE"
-    response     = "{\"client\":{\"message\":\"ok\",\"ok\":true}}"
+  dynamic "https_health_check" {
+    for_each = var.deploy_nomad_server_instances ? [1] : []
+    content {
+      port         = "4646"
+      request_path = "/v1/agent/health?type=client"
+      proxy_header = "NONE"
+      response     = "{\"client\":{\"message\":\"ok\",\"ok\":true}}"
+    }
+  }
+
+  dynamic "http_health_check" {
+    for_each = var.deploy_nomad_server_instances ? [] : [1]
+    content {
+      port         = "4646"
+      request_path = "/v1/agent/health?type=client"
+      proxy_header = "NONE"
+      response     = "{\"client\":{\"message\":\"ok\",\"ok\":true}}"
+    }
   }
 }
 

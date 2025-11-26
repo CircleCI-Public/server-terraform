@@ -155,8 +155,11 @@ resource "google_compute_instance_group_manager" "nomad" {
     health_check      = google_compute_health_check.nomad.id
     initial_delay_sec = 300
   }
-}
 
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
 resource "google_compute_forwarding_rule" "nomad" {
   name                  = "${var.name}-circleci-nomad-server-forwarding-rule"
@@ -174,6 +177,8 @@ resource "google_compute_region_backend_service" "nomad" {
   name          = "${var.name}-circleci-nomad-backend-service"
   region        = var.region
   health_checks = [google_compute_health_check.nomad.id]
+  network       = var.network
+  project       = var.project_id
 
   backend {
     group          = google_compute_instance_group_manager.nomad.instance_group

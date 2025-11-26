@@ -1,6 +1,6 @@
 
 resource "google_compute_firewall" "nomad" {
-  name    = "fw-${var.name}-circleci-allow-nomad-client-traffic-into-nomad-servers"
+  name    = "${var.name}-circleci-allow-nomad-client-traffic-nomad-servers"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
@@ -29,7 +29,7 @@ resource "google_compute_firewall" "nomad" {
 resource "google_compute_firewall" "nomad-ssh" {
   count = length(var.allowed_ips_nomad_ssh_access) > 0 ? 1 : 0
 
-  name    = "fw-${var.name}-circleci-allow-ssh-into-nomad-servers"
+  name    = "${var.name}-circleci-allow-ssh-nomad-servers"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
