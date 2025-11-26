@@ -110,7 +110,7 @@ install_nomad() {
 	log 'export NOMAD_CLIENT_CERT=/etc/nomad/ssl/cert.pem' >> /etc/environment
 	log 'export NOMAD_CLIENT_KEY=/etc/nomad/ssl/key.pem' >> /etc/environment
 	log "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
-	
+
 	log "--------------------------------------"
 	log "Installing Nomad"
 	log "--------------------------------------"
@@ -183,12 +183,13 @@ configure_nomad() {
 	if [ "${client_tls_cert}" ]; then
 		cat <<-EOT >> /etc/nomad/config.hcl
 		tls {
-		  http = false
+		  http = true
 		  rpc  = true
 		  # This verifies the CN ([role].[region].nomad) in the certificate,
 		  # not the hostname or DNS name of the of the remote party.
 		  # https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
 		  verify_server_hostname = true
+		  verify_https_client    = false
 		  ca_file	= "/etc/nomad/ssl/ca.pem"
 		  cert_file = "/etc/nomad/ssl/cert.pem"
 		  key_file	= "/etc/nomad/ssl/key.pem"
