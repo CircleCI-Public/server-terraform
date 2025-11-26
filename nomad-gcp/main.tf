@@ -154,10 +154,10 @@ resource "google_compute_instance_group_manager" "nomad" {
   target_pools       = [google_compute_target_pool.nomad.id]
   base_instance_name = "${var.name}-nomad"
 
-  auto_healing_policies {
-    health_check      = google_compute_health_check.nomad.id
-    initial_delay_sec = 300
-  }
+  # auto_healing_policies {
+  #   health_check      = google_compute_health_check.nomad.id
+  #   initial_delay_sec = 300
+  # }
 
 }
 

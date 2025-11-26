@@ -150,10 +150,10 @@ resource "google_compute_instance_group_manager" "nomad" {
   target_size        = var.min_server_instances
   base_instance_name = "${var.name}-nomad-server"
 
-  auto_healing_policies {
-    health_check      = google_compute_health_check.nomad.id
-    initial_delay_sec = 300
-  }
+  # auto_healing_policies {
+  #   health_check      = google_compute_health_check.nomad.id
+  #   initial_delay_sec = 300
+  # }
 }
 
 # Only External type Load balancer is supported for target pool
