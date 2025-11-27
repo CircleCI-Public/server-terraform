@@ -16,7 +16,7 @@ provider "google-beta" {
 
 module "nomad_clients" {
   # We strongly recommend pinning the version using ref=<<release tag>> as is done here
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-gcp?ref=4.0.0"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-gcp?ref=4.9.0"
 
   zone            = "<< GCP compute zone to deploy nomad clients >>"
   region          = "<< GCP compute region to deploy nomad clients >>"
@@ -75,7 +75,9 @@ There are more examples in the [examples](./examples/) directory.
 | [google_service_account_key.nomad-as-key](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/resources/service_account_key) | resource |
 | [local_file.nomad-as-key-file](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [google_compute_image.machine_image](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/data-sources/compute_image) | data source |
+| [google_compute_subnetwork.k8s](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/data-sources/compute_subnetwork) | data source |
 | [google_compute_subnetwork.nomad](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/data-sources/compute_subnetwork) | data source |
+| [google_container_cluster.k8s](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/data-sources/container_cluster) | data source |
 | [google_project.project](https://registry.terraform.io/providers/hashicorp/google-beta/latest/docs/data-sources/project) | data source |
 
 ## Inputs
@@ -83,7 +85,7 @@ There are more examples in the [examples](./examples/) directory.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_add_server_join"></a> [add\_server\_join](#input\_add\_server\_join) | Includes the 'server\_join' block when setting up nomad clients. Should be disabled when the nomad server endpoint is not immediately known (eg, for dedicated nomad clients). | `bool` | `true` | no |
-| <a name="input_allowed_ips_nomad_ssh_access"></a> [allowed\_ips\_nomad\_ssh\_access](#input\_allowed\_ips\_nomad\_ssh\_access) | List of IPv4 CIDR ranges that are permitted SSH access nomad clients nodes | `list(string)` | `[]` | no |
+| <a name="input_allowed_ips_nomad_ssh_access"></a> [allowed\_ips\_nomad\_ssh\_access](#input\_allowed\_ips\_nomad\_ssh\_access) | List of IPv4 CIDR ranges that are permitted SSH access nomad clients nodes | `list(string)` | <pre>[<br/>  "35.235.240.0/20"<br/>]</pre> | no |
 | <a name="input_assign_public_ip"></a> [assign\_public\_ip](#input\_assign\_public\_ip) | Assign public IP | `bool` | `true` | no |
 | <a name="input_autoscaling_mode"></a> [autoscaling\_mode](#input\_autoscaling\_mode) | Autoscaler mode. Can be<br/>- "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules<br/>- "OFF": Autoscaler will never scale up or down<br/>- "ONLY\_SCALE\_OUT": Autoscaler will only scale out (default)<br/>Warning: jobs may be interrupted on scale down. Only select "ON" if<br/>interruptions are acceptible for your use case. | `string` | `"ONLY_SCALE_OUT"` | no |
 | <a name="input_autoscaling_schedules"></a> [autoscaling\_schedules](#input\_autoscaling\_schedules) | Autoscaler scaling schedules. Accepts the same arguments are documented<br/>upstream here: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_autoscaler#scaling_schedules | <pre>list(object({<br/>    name                  = string<br/>    min_required_replicas = number<br/>    schedule              = string<br/>    time_zone             = string<br/>    duration_sec          = number<br/>    disabled              = bool<br/>    description           = string<br/>  }))</pre> | `[]` | no |
@@ -98,7 +100,10 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_health_check_interval_sec"></a> [health\_check\_interval\_sec](#input\_health\_check\_interval\_sec) | Nomad Server Heath Check Frequency in seconds | `number` | `30` | no |
 | <a name="input_health_check_timeout_sec"></a> [health\_check\_timeout\_sec](#input\_health\_check\_timeout\_sec) | Nomad Server Heath Check Timeout in seconds | `number` | `5` | no |
 | <a name="input_health_check_unhealthy_threshold"></a> [health\_check\_unhealthy\_threshold](#input\_health\_check\_unhealthy\_threshold) | Number of health checks failure in a row to determine unhealthy | `number` | `5` | no |
+| <a name="input_k8s_cluster_location"></a> [k8s\_cluster\_location](#input\_k8s\_cluster\_location) | Kubernetes Cluster Location, Either Region or Zone | `string` | `""` | no |
+| <a name="input_k8s_cluster_name"></a> [k8s\_cluster\_name](#input\_k8s\_cluster\_name) | Kubernetes Cluster Name | `string` | `""` | no |
 | <a name="input_k8s_namespace"></a> [k8s\_namespace](#input\_k8s\_namespace) | If enable\_workload\_identity is true, provide application k8s namespace | `string` | `"circleci-server"` | no |
+| <a name="input_log_level"></a> [log\_level](#input\_log\_level) | Nomad Server and Client Log level | `string` | `"INFO"` | no |
 | <a name="input_machine_image_family"></a> [machine\_image\_family](#input\_machine\_image\_family) | The family value used to retrieve the virtual machine image. | `string` | `"ubuntu-2204-lts"` | no |
 | <a name="input_machine_image_project"></a> [machine\_image\_project](#input\_machine\_image\_project) | The project value used to retrieve the virtual machine image. | `string` | `"ubuntu-os-cloud"` | no |
 | <a name="input_machine_type"></a> [machine\_type](#input\_machine\_type) | Instance type for nomad clients | `string` | `"n2-standard-8"` | no |

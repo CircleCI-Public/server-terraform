@@ -1,9 +1,8 @@
 
 resource "google_compute_firewall" "default" {
-  name    = "fw-${var.name}-allow-retry-with-ssh-circleci-server"
+  name    = "${var.name}-circleci-allow-retry-with-ssh"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
-
 
   allow {
     protocol = "tcp"
@@ -18,13 +17,20 @@ resource "google_compute_firewall" "default" {
     }
   }
 
+  lifecycle {
+    precondition {
+      condition     = length("${var.name}-circleci-allow-retry-with-ssh") <= 62
+      error_message = "Firewall name must be 62 characters or less. Current length: ${length("${var.name}-circleci-allow-retry-with-ssh")}. Consider shortening the 'name' variable."
+    }
+  }
+
   source_ranges = var.retry_with_ssh_allowed_cidr_blocks #tfsec:ignore:google-compute-no-public-ingress
   target_tags   = local.tags
 }
 
 
 resource "google_compute_firewall" "nomad-traffic" {
-  name    = "fw-${var.name}-allow-nomad-traffic-circleci-server"
+  name    = "${var.name}-circleci-allow-traffic-nomad-clients"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
@@ -46,14 +52,22 @@ resource "google_compute_firewall" "nomad-traffic" {
     }
   }
 
+  lifecycle {
+    precondition {
+      condition     = length("${var.name}-circleci-allow-traffic-nomad-clients") <= 62
+      error_message = "Firewall name must be 62 characters or less. Current length: ${length("${var.name}-circleci-allow-traffic-nomad-clients")}. Consider shortening the 'name' variable."
+    }
+  }
+
   source_ranges = [data.google_compute_subnetwork.nomad.ip_cidr_range, "130.211.0.0/22", "35.191.0.0/16"] #tfsec:ignore:google-compute-no-public-ingress
   target_tags   = local.tags
 }
 
+
 resource "google_compute_firewall" "nomad-ssh" {
   count = length(var.allowed_ips_nomad_ssh_access) > 0 ? 1 : 0
 
-  name    = "fw-${var.name}-allow-ssh-into-nomad-clients-circleci-server"
+  name    = "${var.name}-circleci-allow-ssh-nomad-clients"
   network = var.network
   project = length(regexall("projects/([^|]*)/regions", var.subnetwork)) > 0 ? regex("projects/([^|]*)/regions", var.subnetwork)[0] : null
 
@@ -67,6 +81,13 @@ resource "google_compute_firewall" "nomad-ssh" {
     for_each = var.enable_firewall_logging ? [1] : []
     content {
       metadata = "INCLUDE_ALL_METADATA"
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition     = length("${var.name}-circleci-allow-ssh-nomad-clients") <= 62
+      error_message = "Firewall name must be 62 characters or less. Current length: ${length("${var.name}-circleci-allow-ssh-nomad-clients")}. Consider shortening the 'name' variable."
     }
   }
 

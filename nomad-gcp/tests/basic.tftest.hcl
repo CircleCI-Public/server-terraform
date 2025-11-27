@@ -26,7 +26,7 @@ run "test_firewall_configuration" {
   }
 
   assert {
-    condition     = google_compute_firewall.default.name == "fw-test-nomad-allow-retry-with-ssh-circleci-server"
+    condition     = google_compute_firewall.default.name == "test-nomad-circleci-allow-retry-with-ssh"
     error_message = "Default firewall rule name should match expected pattern"
   }
 

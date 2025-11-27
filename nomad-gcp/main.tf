@@ -1,7 +1,7 @@
 locals {
   nomad_server_hostname_and_port = "${var.nomad_server_hostname}:${var.nomad_server_port}"
-  server_retry_join              = "provider=gce project_name=${var.project_id} zone_pattern=${var.zone} tag_value=circleci-${var.name}-nomad-servers"
-  tags                           = ["circleci-server", "nomad-clients", "circleci-nomad-client", "${var.name}-nomad-client"]
+  server_retry_join              = "provider=gce project_name=${var.project_id} zone_pattern=${var.zone} tag_value=${var.name}-circleci-nomad-servers"
+  tags                           = ["${var.name}-circleci-nomad-clients"]
   subnet_or_network              = var.subnetwork != "" ? var.subnetwork : var.network
   is_subnet_a_self_link          = can(regex("^https://www\\.googleapis\\.com/compute/", local.subnet_or_network))
 }
@@ -61,11 +61,24 @@ resource "google_compute_health_check" "nomad" {
   healthy_threshold   = var.health_check_healthy_threshold
   unhealthy_threshold = var.health_check_unhealthy_threshold
 
-  http_health_check {
-    port         = "4646"
-    request_path = "/v1/agent/health?type=client"
-    proxy_header = "NONE"
-    response     = "{\"client\":{\"message\":\"ok\",\"ok\":true}}"
+  dynamic "https_health_check" {
+    for_each = var.deploy_nomad_server_instances ? [1] : []
+    content {
+      port         = "4646"
+      request_path = "/v1/agent/health?type=client"
+      proxy_header = "NONE"
+      response     = "{\"client\":{\"message\":\"ok\",\"ok\":true}}"
+    }
+  }
+
+  dynamic "http_health_check" {
+    for_each = var.deploy_nomad_server_instances ? [] : [1]
+    content {
+      port         = "4646"
+      request_path = "/v1/agent/health?type=client"
+      proxy_header = "NONE"
+      response     = "{\"client\":{\"message\":\"ok\",\"ok\":true}}"
+    }
   }
 }
 
@@ -87,14 +100,16 @@ resource "google_compute_instance_template" "nomad" {
   metadata_startup_script = templatefile(
     "${path.module}/templates/nomad-startup.sh.tpl",
     {
-      nomad_version       = var.nomad_version
-      add_server_join     = var.add_server_join ? var.add_server_join : ""
-      blocked_cidrs       = var.blocked_cidrs
-      client_tls_cert     = module.tls.nomad_client_cert
-      client_tls_key      = module.tls.nomad_client_key
-      tls_ca              = module.tls.nomad_tls_ca
-      docker_network_cidr = var.docker_network_cidr
-      server_retry_join   = var.deploy_nomad_server_instances ? local.server_retry_join : local.nomad_server_hostname_and_port
+      nomad_version         = var.nomad_version
+      add_server_join       = var.add_server_join ? var.add_server_join : ""
+      blocked_cidrs         = var.blocked_cidrs
+      client_tls_cert       = module.tls.nomad_client_cert
+      client_tls_key        = module.tls.nomad_client_key
+      tls_ca                = module.tls.nomad_tls_ca
+      docker_network_cidr   = var.docker_network_cidr
+      server_retry_join     = var.deploy_nomad_server_instances ? local.server_retry_join : local.nomad_server_hostname_and_port
+      log_level             = var.log_level
+      external_nomad_server = var.deploy_nomad_server_instances
     }
   )
 
@@ -138,12 +153,12 @@ resource "google_compute_instance_template" "nomad" {
 }
 
 resource "google_compute_target_pool" "nomad" {
-  name   = "${var.name}-nomad"
+  name   = "${var.name}-nomad-client-pool"
   region = var.region
 }
 
 resource "google_compute_instance_group_manager" "nomad" {
-  name = "${var.name}-nomad"
+  name = "${var.name}-nomad-client-group"
   zone = var.zone
 
   version {
@@ -152,7 +167,7 @@ resource "google_compute_instance_group_manager" "nomad" {
   }
 
   target_pools       = [google_compute_target_pool.nomad.id]
-  base_instance_name = "${var.name}-nomad"
+  base_instance_name = "${var.name}-nomad-client"
 
   auto_healing_policies {
     health_check      = google_compute_health_check.nomad.id

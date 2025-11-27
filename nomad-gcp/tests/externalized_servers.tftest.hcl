@@ -4,7 +4,7 @@ mock_provider "google" {
       name          = "default"
       ip_cidr_range = "10.138.0.0/20"
       region        = "us-central1"
-
+      self_link     = "https://www.googleapis.com/compute/v1/projects/test-project/regions/us-central1/subnetworks/default"
     }
   }
 
@@ -12,6 +12,42 @@ mock_provider "google" {
     defaults = {
       name   = "ubuntu-2204-jammy-v20231101"
       family = "ubuntu-2204-lts"
+    }
+  }
+
+  mock_data "google_project" {
+    defaults = {
+      project_id = "test-project"
+      name       = "test-project"
+      number     = "123456789"
+    }
+  }
+
+  mock_data "google_container_cluster" {
+    defaults = {
+      name              = "test-k8s-cluster"
+      location          = "us-central1"
+      subnetwork        = "projects/test-project/regions/us-central1/subnetworks/test-subnet"
+      cluster_ipv4_cidr = "10.0.0.0/14"
+    }
+  }
+
+  override_data {
+    target = data.google_container_cluster.k8s[0]
+    values = {
+      name              = "test-k8s-cluster"
+      location          = "us-central1"
+      subnetwork        = "projects/test-project/regions/us-central1/subnetworks/test-subnet"
+      cluster_ipv4_cidr = "10.0.0.0/14"
+    }
+  }
+
+  override_data {
+    target = data.google_compute_subnetwork.k8s[0]
+    values = {
+      name          = "test-subnet"
+      ip_cidr_range = "10.100.0.0/20"
+      region        = "us-central1"
     }
   }
 
@@ -29,6 +65,15 @@ mock_provider "google" {
       name          = "default"
       ip_cidr_range = "10.138.0.0/20"
       region        = "us-central1"
+      self_link     = "https://www.googleapis.com/compute/v1/projects/test-project/regions/us-central1/subnetworks/default"
+    }
+  }
+
+  override_resource {
+    target = google_compute_address.nomad_server[0]
+    values = {
+      name    = "test-server-nomad-server-lb-ip"
+      address = "10.138.0.10"
     }
   }
 
@@ -44,6 +89,19 @@ mock_provider "google" {
         {
           protocol = "udp"
           ports    = ["4646-4648"]
+        }
+      ]
+    }
+  }
+
+  override_resource {
+    target = module.server[0].google_compute_firewall.nomad-ssh[0]
+    values = {
+      name = "fw-test-server-allow-ssh"
+      allow = [
+        {
+          protocol = "tcp"
+          ports    = ["22"]
         }
       ]
     }
@@ -111,15 +169,31 @@ mock_provider "google" {
       load_balancing_scheme = "EXTERNAL"
     }
   }
+
+  override_resource {
+    target = module.server[0].google_compute_region_backend_service.nomad
+    values = {
+      name                  = "test-server-nomad-backend-service"
+      protocol              = "TCP"
+      load_balancing_scheme = "EXTERNAL"
+      timeout_sec           = 10
+      port_name             = "nomad"
+      region                = "us-central1"
+    }
+  }
 }
 
 run "test_server_networking" {
+  command = plan
   variables {
+    project_id                    = "test-project"
     region                        = "us-central1"
     zone                          = "us-central1-a"
     name                          = "test-server"
     deploy_nomad_server_instances = true
     nomad_server_hostname         = "nomad.example.com"
+    k8s_cluster_name              = "test-k8s-cluster"
+    k8s_cluster_location          = "us-central1"
   }
 
   assert {
@@ -172,6 +246,8 @@ run "test_server_autoscaler_configuration" {
     server_target_cpu_utilization = 0.7
     deploy_nomad_server_instances = true
     nomad_server_hostname         = "nomad.example.com"
+    k8s_cluster_name              = "test-k8s-cluster"
+    k8s_cluster_location          = "europe-west1"
   }
 
   assert {
@@ -197,20 +273,22 @@ run "test_server_health_check_configuration" {
     name                          = "test-server"
     deploy_nomad_server_instances = true
     nomad_server_hostname         = "nomad.example.com"
+    k8s_cluster_name              = "test-k8s-cluster"
+    k8s_cluster_location          = "asia-southeast1"
   }
 
   assert {
-    condition     = module.server[0].nomad_server_health_check.http_health_check[0].port == 4646
+    condition     = module.server[0].nomad_server_health_check.https_health_check[0].port == 4646
     error_message = "Server health check should use Nomad port 4646"
   }
 
   assert {
-    condition     = module.server[0].nomad_server_health_check.http_health_check[0].request_path == "/v1/agent/health?type=server"
+    condition     = module.server[0].nomad_server_health_check.https_health_check[0].request_path == "/v1/agent/health?type=server"
     error_message = "Server health check should use server health endpoint"
   }
 
   assert {
-    condition     = module.server[0].nomad_server_health_check.http_health_check[0].response == "{\"server\":{\"message\":\"ok\",\"ok\":true}}"
+    condition     = module.server[0].nomad_server_health_check.https_health_check[0].response == "{\"server\":{\"message\":\"ok\",\"ok\":true}}"
     error_message = "Server health check should expect server response format"
   }
 }
@@ -222,6 +300,8 @@ run "test_server_instance_group_configuration" {
     name                          = "test-server"
     deploy_nomad_server_instances = true
     nomad_server_hostname         = "nomad.example.com"
+    k8s_cluster_name              = "test-k8s-cluster"
+    k8s_cluster_location          = "canada-central1"
   }
 
   assert {
@@ -237,10 +317,12 @@ run "test_server_firewall_configuration" {
     name                          = "test-server"
     deploy_nomad_server_instances = true
     nomad_server_hostname         = "nomad.example.com"
+    k8s_cluster_name              = "test-k8s-cluster"
+    k8s_cluster_location          = "canada-central1"
   }
 
   assert {
-    condition     = module.server[0].nomad_server_firewall.name == "fw-test-server-allow-nomad-client-traffic-circleci-server"
+    condition     = module.server[0].nomad_server_firewall.name == "test-server-circleci-allow-nomad-client-traffic-nomad-servers"
     error_message = "Instance group manager name should match expected pattern"
   }
 
@@ -271,6 +353,8 @@ run "test_firewall_logging_configuration" {
     deploy_nomad_server_instances = true
     nomad_server_hostname         = "nomad.example.com"
     enable_firewall_logging       = true
+    k8s_cluster_name              = "test-k8s-cluster"
+    k8s_cluster_location          = "canada-central1"
   }
 
   assert {

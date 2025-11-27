@@ -89,9 +89,9 @@ enabled_docker_userns() {
 }
 
 configure_circleci() {
-	log "--------------------------------------"
+	log "----------------------------------------------"
 	log "Configuring CircleCI"
-	log "--------------------------------------"
+	log "----------------------------------------------"
 	public_ip="$(curl -H 'Metadata-Flavor: Google' http://169.254.169.254/computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip)"
 	private_ip="$(hostname --ip-address)"
 	if ! (echo $public_ip | grep -qP "^[\d.]+$"); then
@@ -103,9 +103,9 @@ configure_circleci() {
 }
 
 install_nomad() {
-	log "--------------------------------------"
-	log "Installing Nomad"
-	log "--------------------------------------"
+	log "----------------------------------------------"
+	log "Installing Nomad version ${nomad_version}"
+	log "----------------------------------------------"
 	sudo apt-get update && \
 	sudo apt-get install wget gpg coreutils
 	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
@@ -116,25 +116,35 @@ install_nomad() {
 }
 
 configure_nomad() {
-	log "--------------------------------------"
-	log "Installing TLS Certificates"
-	log "--------------------------------------"
 
-	mkdir -p /etc/nomad/ssl
-	chmod 0700 /etc/nomad/ssl
-	cat <<-EOT > /etc/nomad/ssl/cert.pem
+	log "----------------------------------------------"
+	log "Installing TLS Certificates"
+	log "----------------------------------------------"
+
+	mkdir -p /etc/ssl/nomad/
+	chmod 0755 /etc/ssl/nomad/
+	cat <<-EOT > /etc/ssl/nomad/client.pem
 	${client_tls_cert}
 	EOT
-	cat <<-EOT > /etc/nomad/ssl/key.pem
+	cat <<-EOT > /etc/ssl/nomad/key.pem
 	${client_tls_key}
 	EOT
-	cat <<-EOT > /etc/nomad/ssl/ca.pem
+	cat <<-EOT > /etc/ssl/nomad/ca.pem
 	${tls_ca}
 	EOT
+	ls -l /etc/ssl/nomad
+
+	echo "----------------------------------------------"
+	echo "      Setting environment variables"
+	echo "----------------------------------------------"
+	echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
+	echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/client.pem' >> /etc/environment
+	echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
+	echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
 
 	log "Setting nomad configuration"
 	mkdir -p /etc/nomad
-	cat <<-EOT > /etc/nomad/config.hcl
+	cat <<-EOT > /etc/nomad/client.hcl
 	log_level = "DEBUG"
 	name = "$(hostname)"
 	data_dir = "/opt/nomad"
@@ -149,13 +159,13 @@ configure_nomad() {
 	EOT
 	# Expecting to have DNS record for nomad server(s)
 	if [ "${add_server_join}" ]; then
-	cat <<-EOT >> /etc/nomad/config.hcl
+	cat <<-EOT >> /etc/nomad/client.hcl
 	  server_join = {
 		retry_join = ["${server_retry_join}"]
 	  }
 	EOT
 	fi
-	cat <<-EOT >> /etc/nomad/config.hcl
+	cat <<-EOT >> /etc/nomad/client.hcl
 	  node_class = "linux-64bit"
 	}
 	plugin "raw_exec" {
@@ -172,36 +182,59 @@ configure_nomad() {
 	}
 	EOT
 
-	if [ "${client_tls_cert}" ]; then
-		cat <<-EOT >> /etc/nomad/config.hcl
-		tls {
-		  http = false
-		  rpc  = true
-		  # This verifies the CN ([role].[region].nomad) in the certificate,
-		  # not the hostname or DNS name of the of the remote party.
-		  # https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
-		  verify_server_hostname = true
-		  ca_file	= "/etc/nomad/ssl/ca.pem"
-		  cert_file = "/etc/nomad/ssl/cert.pem"
-		  key_file	= "/etc/nomad/ssl/key.pem"
-		}
-		EOT
+	if [ "${external_nomad_server}" == "true" ]; then
+	cat <<-EOT >> /etc/nomad/client.hcl
+	tls {
+		http = true
+		rpc  = true
+		# This verifies the CN ([role].[region].nomad) in the certificate,
+		# not the hostname or DNS name of the of the remote party.
+		# https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
+		verify_server_hostname = true
+		verify_https_client = false
+		ca_file   = "/etc/ssl/nomad/ca.pem"
+		cert_file = "/etc/ssl/nomad/client.pem"
+		key_file  = "/etc/ssl/nomad/key.pem"
+	}
+	EOT
+	else
+	cat <<-EOT >> /etc/nomad/client.hcl
+	tls {
+		http = false
+		rpc  = true
+		# This verifies the CN ([role].[region].nomad) in the certificate,
+		# not the hostname or DNS name of the of the remote party.
+		# https://learn.hashicorp.com/tutorials/nomad/security-enable-tls?in=nomad/transport-security#node-certificates
+		verify_server_hostname = true
+		verify_https_client = false
+		ca_file   = "/etc/ssl/nomad/ca.pem"
+		cert_file = "/etc/ssl/nomad/client.pem"
+		key_file  = "/etc/ssl/nomad/key.pem"
+	}
+	EOT
 	fi
+	ls -l /etc/nomad/client.hcl
 
 	log "Writing nomad systemd unit"
 	cat <<-EOT > /etc/systemd/system/nomad.service
 	[Unit]
 	Description="nomad"
 	[Service]
+	Environment="NOMAD_CACERT=/etc/ssl/nomad/ca.pem"
+	Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/client.pem"
+	Environment="NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem"
+	Environment="NOMAD_ADDR=https://localhost:4646"
 	Restart=always
 	RestartSec=30
 	TimeoutStartSec=1m
-	ExecStart=/usr/bin/nomad agent -config /etc/nomad/config.hcl
+	ExecStart=/usr/bin/nomad agent -config /etc/nomad/client.hcl
 	[Install]
 	WantedBy=multi-user.target
 	EOT
 
+	echo "----------------------------------------------"
 	log "Starting up nomad" 
+	echo "----------------------------------------------"
 	systemctl enable --now nomad
 }
 
@@ -257,6 +290,9 @@ setup_docker_gc() {
 	EOT
 	chmod 0700 /etc/docker-gc-start.rc
 
+	echo "----------------------------------------------"
+	log "starting docker garbage collection"
+	echo "----------------------------------------------"
 	systemctl enable --now docker-gc
 }
 
@@ -307,5 +343,8 @@ docker_chain="DOCKER-USER"
 /sbin/iptables --wait --insert $docker_chain 5 -i br+ --destination "${cidr_block}" --jump DROP
 %{ endfor ~}
 
+echo "--------------------------------------"
+echo "	Reverting Cgroup v2"
+echo "--------------------------------------"
 revert_cgroups
 reboot

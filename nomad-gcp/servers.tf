@@ -2,9 +2,27 @@ resource "google_compute_address" "nomad_server" {
   count = var.deploy_nomad_server_instances ? 1 : 0
 
   name         = "${var.name}-nomad-server-lb-ip"
-  address_type = "EXTERNAL"
+  address_type = "INTERNAL"
   region       = var.region
+  subnetwork   = var.subnetwork
+  purpose      = "GCE_ENDPOINT"
 }
+
+data "google_container_cluster" "k8s" {
+  count = var.deploy_nomad_server_instances ? 1 : 0
+
+  name     = var.k8s_cluster_name
+  location = var.k8s_cluster_location
+}
+
+data "google_compute_subnetwork" "k8s" {
+  count = var.deploy_nomad_server_instances ? 1 : 0
+
+  # Extract subnet name from self_link
+  name   = element(split("/", data.google_container_cluster.k8s[0].subnetwork), length(split("/", data.google_container_cluster.k8s[0].subnetwork)) - 1)
+  region = var.region
+}
+
 
 module "server" {
   source = "./modules/nomad-server-gcp"
@@ -38,4 +56,9 @@ module "server" {
   health_check_healthy_threshold   = var.health_check_healthy_threshold
   health_check_unhealthy_threshold = var.health_check_unhealthy_threshold
   enable_firewall_logging          = var.enable_firewall_logging
+  allowed_ips_nomad_ssh_access     = var.allowed_ips_nomad_ssh_access
+  nomad_version                    = var.nomad_version
+  nomad_clients_tags               = local.tags
+  gcp_cluster_ipv4_cidr            = data.google_container_cluster.k8s[0].cluster_ipv4_cidr
+  gcp_cluster_network_cidr         = data.google_compute_subnetwork.k8s[0].ip_cidr_range
 }

@@ -11,7 +11,7 @@ data "google_compute_subnetwork" "nomad" {
 }
 
 locals {
-  tags                  = ["circleci-server", "nomad-server", "circleci-nomad-server", "${var.name}-nomad-server", "circleci-${var.name}-nomad-servers"]
+  tags                  = ["${var.name}-circleci-nomad-servers"]
   subnet_or_network     = var.subnetwork != "" ? var.subnetwork : var.network
   is_subnet_a_self_link = can(regex("^https://www\\.googleapis\\.com/compute/", local.subnet_or_network))
 }
@@ -58,7 +58,7 @@ resource "google_compute_health_check" "nomad" {
   healthy_threshold   = var.health_check_healthy_threshold
   unhealthy_threshold = var.health_check_unhealthy_threshold
 
-  http_health_check {
+  https_health_check {
     port         = "4646"
     host         = "127.0.0.1"
     request_path = "/v1/agent/health?type=server"
@@ -155,15 +155,33 @@ resource "google_compute_instance_group_manager" "nomad" {
     health_check      = google_compute_health_check.nomad.id
     initial_delay_sec = 300
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
-# Only External type Load balancer is supported for target pool
 resource "google_compute_forwarding_rule" "nomad" {
+  name                  = "${var.name}-circleci-nomad-server-forwarding-rule"
   region                = var.region
-  name                  = "${var.name}-nomad-server-forwarding-rule"
-  target                = google_compute_target_pool.nomad.self_link
-  load_balancing_scheme = "EXTERNAL"
-  port_range            = "4646-4648"
-  ip_protocol           = "TCP"
+  load_balancing_scheme = "INTERNAL"
   ip_address            = var.nomad_server_lb_ip
+  ip_protocol           = "TCP"
+  network               = var.network
+  subnetwork            = var.subnetwork
+  backend_service       = google_compute_region_backend_service.nomad.id
+  all_ports             = true
+}
+
+resource "google_compute_region_backend_service" "nomad" {
+  name          = "${var.name}-circleci-nomad-backend-service"
+  region        = var.region
+  health_checks = [google_compute_health_check.nomad.id]
+  network       = var.network
+  project       = var.project_id
+
+  backend {
+    group          = google_compute_instance_group_manager.nomad.instance_group
+    balancing_mode = "CONNECTION"
+  }
 }
