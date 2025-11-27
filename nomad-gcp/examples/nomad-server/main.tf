@@ -89,6 +89,8 @@ module "nomad" {
   min_server_instances          = 3
   server_disk_size_gb           = 50
   server_target_cpu_utilization = 0.8
+  k8s_cluster_name              = "my-k8s-cluster"
+  k8s_cluster_location          = var.region
 }
 
 output "module" {

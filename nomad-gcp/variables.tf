@@ -327,17 +327,19 @@ variable "log_level" {
 variable "k8s_cluster_name" {
   type        = string
   description = "Kubernetes Cluster Name"
+  default     = ""
   validation {
-    condition     = var.deploy_nomad_server_instances && var.k8s_cluster_name != ""
-    error_message = "Kubernetes Cluster Name is required if using external nomad server"
+    condition     = !var.deploy_nomad_server_instances || length(var.k8s_cluster_name) > 0
+    error_message = "Kubernetes Cluster Name is required when deploying nomad server instances"
   }
 }
 
 variable "k8s_cluster_location" {
   type        = string
   description = "Kubernetes Cluster Location, Either Region or Zone"
+  default     = ""
   validation {
-    condition     = var.deploy_nomad_server_instances && var.k8s_cluster_location != ""
-    error_message = "Kubernetes Cluster Location is required if using external nomad server"
+    condition     = !var.deploy_nomad_server_instances || length(var.k8s_cluster_location) > 0
+    error_message = "Kubernetes Cluster Location is required when deploying nomad server instances"
   }
 }
