@@ -21,7 +21,7 @@ output "nomad_clients_cert_base64" {
 
 output "nomad_clients_key_base64" {
   description = "set this value for the `nomad.clients.mTLS.privateKey` key in the CircleCI Server's Helm values.yaml"
-  value       = var.deploy_nomad_server_instances ? nonsensitive(base64encode(module.nomad_tls.nomad_client_cert)) : ""
+  value       = var.deploy_nomad_server_instances ? nonsensitive(base64encode(module.nomad_tls.nomad_client_key)) : ""
 }
 
 output "nomad_sg_id" {
