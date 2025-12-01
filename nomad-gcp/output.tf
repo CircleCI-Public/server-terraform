@@ -1,30 +1,27 @@
-output "nomad_server_tls_cert" {
-  value = module.tls.nomad_server_cert
-}
-
-output "nomad_server_tls_key" {
-  value = nonsensitive(module.tls.nomad_server_key)
-}
-
-output "nomad_tls_ca" {
-  value = module.tls.nomad_tls_ca
-}
-
 output "nomad_server_tls_cert_base64" {
   description = "set this value for the `nomad.server.rpc.mTLS.certificate` key in the CircleCI Server's Helm values.yaml"
-  value       = base64encode(module.tls.nomad_server_cert)
+  value       = var.deploy_nomad_server_instances ? "" : base64encode(module.tls.nomad_server_cert)
 }
 
 output "nomad_server_tls_key_base64" {
   description = "set this value for the `nomad.server.rpc.mTLS.privateKey` key in the CircleCI Server's Helm values.yaml"
-  value       = nonsensitive(base64encode(module.tls.nomad_server_key))
+  value       = var.deploy_nomad_server_instances ? "" : nonsensitive(base64encode(module.tls.nomad_server_key))
 }
 
 output "nomad_tls_ca_base64" {
-  description = "set this value for the `nomad.server.rpc.mTLS.CACertificate` key in the CircleCI Server's Helm values.yaml"
+  description = "set this value for the `nomad.server.rpc.mTLS.CACertificate` and `nomad.clients.mTLS.CACertificate` key in the CircleCI Server's Helm values.yaml"
   value       = base64encode(module.tls.nomad_tls_ca)
 }
 
+output "nomad_clients_cert_base64" {
+  description = "set this value for the `nomad.clients.mTLS.certificate` key in the CircleCI Server's Helm values.yaml"
+  value       = var.deploy_nomad_server_instances ? base64encode(module.tls.nomad_client_cert) : ""
+}
+
+output "nomad_clients_key_base64" {
+  description = "set this value for the `nomad.clients.mTLS.privateKey` key in the CircleCI Server's Helm values.yaml"
+  value       = var.deploy_nomad_server_instances ? nonsensitive(base64encode(module.tls.nomad_client_cert)) : ""
+}
 
 output "managed_instance_group_nomad_client" {
   value = google_compute_instance_group_manager.nomad.name
