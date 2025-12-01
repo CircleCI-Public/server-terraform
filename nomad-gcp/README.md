@@ -142,13 +142,12 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="output_managed_instance_group_region"></a> [managed\_instance\_group\_region](#output\_managed\_instance\_group\_region) | n/a |
 | <a name="output_managed_instance_group_type"></a> [managed\_instance\_group\_type](#output\_managed\_instance\_group\_type) | n/a |
 | <a name="output_managed_instance_group_zone"></a> [managed\_instance\_group\_zone](#output\_managed\_instance\_group\_zone) | n/a |
+| <a name="output_nomad_clients_cert_base64"></a> [nomad\_clients\_cert\_base64](#output\_nomad\_clients\_cert\_base64) | set this value for the `nomad.clients.mTLS.certificate` key in the CircleCI Server's Helm values.yaml |
+| <a name="output_nomad_clients_key_base64"></a> [nomad\_clients\_key\_base64](#output\_nomad\_clients\_key\_base64) | set this value for the `nomad.clients.mTLS.privateKey` key in the CircleCI Server's Helm values.yaml |
 | <a name="output_nomad_server_ip"></a> [nomad\_server\_ip](#output\_nomad\_server\_ip) | n/a |
-| <a name="output_nomad_server_tls_cert"></a> [nomad\_server\_tls\_cert](#output\_nomad\_server\_tls\_cert) | n/a |
 | <a name="output_nomad_server_tls_cert_base64"></a> [nomad\_server\_tls\_cert\_base64](#output\_nomad\_server\_tls\_cert\_base64) | set this value for the `nomad.server.rpc.mTLS.certificate` key in the CircleCI Server's Helm values.yaml |
-| <a name="output_nomad_server_tls_key"></a> [nomad\_server\_tls\_key](#output\_nomad\_server\_tls\_key) | n/a |
 | <a name="output_nomad_server_tls_key_base64"></a> [nomad\_server\_tls\_key\_base64](#output\_nomad\_server\_tls\_key\_base64) | set this value for the `nomad.server.rpc.mTLS.privateKey` key in the CircleCI Server's Helm values.yaml |
-| <a name="output_nomad_tls_ca"></a> [nomad\_tls\_ca](#output\_nomad\_tls\_ca) | n/a |
-| <a name="output_nomad_tls_ca_base64"></a> [nomad\_tls\_ca\_base64](#output\_nomad\_tls\_ca\_base64) | set this value for the `nomad.server.rpc.mTLS.CACertificate` key in the CircleCI Server's Helm values.yaml |
+| <a name="output_nomad_tls_ca_base64"></a> [nomad\_tls\_ca\_base64](#output\_nomad\_tls\_ca\_base64) | set this value for the `nomad.server.rpc.mTLS.CACertificate` and `nomad.clients.mTLS.CACertificate` key in the CircleCI Server's Helm values.yaml |
 | <a name="output_service_account_email"></a> [service\_account\_email](#output\_service\_account\_email) | n/a |
 | <a name="output_service_account_key"></a> [service\_account\_key](#output\_service\_account\_key) | Base64 decoded service account key. |
 | <a name="output_service_account_key_location"></a> [service\_account\_key\_location](#output\_service\_account\_key\_location) | n/a |
