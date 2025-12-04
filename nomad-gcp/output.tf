@@ -60,3 +60,14 @@ output "managed_instance_group_nomad_server" {
 output "nomad_server_ip" {
   value = var.deploy_nomad_server_instances ? google_compute_address.nomad_server[0].address : ""
 }
+
+output "msg" {
+  value = (
+    var.deploy_nomad_server_instances
+    ? <<-EOT
+    Using External Nomad Servers -
+    Create a DNS entry - nomad-server.${var.nomad_server_hostname} which points to ${google_compute_address.nomad_server[0].address}
+  EOT
+    : ""
+  )
+}

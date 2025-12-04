@@ -142,6 +142,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="output_managed_instance_group_region"></a> [managed\_instance\_group\_region](#output\_managed\_instance\_group\_region) | n/a |
 | <a name="output_managed_instance_group_type"></a> [managed\_instance\_group\_type](#output\_managed\_instance\_group\_type) | n/a |
 | <a name="output_managed_instance_group_zone"></a> [managed\_instance\_group\_zone](#output\_managed\_instance\_group\_zone) | n/a |
+| <a name="output_msg"></a> [msg](#output\_msg) | n/a |
 | <a name="output_nomad_clients_cert_base64"></a> [nomad\_clients\_cert\_base64](#output\_nomad\_clients\_cert\_base64) | set this value for the `nomad.clients.mTLS.certificate` key in the CircleCI Server's Helm values.yaml |
 | <a name="output_nomad_clients_key_base64"></a> [nomad\_clients\_key\_base64](#output\_nomad\_clients\_key\_base64) | set this value for the `nomad.clients.mTLS.privateKey` key in the CircleCI Server's Helm values.yaml |
 | <a name="output_nomad_server_ip"></a> [nomad\_server\_ip](#output\_nomad\_server\_ip) | n/a |
