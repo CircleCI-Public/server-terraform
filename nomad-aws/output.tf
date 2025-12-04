@@ -76,3 +76,14 @@ output "nomad_server_autoscaling_group_name" {
 output "nomad_server_lb_zone_id" {
   value = var.deploy_nomad_server_instances ? aws_lb.internal_nlb[0].zone_id : ""
 }
+
+output "msg" {
+  value = (
+    var.deploy_nomad_server_instances
+    ? <<-EOT
+    Using External Nomad Servers -
+    Create a Route53 entry - nomad-server.${var.nomad_server_hostname} which points to ${aws_lb.internal_nlb[0].dns_name}
+  EOT
+    : ""
+  )
+}

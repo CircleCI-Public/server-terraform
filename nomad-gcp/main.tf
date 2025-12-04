@@ -15,7 +15,7 @@ data "google_compute_subnetwork" "nomad" {
 
 module "tls" {
   source                = "./../shared/modules/tls"
-  nomad_server_hostname = var.nomad_server_hostname
+  nomad_server_hostname = var.deploy_nomad_server_instances ? "nomad-server.${var.nomad_server_hostname}" : var.nomad_server_hostname
   nomad_server_port     = var.nomad_server_port
 }
 

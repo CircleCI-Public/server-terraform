@@ -173,6 +173,7 @@ There are more examples in the [examples](./examples/) directory.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_msg"></a> [msg](#output\_msg) | n/a |
 | <a name="output_nomad_asg_arn"></a> [nomad\_asg\_arn](#output\_nomad\_asg\_arn) | n/a |
 | <a name="output_nomad_asg_name"></a> [nomad\_asg\_name](#output\_nomad\_asg\_name) | n/a |
 | <a name="output_nomad_asg_user_access_key"></a> [nomad\_asg\_user\_access\_key](#output\_nomad\_asg\_user\_access\_key) | n/a |
