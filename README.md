@@ -17,15 +17,15 @@ repository] support and pinning a fixed reference. For example, you might
 consume the AWS Nomad client module as follows:
 
 ```terraform
-module "my-aws-nomad-clients" {
-  # Pin release to 4.1.0 (for example) and use /nomad-aws subdirectory
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=4.1.0"
+module "nomad" {
+  # Pin release to 4.9.0 (for example) and use /nomad-aws subdirectory
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=4.9.0"
 
   # Other variables here...
 }
 ```
 
-> Note the use of `ref=4.1.0` to select a specific git tag and
+> Note the use of `ref=4.9.0` to select a specific git tag and
 > `//nomad-aws` to select the `nomad-aws` module.
 
 [generic git repository]: https://www.terraform.io/docs/language/modules/sources.html#generic-git-repository

@@ -14,7 +14,7 @@ provider "google-beta" {
   zone    = "<< GCP compute zone to deploy nomad clients >>""
 }
 
-module "nomad_clients" {
+module "nomad" {
   # We strongly recommend pinning the version using ref=<<release tag>> as is done here
   source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-gcp?ref=4.9.0"
 
@@ -26,7 +26,7 @@ module "nomad_clients" {
 }
 
 output "module" {
-  value = module.nomad_clients
+  value = module.nomad
 }
 ```
 
