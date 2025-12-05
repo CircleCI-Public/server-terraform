@@ -23,9 +23,9 @@ provider "aws" {
   region = "us-west-1"
 }
 
-module "nomad_clients" {
+module "nomad" {
   # We strongly recommend pinning the version using ref=<<release tag>> as is done here
-  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=4.0.0"
+  source = "git::https://github.com/CircleCI-Public/server-terraform.git//nomad-aws?ref=4.9.0"
 
   # Number of nomad clients to run
   nodes = 4
@@ -57,7 +57,7 @@ module "nomad_clients" {
 }
 
 output "nomad" {
-  value     = module.nomad_clients
+  value     = module.nomad
   sensitive = true
 }
 ```
@@ -65,6 +65,7 @@ output "nomad" {
 There are more examples in the [examples](./examples/) directory.
 - [Basic example](./examples/basic/main.tf)
 - [IRSA example](./examples/irsa/main.tf)
+- [External Nomad Server example](./examples/nomad-server/main.tf)
 
 ---
 

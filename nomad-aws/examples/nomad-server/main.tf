@@ -57,13 +57,14 @@ module "nomad-aws" {
 
   # Externalized Nomad Servers
   deploy_nomad_server_instances = true
-  server_public_ip              = true
+  server_public_ip              = true # if false, the servers will use the private IP address
   allow_ssh                     = true
   ssh_key                       = "<your-public-key>"
   server_machine_type           = "t3a.micro"
   max_server_instances          = 7
   desired_server_instances      = 3
   aws_region                    = "us-east-1"
+  client_public_ip              = true # if false, the clients will use the private IP address
 }
 
 output "nomad_module" {

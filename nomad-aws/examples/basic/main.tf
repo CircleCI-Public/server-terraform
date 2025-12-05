@@ -27,7 +27,7 @@ module "vpc" {
   enable_dns_hostnames = true
 }
 
-module "nomad-aws" {
+module "nomad" {
   source = "../.."
 
   # Number of nomad clients to run
@@ -57,5 +57,5 @@ module "nomad-aws" {
 }
 
 output "nomad_module" {
-  value = module.nomad-aws
+  value = module.nomad
 }
