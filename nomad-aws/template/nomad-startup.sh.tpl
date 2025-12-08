@@ -26,7 +26,14 @@ echo "--------------------------------------"
 echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
 echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/client.pem' >> /etc/environment
 echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
-echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
+
+if [ "${external_nomad_server}" == "true" ]; then
+    echo 'export NOMAD_ADDR=https://localhost:4646' >> /etc/environment
+    export NOMAD_ADDR="https://localhost:4646"
+else
+    echo 'export NOMAD_ADDR=http://localhost:4646' >> /etc/environment
+    export NOMAD_ADDR="http://localhost:4646"
+fi
 
 retry() {
     local -r -i max_attempts=5
@@ -221,7 +228,7 @@ Description="nomad"
 Environment="NOMAD_CACERT=/etc/ssl/nomad/ca.pem"
 Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/client.pem"
 Environment="NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem"
-Environment="NOMAD_ADDR=https://localhost:4646"
+Environment="NOMAD_ADDR=$NOMAD_ADDR"
 Restart=always
 RestartSec=30
 TimeoutStartSec=1m
