@@ -80,6 +80,9 @@ configure_nomad() {
 	echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/server.pem' >> /etc/environment
 	echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
 	echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment	
+
+	source /etc/environment
+	env | grep "NOMAD_"
 	##########################################################################
 
 
@@ -134,6 +137,7 @@ configure_nomad() {
 	EOT
 	##########################################################################
 
+	log ""
 
 
 	log "-----------------------------------------"
@@ -161,6 +165,7 @@ configure_nomad() {
 	log "-----------------------------------------"
 
 	log ""
+
 	log "Starting up nomad"
 	systemctl enable --now nomad
 }

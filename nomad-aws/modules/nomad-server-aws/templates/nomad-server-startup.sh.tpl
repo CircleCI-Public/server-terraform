@@ -30,6 +30,9 @@ echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/server.pem' >> /etc/environment
 echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
 echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
 
+source /etc/environment
+env | grep "NOMAD_"
+
 echo "----------------------------------------"
 echo "        Tuning kernel parameters"
 echo "----------------------------------------"
@@ -148,6 +151,7 @@ ExecStart=/usr/bin/nomad agent -config /etc/nomad/server.hcl
 [Install]
 WantedBy=multi-user.target
 EOT
+
 
 echo "--------------------------------------"
 echo "      Starting Nomad service"
