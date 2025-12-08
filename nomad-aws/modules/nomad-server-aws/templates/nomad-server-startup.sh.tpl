@@ -149,6 +149,11 @@ ExecStart=/usr/bin/nomad agent -config /etc/nomad/server.hcl
 WantedBy=multi-user.target
 EOT
 
+echo "----------------------------------------------"
+echo "Nomad env vars"
+echo "----------------------------------------------"
+env | grep NOMAD_
+
 echo "--------------------------------------"
 echo "      Starting Nomad service"
 echo "--------------------------------------"

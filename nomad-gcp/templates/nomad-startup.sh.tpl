@@ -236,6 +236,11 @@ configure_nomad() {
 	EOT
 
 	echo "----------------------------------------------"
+	log "Nomad env vars"
+	echo "----------------------------------------------"
+	env | grep NOMAD_
+
+	echo "----------------------------------------------"
 	log "Starting up nomad" 
 	echo "----------------------------------------------"
 	systemctl enable --now nomad

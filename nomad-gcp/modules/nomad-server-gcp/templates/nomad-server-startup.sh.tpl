@@ -161,6 +161,13 @@ configure_nomad() {
 	log "-----------------------------------------"
 
 	log ""
+
+	log "----------------------------------------------"
+	log "Nomad env vars"
+	log "----------------------------------------------"
+	env | grep NOMAD_
+
+	log ""
 	log "Starting up nomad"
 	systemctl enable --now nomad
 }
