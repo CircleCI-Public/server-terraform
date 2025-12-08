@@ -26,7 +26,11 @@ echo "--------------------------------------"
 echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
 echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/client.pem' >> /etc/environment
 echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
-echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
+if [ "${external_nomad_server}" == "true" ]; then
+  echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
+else
+  echo "export NOMAD_ADDR=https://${server_retry_join}:4646" >> /etc/environment
+fi
 
 retry() {
     local -r -i max_attempts=5
@@ -214,6 +218,11 @@ ls -l /etc/nomad
 echo "--------------------------------------"
 echo "      Creating nomad.service"
 echo "--------------------------------------"
+if [ "${external_nomad_server}" == "true" ]; then
+  NOMAD_SERVICE_ADDR="https://localhost:4646"
+else
+  NOMAD_SERVICE_ADDR="https://${server_retry_join}:4646"
+fi
 cat <<EOT > /etc/systemd/system/nomad.service
 [Unit]
 Description="nomad"
@@ -221,7 +230,7 @@ Description="nomad"
 Environment="NOMAD_CACERT=/etc/ssl/nomad/ca.pem"
 Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/client.pem"
 Environment="NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem"
-Environment="NOMAD_ADDR=https://localhost:4646"
+Environment="NOMAD_ADDR=$NOMAD_SERVICE_ADDR"
 Restart=always
 RestartSec=30
 TimeoutStartSec=1m
