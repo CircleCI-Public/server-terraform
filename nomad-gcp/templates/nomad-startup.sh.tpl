@@ -143,7 +143,9 @@ configure_nomad() {
 
 	[ "${external_nomad_server}" == "true" ] && SCHEME="https" || SCHEME="http"
 	echo "export NOMAD_ADDR=$SCHEME://localhost:4646" >> /etc/environment
-	export NOMAD_ADDR="$SCHEME://localhost:4646"
+
+	source /etc/environment
+	env | grep "NOMAD_"
 
 	log "Setting nomad configuration"
 	mkdir -p /etc/nomad
@@ -218,6 +220,7 @@ configure_nomad() {
 	fi
 	ls -l /etc/nomad/client.hcl
 
+
 	log "Writing nomad systemd unit"
 	cat <<-EOT > /etc/systemd/system/nomad.service
 	[Unit]
@@ -234,11 +237,6 @@ configure_nomad() {
 	[Install]
 	WantedBy=multi-user.target
 	EOT
-
-	echo "----------------------------------------------"
-	log "Nomad env vars"
-	echo "----------------------------------------------"
-	env | grep NOMAD_
 
 	echo "----------------------------------------------"
 	log "Starting up nomad" 

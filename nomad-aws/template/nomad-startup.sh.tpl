@@ -29,7 +29,9 @@ echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
 
 [ "${external_nomad_server}" == "true" ] && SCHEME="https" || SCHEME="http"
 echo "export NOMAD_ADDR=$SCHEME://localhost:4646" >> /etc/environment
-export NOMAD_ADDR="$SCHEME://localhost:4646"
+
+source /etc/environment
+env | grep "NOMAD_"
 
 retry() {
     local -r -i max_attempts=5
@@ -213,11 +215,6 @@ EOT
 fi
 
 ls -l /etc/nomad
-
-echo "----------------------------------------------"
-echo "Nomad env vars"
-echo "----------------------------------------------"
-env | grep NOMAD_
 
 echo "--------------------------------------"
 echo "      Creating nomad.service"
