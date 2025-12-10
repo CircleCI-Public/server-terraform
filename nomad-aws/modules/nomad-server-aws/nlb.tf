@@ -14,7 +14,7 @@ resource "aws_lb_target_group" "target_group_4646" {
   health_check {
     path                = "/v1/agent/health?type=server"
     port                = "4646"
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     healthy_threshold   = 3
     unhealthy_threshold = 2
     matcher             = "200"
@@ -48,7 +48,7 @@ resource "aws_lb_target_group" "target_group_4647" {
   health_check {
     path                = "/v1/agent/health?type=server"
     port                = "4646"
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     healthy_threshold   = 3
     unhealthy_threshold = 2
     matcher             = "200"
@@ -81,7 +81,7 @@ resource "aws_lb_target_group" "target_group_4648" {
   health_check {
     path                = "/v1/agent/health?type=server"
     port                = "4646"
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     healthy_threshold   = 3
     unhealthy_threshold = 2
     matcher             = "200"
