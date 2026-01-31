@@ -54,6 +54,9 @@ module "nomad" {
   basename = "<< name prefix for nomad clients >>"
 
   enable_imdsv2 = "<< optional/required >>"
+
+  # Optional: Custom CA for Docker/Podman to trust when pulling images (e.g., corporate proxies or private registries)
+  # custom_ca_cert = file("path/to/your/ca-cert.pem")
 }
 
 output "nomad" {

@@ -114,6 +114,7 @@ resource "google_compute_instance_template" "nomad" {
       use_podman               = var.use_podman
       podman_cpu_quota_percent = var.podman_cpu_quota_percent
       podman_tasks_max         = var.podman_tasks_max
+      custom_ca_cert           = var.custom_ca_cert
     }
   )
 

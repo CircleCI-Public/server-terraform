@@ -367,6 +367,19 @@ systemctl daemon-reload
 # Pre-cache podman info for docker-agent
 curl -o /tmp/info-stash --unix-socket /run/podman/podman.sock http://v1.41/info || true
 
+%{ if custom_ca_cert != "" ~}
+echo "--------------------------------------"
+echo "   Installing Custom CA Certificate"
+echo "--------------------------------------"
+cat <<EOT > /usr/local/share/ca-certificates/circleci-custom-ca.crt
+${custom_ca_cert}
+EOT
+update-ca-certificates
+echo "Custom CA certificate installed successfully"
+systemctl restart podman || true
+curl -o /tmp/info-stash --unix-socket /run/podman/podman.sock http://v1.41/info || true
+%{ endif ~}
+
 configure_circleci
 install_nomad || (echo "=================\nFailed to install nomad\n==================\n" && exit 1)
 configure_nomad
@@ -386,6 +399,19 @@ echo "----------------------------------------"
 apt-get install -y docker-ce=5:28.5.2-1~ubuntu.22.04~jammy docker-ce-cli=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
 
 enabled_docker_userns
+
+%{ if custom_ca_cert != "" ~}
+echo "--------------------------------------"
+echo "   Installing Custom CA Certificate"
+echo "--------------------------------------"
+cat <<EOT > /usr/local/share/ca-certificates/circleci-custom-ca.crt
+${custom_ca_cert}
+EOT
+update-ca-certificates
+echo "Custom CA certificate installed successfully"
+systemctl restart docker
+%{ endif ~}
+
 configure_circleci
 install_nomad || (echo "=================\nFailed to install nomad\n==================\n" && exit 1)
 configure_nomad
