@@ -110,6 +110,7 @@ resource "google_compute_instance_template" "nomad" {
       server_retry_join     = var.deploy_nomad_server_instances ? local.server_retry_join : local.nomad_server_hostname_and_port
       log_level             = var.log_level
       external_nomad_server = var.deploy_nomad_server_instances
+      custom_ca_cert        = var.custom_ca_cert
     }
   )
 

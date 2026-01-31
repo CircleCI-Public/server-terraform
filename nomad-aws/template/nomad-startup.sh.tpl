@@ -101,6 +101,18 @@ cat <<EOT > /etc/docker/daemon.json
 EOT
 
 echo 'export no_proxy="true"' >> /etc/default/docker
+
+%{ if custom_ca_cert != "" ~}
+echo "--------------------------------------"
+echo "   Installing Custom CA Certificate"
+echo "--------------------------------------"
+cat <<EOT > /usr/local/share/ca-certificates/circleci-custom-ca.crt
+${custom_ca_cert}
+EOT
+update-ca-certificates
+echo "Custom CA certificate installed successfully"
+%{ endif ~}
+
 service docker restart
 sleep 5
 

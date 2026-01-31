@@ -343,3 +343,15 @@ variable "k8s_cluster_location" {
     error_message = "Kubernetes Cluster Location is required when deploying nomad server instances"
   }
 }
+
+variable "custom_ca_cert" {
+  type        = string
+  default     = ""
+  description = <<-EOF
+    Custom CA certificate (PEM format) to install on Nomad client hosts.
+    This CA will be added to the system trust store, allowing Docker to pull
+    images from registries that use certificates signed by this CA.
+    This is useful for environments with corporate proxies or private registries
+    that use custom/self-signed certificates.
+    EOF
+}
