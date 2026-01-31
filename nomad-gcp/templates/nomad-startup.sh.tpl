@@ -326,6 +326,19 @@ apt-get install -y docker-ce=5:28.5.2-1~ubuntu.22.04~jammy docker-ce-cli=5:28.5.
 install jq
 
 enabled_docker_userns
+
+%{ if custom_ca_cert != "" ~}
+echo "--------------------------------------"
+echo "   Installing Custom CA Certificate"
+echo "--------------------------------------"
+cat <<EOT > /usr/local/share/ca-certificates/circleci-custom-ca.crt
+${custom_ca_cert}
+EOT
+update-ca-certificates
+echo "Custom CA certificate installed successfully"
+systemctl restart docker
+%{ endif ~}
+
 configure_circleci
 install_nomad || (echo "=================\nFailed to install nomad\n==================\n" && exit 1)
 configure_nomad

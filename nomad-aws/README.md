@@ -54,6 +54,9 @@ module "nomad" {
   basename = "<< name prefix for nomad clients >>"
 
   enable_imdsv2 = "<< optional/required >>"
+
+  # Optional: Custom CA certificate for Docker to trust (e.g., for corporate proxies or private registries)
+  # custom_ca_cert = file("path/to/your/ca-cert.pem")
 }
 
 output "nomad" {

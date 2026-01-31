@@ -266,3 +266,15 @@ variable "log_level" {
     error_message = "The value for log_level must be 'INFO', 'DEBUG', 'WARN', or 'TRACE'."
   }
 }
+
+variable "custom_ca_cert" {
+  type        = string
+  default     = ""
+  description = <<-EOF
+    Custom CA certificate (PEM format) to install on Nomad client hosts.
+    This CA will be added to the system trust store, allowing Docker to pull
+    images from registries that use certificates signed by this CA.
+    This is useful for environments with corporate proxies or private registries
+    that use custom/self-signed certificates.
+    EOF
+}

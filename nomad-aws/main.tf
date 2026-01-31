@@ -60,6 +60,7 @@ data "cloudinit_config" "nomad_user_data" {
         server_retry_join     = var.deploy_nomad_server_instances ? local.server_retry_join : var.nomad_server_hostname
         log_level             = var.log_level
         external_nomad_server = var.deploy_nomad_server_instances
+        custom_ca_cert        = var.custom_ca_cert
       }
     )
   }
