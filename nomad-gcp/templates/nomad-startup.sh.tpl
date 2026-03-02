@@ -33,7 +33,7 @@ system_update() {
 }
 
 retry() {
-    local -r -i max_attempts=${startup_retry_max_attempts}
+    local -r -i max_attempts=${apt_retry_max_attempts}
     local -i attempt_num=1
 
     until "$@"; do
