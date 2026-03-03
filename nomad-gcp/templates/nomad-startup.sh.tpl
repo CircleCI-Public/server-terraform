@@ -33,7 +33,7 @@ system_update() {
 }
 
 retry() {
-    local -r -i max_attempts=5
+    local -r -i max_attempts=${apt_retry_max_attempts}
     local -i attempt_num=1
 
     until "$@"; do
@@ -41,7 +41,7 @@ retry() {
             echo "Attempt $attempt_num failed and there are no more attempts left!"
             exit 1
         else
-            echo "Attempt $attempt_num failed! Trying again..."
+            echo "Attempt $attempt_num failed! Trying again in 5s... ($attempt_num/$max_attempts)"
             ((attempt_num++))
             sleep 5
         fi

@@ -195,6 +195,12 @@ variable "nomad_version" {
   default     = "1.7.7-1"
 }
 
+variable "apt_retry_max_attempts" {
+  type        = number
+  description = "Maximum number of retry attempts for apt-get commands during startup. Each attempt waits 5 seconds."
+  default     = 5
+}
+
 variable "health_check_timeout_sec" {
   description = "Nomad Server Heath Check Timeout in seconds"
   type        = number

@@ -183,6 +183,12 @@ variable "nomad_version" {
   default     = "1.7.7-1"
 }
 
+variable "apt_retry_max_attempts" {
+  type        = number
+  description = "Maximum number of retry attempts for apt-get commands during startup. Each attempt waits 5 seconds."
+  default     = 5
+}
+
 variable "allowed_ips_retry_ssh" {
   type        = list(string)
   description = "List of IPv4 ranges that are permitted to access nomad nodes for the retry-with-ssh feature"
