@@ -69,6 +69,54 @@ echo "        Installing NTP"
 echo "--------------------------------------"
 retry apt-get install -y ntp
 
+if [ "${use_podman}" == "true" ]; then
+
+echo "--------------------------------------"
+echo "        Installing Podman"
+echo "--------------------------------------"
+retry apt-get install -y podman jq
+
+echo "--------------------------------------"
+echo "    Configuring cgroupv2 tuning"
+echo "--------------------------------------"
+
+mkdir -p /etc/systemd/system/system.slice.d
+cat <<EOT > /etc/systemd/system/system.slice.d/cgroup.conf
+[Slice]
+CPUWeight=1000
+IOWeight=1000
+EOT
+
+mkdir -p /etc/systemd/system/podman.service.d
+cat <<EOT > /etc/systemd/system/podman.service.d/cgroup.conf
+[Service]
+CPUWeight=1000
+IOWeight=1000
+OOMScoreAdjust=-1000
+EOT
+
+mkdir -p /etc/systemd/system/circleci.slice.d
+cat <<EOT > /etc/systemd/system/circleci.slice.d/cgroup.conf
+[Slice]
+CPUQuota=3400%
+TasksMax=4192256
+MemorySwapMax=0
+EOT
+
+# Ubuntu 22.04 LLVM sanitizer workaround
+# See https://github.com/google/sanitizers/issues/1716#issuecomment-2010399341
+ubuntu_version=$(. /etc/os-release && echo "$VERSION_ID")
+if [ "$ubuntu_version" = "22.04" ]; then
+    sysctl vm.mmap_rnd_bits=28
+fi
+
+systemctl daemon-reload
+
+# Pre-cache podman info for docker-agent
+curl -o /tmp/info-stash --unix-socket /run/podman/podman.sock http://v1.41/info || true
+
+else
+
 echo "--------------------------------------"
 echo "        Installing Docker"
 echo "--------------------------------------"
@@ -103,6 +151,8 @@ EOT
 echo 'export no_proxy="true"' >> /etc/default/docker
 service docker restart
 sleep 5
+
+fi
 
 echo "--------------------------------------"
 echo " Populating /etc/circleci/public-ipv4"
@@ -235,10 +285,12 @@ ExecStart=/usr/bin/nomad agent -config /etc/nomad/client.hcl
 WantedBy=multi-user.target
 EOT
 
+if [ "${use_podman}" != "true" ]; then
 echo "--------------------------------------"
 echo "   Creating ci-privileged network"
 echo "--------------------------------------"
 docker network create --label keep --driver=bridge --opt com.docker.network.bridge.name=ci-privileged ci-privileged
+fi
 
 echo "--------------------------------------"
 echo "      Starting Nomad service"
@@ -246,6 +298,7 @@ echo "--------------------------------------"
 systemctl enable --now nomad
 systemctl status nomad
 
+if [ "${use_podman}" != "true" ]; then
 
 echo "--------------------------------------"
 echo "  Set Up Docker Garbage Collection"
@@ -310,3 +363,5 @@ docker_chain="DOCKER-USER"
 %{ endfor ~}
 /sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination "${dns_server}" -p tcp --dport 53 --jump RETURN
 /sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination "${dns_server}" -p udp --dport 53 --jump RETURN
+
+fi

@@ -26,7 +26,7 @@ resource "aws_security_group_rule" "nomad_retry_ssh_ingress" {
   description       = "Allow CircleCI to run a nomad job with Retry with SSH Access"
   security_group_id = aws_security_group.nomad_sg.id
   type              = "ingress"
-  from_port         = 64535
+  from_port         = 32768
   to_port           = 65535
   protocol          = "tcp"
   cidr_blocks       = var.allowed_ips_retry_ssh # tfsec:ignore:aws-vpc-no-public-ingress-sgr

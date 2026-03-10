@@ -309,6 +309,55 @@ revert_cgroups(){
 
 tune_io_scheduler
 system_update
+
+install ntp
+install jq
+
+if [ "${use_podman}" == "true" ]; then
+
+echo "----------------------------------------"
+echo "	Installing Podman  "
+echo "----------------------------------------"
+install podman
+
+echo "--------------------------------------"
+echo "    Configuring cgroupv2 tuning"
+echo "--------------------------------------"
+
+mkdir -p /etc/systemd/system/system.slice.d
+cat <<-EOT > /etc/systemd/system/system.slice.d/cgroup.conf
+[Slice]
+CPUWeight=1000
+IOWeight=1000
+EOT
+
+mkdir -p /etc/systemd/system/podman.service.d
+cat <<-EOT > /etc/systemd/system/podman.service.d/cgroup.conf
+[Service]
+CPUWeight=1000
+IOWeight=1000
+OOMScoreAdjust=-1000
+EOT
+
+mkdir -p /etc/systemd/system/circleci.slice.d
+cat <<-EOT > /etc/systemd/system/circleci.slice.d/cgroup.conf
+[Slice]
+CPUQuota=3400%
+TasksMax=4192256
+MemorySwapMax=0
+EOT
+
+systemctl daemon-reload
+
+# Pre-cache podman info for docker-agent
+curl -o /tmp/info-stash --unix-socket /run/podman/podman.sock http://v1.41/info || true
+
+configure_circleci
+install_nomad || (echo "=================\nFailed to install nomad\n==================\n" && exit 1)
+configure_nomad
+
+else
+
 add_docker_repo
 
 echo "----------------------------------------"
@@ -316,14 +365,10 @@ echo "	Removing Docker If Already Installed  "
 echo "----------------------------------------"
 sudo apt-get -y purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
 
-install ntp
-
 echo "----------------------------------------"
 echo "	Installing Docker  "
 echo "----------------------------------------"
 apt-get install -y docker-ce=5:28.5.2-1~ubuntu.22.04~jammy docker-ce-cli=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
-
-install jq
 
 enabled_docker_userns
 configure_circleci
@@ -354,3 +399,5 @@ echo "	Reverting Cgroup v2"
 echo "--------------------------------------"
 revert_cgroups
 reboot
+
+fi
