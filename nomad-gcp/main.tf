@@ -111,6 +111,7 @@ resource "google_compute_instance_template" "nomad" {
       log_level              = var.log_level
       external_nomad_server  = var.deploy_nomad_server_instances
       apt_retry_max_attempts = var.apt_retry_max_attempts
+      use_podman             = var.use_podman
     }
   )
 
