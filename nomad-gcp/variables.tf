@@ -195,6 +195,12 @@ variable "nomad_version" {
   default     = "1.7.7-1"
 }
 
+variable "use_podman" {
+  type        = bool
+  description = "Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2)."
+  default     = false
+}
+
 variable "apt_retry_max_attempts" {
   type        = number
   description = "Maximum number of retry attempts for apt-get commands during startup. Each attempt waits 5 seconds."

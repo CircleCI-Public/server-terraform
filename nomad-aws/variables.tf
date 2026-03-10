@@ -189,6 +189,18 @@ variable "apt_retry_max_attempts" {
   default     = 5
 }
 
+variable "use_podman" {
+  type        = bool
+  description = "Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2)."
+  default     = false
+}
+
+variable "machine_image_names_podman" {
+  type        = list(string)
+  description = "Strings to filter image names for podman nomad virtual machine images."
+  default     = ["CircleCIServerPodmanNomad*"]
+}
+
 variable "allowed_ips_retry_ssh" {
   type        = list(string)
   description = "List of IPv4 ranges that are permitted to access nomad nodes for the retry-with-ssh feature"
