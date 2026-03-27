@@ -50,7 +50,7 @@ data "cloudinit_config" "nomad_user_data" {
     content = templatefile(
       "${path.module}/template/nomad-startup.sh.tpl",
       {
-        nomad_version          = var.nomad_version
+        nomad_version          = var.nomad_client_version
         client_tls_cert        = module.nomad_tls.nomad_client_cert
         client_tls_key         = module.nomad_tls.nomad_client_key
         tls_ca                 = module.nomad_tls.nomad_tls_ca

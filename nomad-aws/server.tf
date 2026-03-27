@@ -29,6 +29,7 @@ module "server" {
   server_nlb_arn                = aws_lb.internal_nlb[0].arn
   log_level                     = var.log_level
   security_group_id             = aws_security_group.nomad_server_sg[0].id
+  nomad_version                 = var.nomad_server_version
 }
 
 

@@ -112,7 +112,7 @@ variable "max_size" {
 variable "nomad_version" {
   type        = string
   description = "The version of Nomad to install"
-  default     = "1.7.7-1"
+  default     = "1.11.3"
 }
 #
 #Tags and Names
