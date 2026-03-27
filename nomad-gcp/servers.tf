@@ -57,7 +57,7 @@ module "server" {
   health_check_unhealthy_threshold = var.health_check_unhealthy_threshold
   enable_firewall_logging          = var.enable_firewall_logging
   allowed_ips_nomad_ssh_access     = var.allowed_ips_nomad_ssh_access
-  nomad_version                    = var.nomad_version
+  nomad_version                    = var.nomad_server_version
   nomad_clients_tags               = local.tags
   gcp_cluster_ipv4_cidr            = data.google_container_cluster.k8s[0].cluster_ipv4_cidr
   gcp_cluster_network_cidr         = data.google_compute_subnetwork.k8s[0].ip_cidr_range
