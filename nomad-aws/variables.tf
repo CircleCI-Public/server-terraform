@@ -186,7 +186,7 @@ variable "nomad_client_version" {
 variable "nomad_server_version" {
   type        = string
   description = "The version of Nomad servers to install"
-  default     = "1.11.3"
+  default     = "1.11.3-1"
 }
 
 variable "apt_retry_max_attempts" {
