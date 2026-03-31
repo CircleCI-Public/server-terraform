@@ -92,10 +92,10 @@ install_nomad() {
 	log "Installing Nomad"
 	log "--------------------------------------"
 	sudo apt-get update && \
-	sudo apt-get install wget gpg coreutils
+	sudo apt-get install -y wget gpg coreutils
 	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-	sudo apt-get update && sudo apt-get install nomad=${nomad_version}
+	sudo apt-get update && sudo apt-get install -y nomad=${nomad_version}
 
 	nomad --version || ( echo "Nomad failed to install" && exit 1 )
 }
@@ -186,7 +186,7 @@ configure_nomad() {
 	WantedBy=multi-user.target
 	EOT
 
-	log "Starting up nomad" 
+	log "Starting up nomad"
 	systemctl enable --now nomad
 }
 

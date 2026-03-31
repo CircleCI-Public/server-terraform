@@ -48,8 +48,7 @@ install_nomad() {
 	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 	sudo apt-get update
 
-
-    if [ -z "$nomad_version" ] || [ "$nomad_version"=="latest" ]; then
+	if [ -z "$nomad_version" ] || [ "$nomad_version"=="latest" ]; then
 		install nomad
 	else
 		install nomad=${nomad_version}
@@ -59,7 +58,7 @@ install_nomad() {
 }
 
 configure_nomad() {
-	
+
 	##########################################################################
 	log "-----------------------------------------"
 	log "Installing TLS Certificates"
@@ -67,15 +66,15 @@ configure_nomad() {
 
 	mkdir -p /etc/nomad/ssl
 	chmod 0700 /etc/nomad/ssl
-	
+
 	cat <<-EOT > /etc/nomad/ssl/cert.pem
 	${tls_cert}
 	EOT
-	
+
 	cat <<-EOT > /etc/nomad/ssl/key.pem
 	${tls_key}
 	EOT
-	
+
 	cat <<-EOT > /etc/nomad/ssl/ca.pem
 	${tls_ca}
 	EOT
@@ -86,9 +85,9 @@ configure_nomad() {
 	log "-----------------------------------------"
 	log "Setting nomad configuration"
 	log "-----------------------------------------"
-	
+
 	mkdir -p /etc/nomad
-	
+
 	cat <<-EOT > /etc/nomad/config.hcl
 	log_level = "DEBUG"
 	name = "$(hostname)"
@@ -108,7 +107,7 @@ configure_nomad() {
     		retry_interval = "30s"
 		}
 	}
-	
+
 	telemetry {
 	  collection_interval = "1s"
 	  disable_hostname = true
