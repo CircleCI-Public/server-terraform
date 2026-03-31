@@ -46,13 +46,13 @@ install_nomad() {
 	install wget gpg coreutils zip
 	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-	sudo apt-get update && sudo apt-get install nomad=${nomad_version}
+	sudo apt-get update && sudo apt-get install -y nomad=${nomad_version}
 
 	nomad --version || ( echo "Nomad failed to install" && exit 1 )
 }
 
 configure_nomad() {
-	
+
 	##########################################################################
 	log "-----------------------------------------"
 	log "Installing TLS Certificates"
@@ -60,15 +60,15 @@ configure_nomad() {
 
 	mkdir -p /etc/ssl/nomad/
 	chmod 0700 /etc/ssl/nomad/
-	
+
 	cat <<-EOT > /etc/ssl/nomad/server.pem
 	${tls_cert}
 	EOT
-	
+
 	cat <<-EOT > /etc/ssl/nomad/key.pem
 	${tls_key}
 	EOT
-	
+
 	cat <<-EOT > /etc/ssl/nomad/ca.pem
 	${tls_ca}
 	EOT
@@ -79,7 +79,7 @@ configure_nomad() {
 	echo 'export NOMAD_CACERT=/etc/ssl/nomad/ca.pem' >> /etc/environment
 	echo 'export NOMAD_CLIENT_CERT=/etc/ssl/nomad/server.pem' >> /etc/environment
 	echo 'export NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem' >> /etc/environment
-	echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment	
+	echo "export NOMAD_ADDR=https://localhost:4646" >> /etc/environment
 
 	source /etc/environment
 	env | grep "NOMAD_"
@@ -90,9 +90,9 @@ configure_nomad() {
 	log "-----------------------------------------"
 	log "Setting nomad configuration"
 	log "-----------------------------------------"
-	
+
 	mkdir -p /etc/nomad
-	
+
 	cat <<-EOT > /etc/nomad/server.hcl
 	log_level = "DEBUG"
 	name = "$(hostname)"
@@ -112,7 +112,7 @@ configure_nomad() {
     		retry_interval = "30s"
 		}
 	}
-	
+
 	telemetry {
 	  collection_interval = "1s"
 	  disable_hostname = true
@@ -150,7 +150,7 @@ configure_nomad() {
 	Environment="NOMAD_CACERT=/etc/ssl/nomad/ca.pem"
 	Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/server.pem"
 	Environment="NOMAD_CLIENT_KEY=/etc/ssl/nomad/key.pem"
-	Environment="NOMAD_ADDR=https://localhost:4646"	
+	Environment="NOMAD_ADDR=https://localhost:4646"
 	Restart=always
 	RestartSec=30
 	TimeoutStartSec=1m
