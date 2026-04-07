@@ -31,6 +31,18 @@ data "aws_ami" "ubuntu_focal" {
   owners = var.machine_image_owners
 }
 
+data "aws_ami" "ubuntu_podman" {
+  count       = var.use_podman ? 1 : 0
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = var.machine_image_names_podman
+  }
+
+  owners = var.machine_image_owners
+}
+
 data "aws_vpc" "nomad" {
   id = var.vpc_id
 }
@@ -61,6 +73,9 @@ data "cloudinit_config" "nomad_user_data" {
         log_level              = var.log_level
         external_nomad_server  = var.deploy_nomad_server_instances
         apt_retry_max_attempts = var.apt_retry_max_attempts
+        use_podman             = var.use_podman
+        podman_cpu_quota_percent = var.podman_cpu_quota_percent
+        podman_tasks_max       = var.podman_tasks_max
       }
     )
   }
@@ -76,7 +91,7 @@ resource "aws_iam_instance_profile" "nomad_client_profile" {
 resource "aws_launch_template" "nomad_clients" {
   name_prefix   = "${var.basename}-nomad-clients-"
   instance_type = var.instance_type
-  image_id      = data.aws_ami.ubuntu_focal.id
+  image_id      = var.use_podman ? data.aws_ami.ubuntu_podman[0].id : data.aws_ami.ubuntu_focal.id
   key_name      = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
 
   network_interfaces {

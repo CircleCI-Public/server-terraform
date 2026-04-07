@@ -201,6 +201,24 @@ variable "nomad_server_version" {
   default     = "1.11.3-1"
 }
 
+variable "use_podman" {
+  type        = bool
+  description = "Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2)."
+  default     = false
+}
+
+variable "podman_cpu_quota_percent" {
+  type        = number
+  description = "Percentage of total CPUs allocated to the circleci.slice for job execution when using podman. The remaining CPUs are available for system services under contention via CPUWeight. (e.g. 90 = 90% of total CPUs)"
+  default     = 90
+}
+
+variable "podman_tasks_max" {
+  type        = string
+  description = "TasksMax (max PIDs) for the circleci.slice when using podman. Leave empty to auto-calculate as kernel pid_max minus 2048."
+  default     = ""
+}
+
 variable "apt_retry_max_attempts" {
   type        = number
   description = "Maximum number of retry attempts for apt-get commands during startup. Each attempt waits 5 seconds."
