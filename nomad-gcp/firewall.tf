@@ -6,7 +6,7 @@ resource "google_compute_firewall" "default" {
 
   allow {
     protocol = "tcp"
-    ports    = ["32768-65535"]
+    ports    = var.use_podman ? ["32768-65535"] : ["64535-65535"]
   }
 
 
