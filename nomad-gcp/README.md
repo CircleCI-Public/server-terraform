@@ -120,6 +120,8 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com) | `string` | n/a | yes |
 | <a name="input_nomad_server_port"></a> [nomad\_server\_port](#input\_nomad\_server\_port) | Port that the server endpoint listens on for nomad connections. | `number` | `4647` | no |
 | <a name="input_nomad_server_version"></a> [nomad\_server\_version](#input\_nomad\_server\_version) | The version of Nomad servers to install | `string` | `"1.11.3-1"` | no |
+| <a name="input_podman_cpu_quota_percent"></a> [podman\_cpu\_quota\_percent](#input\_podman\_cpu\_quota\_percent) | Percentage of total CPUs allocated to the circleci.slice for job execution when using podman. The remaining CPUs are available for system services under contention via CPUWeight. (e.g. 90 = 90% of total CPUs) | `number` | `90` | no |
+| <a name="input_podman_tasks_max"></a> [podman\_tasks\_max](#input\_podman\_tasks\_max) | TasksMax (max PIDs) for the circleci.slice when using podman. Leave empty to auto-calculate as kernel pid\_max minus 2048. | `string` | `""` | no |
 | <a name="input_preemptible"></a> [preemptible](#input\_preemptible) | Whether or not to use preemptible nodes | `bool` | `false` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | GCP project ID to deploy resources into. By default uses the data sourced GCP project ID. | `string` | `""` | no |
 | <a name="input_region"></a> [region](#input\_region) | GCP region to deploy nomad clients into (e.g us-east1) | `string` | n/a | yes |
@@ -133,6 +135,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_server_target_cpu_utilization"></a> [server\_target\_cpu\_utilization](#input\_server\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling for nomad server cluster | `number` | `0.8` | no |
 | <a name="input_subnetwork"></a> [subnetwork](#input\_subnetwork) | Subnetwork to deploy nomad clients into. NB. This is required if using custom subnets | `string` | `""` | no |
 | <a name="input_target_cpu_utilization"></a> [target\_cpu\_utilization](#input\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling | `number` | `0.5` | no |
+| <a name="input_use_podman"></a> [use\_podman](#input\_use\_podman) | Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2). | `bool` | `false` | no |
 | <a name="input_zone"></a> [zone](#input\_zone) | GCP compute zone to deploy nomad clients into (e.g us-east1-a) | `string` | n/a | yes |
 
 ## Outputs

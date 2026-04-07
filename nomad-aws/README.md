@@ -121,6 +121,7 @@ There are more examples in the [examples](./examples/) directory.
 | [aws_security_group_rule.nomad_traffic_sg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [random_string.key_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 | [aws_ami.ubuntu_focal](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
+| [aws_ami.ubuntu_podman](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_iam_policy_document.assume_ec2_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.ec2_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_role.existing_nomad_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_role) | data source |
@@ -152,6 +153,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_launch_template_version"></a> [launch\_template\_version](#input\_launch\_template\_version) | Specific version of the instance template | `string` | `"$Latest"` | no |
 | <a name="input_log_level"></a> [log\_level](#input\_log\_level) | Nomad Server and Client Log level | `string` | `"INFO"` | no |
 | <a name="input_machine_image_names"></a> [machine\_image\_names](#input\_machine\_image\_names) | Strings to filter image names for nomad virtual machine images. | `list(string)` | <pre>[<br/>  "CircleCIServerNomad*"<br/>]</pre> | no |
+| <a name="input_machine_image_names_podman"></a> [machine\_image\_names\_podman](#input\_machine\_image\_names\_podman) | Strings to filter image names for podman nomad virtual machine images. | `list(string)` | <pre>[<br/>  "CircleCIServerPodmanNomad*"<br/>]</pre> | no |
 | <a name="input_machine_image_owners"></a> [machine\_image\_owners](#input\_machine\_image\_owners) | List of AWS account IDs that own the images to be used for nomad virtual machines. | `list(string)` | <pre>[<br/>  "833371238208",<br/>  "535726571669"<br/>]</pre> | no |
 | <a name="input_max_nodes"></a> [max\_nodes](#input\_max\_nodes) | Maximum number of nomad clients to create. Must be greater than or equal to nodes | `number` | `5` | no |
 | <a name="input_max_server_instances"></a> [max\_server\_instances](#input\_max\_server\_instances) | Maximum number of Nomad Server instances | `number` | `7` | no |
@@ -161,6 +163,8 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_nomad_server_hostname"></a> [nomad\_server\_hostname](#input\_nomad\_server\_hostname) | Hostname of RPC service of Nomad control plane (e.g circleci.example.com). | `string` | n/a | yes |
 | <a name="input_nomad_server_port"></a> [nomad\_server\_port](#input\_nomad\_server\_port) | Port that the server endpoint listens on for nomad connections. | `number` | `4647` | no |
 | <a name="input_nomad_server_version"></a> [nomad\_server\_version](#input\_nomad\_server\_version) | The version of Nomad servers to install | `string` | `"1.11.3-1"` | no |
+| <a name="input_podman_cpu_quota_percent"></a> [podman\_cpu\_quota\_percent](#input\_podman\_cpu\_quota\_percent) | Percentage of total CPUs allocated to the circleci.slice for job execution when using podman. The remaining CPUs are available for system services under contention via CPUWeight. (e.g. 90 = 90% of total CPUs) | `number` | `90` | no |
+| <a name="input_podman_tasks_max"></a> [podman\_tasks\_max](#input\_podman\_tasks\_max) | TasksMax (max PIDs) for the circleci.slice when using podman. Leave empty to auto-calculate as kernel pid\_max minus 2048. | `string` | `""` | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the role to add to the instance profile | `string` | `null` | no |
 | <a name="input_security_group_id"></a> [security\_group\_id](#input\_security\_group\_id) | ID for the security group for Nomad clients.<br/>See security documentation for recommendations. | `list(string)` | `[]` | no |
 | <a name="input_server_disk_size_gb"></a> [server\_disk\_size\_gb](#input\_server\_disk\_size\_gb) | Disk size for nomad server instances | `number` | `20` | no |
@@ -169,6 +173,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes. Both clients and servers when deployed | `string` | `null` | no |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet ID | `string` | `""` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Subnet IDs | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
+| <a name="input_use_podman"></a> [use\_podman](#input\_use\_podman) | Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2). | `bool` | `false` | no |
 | <a name="input_volume_type"></a> [volume\_type](#input\_volume\_type) | The EBS volume type of the node. If gp3 is not available in your desired region, switch to gp2 | `string` | `"gp3"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |
 
