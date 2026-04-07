@@ -74,6 +74,8 @@ data "cloudinit_config" "nomad_user_data" {
         external_nomad_server  = var.deploy_nomad_server_instances
         apt_retry_max_attempts = var.apt_retry_max_attempts
         use_podman             = var.use_podman
+        podman_cpu_quota_percent = var.podman_cpu_quota_percent
+        podman_tasks_max       = var.podman_tasks_max
       }
     )
   }

@@ -201,6 +201,18 @@ variable "use_podman" {
   default     = false
 }
 
+variable "podman_cpu_quota_percent" {
+  type        = number
+  description = "Percentage of total CPUs allocated to the circleci.slice for job execution when using podman. The remaining CPUs are available for system services under contention via CPUWeight. (e.g. 90 = 90% of total CPUs)"
+  default     = 90
+}
+
+variable "podman_tasks_max" {
+  type        = string
+  description = "TasksMax (max PIDs) for the circleci.slice when using podman. Leave empty to auto-calculate as kernel pid_max minus 2048."
+  default     = ""
+}
+
 variable "machine_image_names_podman" {
   type        = list(string)
   description = "Strings to filter image names for podman nomad virtual machine images."

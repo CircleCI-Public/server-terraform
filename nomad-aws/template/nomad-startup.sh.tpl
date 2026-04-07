@@ -95,13 +95,28 @@ IOWeight=1000
 OOMScoreAdjust=-1000
 EOT
 
+# Calculate circleci.slice cgroup limits
+# CPUQuota = nproc * podman_cpu_quota_percent. CPUWeight on system.slice handles contention.
+total_cpus=$(nproc)
+CIRCLECI_CPU_QUOTA="$((total_cpus * ${podman_cpu_quota_percent}))%"
+
+if [ -n "${podman_tasks_max}" ]; then
+    CIRCLECI_TASKS_MAX="${podman_tasks_max}"
+else
+    # Auto-calculate: kernel pid_max minus 2048 system reserve
+    max_pids=$(cat /proc/sys/kernel/pid_max)
+    CIRCLECI_TASKS_MAX=$((max_pids - 2048))
+fi
+
 mkdir -p /etc/systemd/system/circleci.slice.d
 cat <<EOT > /etc/systemd/system/circleci.slice.d/cgroup.conf
 [Slice]
-CPUQuota=3400%
-TasksMax=4192256
+CPUQuota=$CIRCLECI_CPU_QUOTA
+TasksMax=$CIRCLECI_TASKS_MAX
 MemorySwapMax=0
 EOT
+
+echo "circleci.slice: CPUQuota=$CIRCLECI_CPU_QUOTA TasksMax=$CIRCLECI_TASKS_MAX"
 
 # Ubuntu 22.04 LLVM sanitizer workaround
 # See https://github.com/google/sanitizers/issues/1716#issuecomment-2010399341
