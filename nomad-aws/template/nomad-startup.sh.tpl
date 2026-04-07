@@ -182,7 +182,7 @@ echo "Custom CA certificate installed successfully"
 if [ "${use_podman}" == "true" ]; then
     systemctl restart podman || true
 else
-    service docker restart
+    systemctl restart docker
     sleep 5
 fi
 %{ endif ~}
