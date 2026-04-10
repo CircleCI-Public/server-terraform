@@ -73,14 +73,14 @@ There are more examples in the [examples](./examples/) directory.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0 |
 | <a name="requirement_cloudinit"></a> [cloudinit](#requirement\_cloudinit) | >=2.3 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0 |
 | <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | >=2.3 |
 | <a name="provider_random"></a> [random](#provider\_random) | n/a |
 
