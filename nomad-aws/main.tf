@@ -76,6 +76,7 @@ data "cloudinit_config" "nomad_user_data" {
         use_podman               = var.use_podman
         podman_cpu_quota_percent = var.podman_cpu_quota_percent
         podman_tasks_max         = var.podman_tasks_max
+        custom_ca_cert           = var.custom_ca_cert
       }
     )
   }
