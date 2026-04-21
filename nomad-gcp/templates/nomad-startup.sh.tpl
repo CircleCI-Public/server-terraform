@@ -29,6 +29,12 @@ system_update() {
 	log "--------------------------------------"
 	log "Updating system"
 	log "--------------------------------------"
+	# Stop unattended-upgrades and wait for dpkg lock to avoid conflicts on first boot
+	systemctl stop unattended-upgrades 2>/dev/null || true
+	while ! flock -n /var/lib/dpkg/lock-frontend -c true 2>/dev/null; do
+		echo "Waiting for dpkg lock to be released..."
+		sleep 10
+	done
 	apt-get update && apt-get -y upgrade
 }
 
