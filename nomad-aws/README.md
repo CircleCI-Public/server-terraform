@@ -50,7 +50,12 @@ module "nomad" {
   # for more info, visit - https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html
   enable_irsa = {}
 
+  # Option 1: provide a public key and terraform will create a new AWS Key Pair
   ssh_key = "<< public key to be placed on each nomad client >>"
+
+  # Option 2: use a pre-existing AWS Key Pair by name (mutually exclusive with ssh_key)
+  # ssh_key_name = "<< name of existing AWS Key Pair >>"
+
   basename = "<< name prefix for nomad clients >>"
 
   enable_imdsv2 = "<< optional/required >>"
@@ -170,7 +175,8 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_server_disk_size_gb"></a> [server\_disk\_size\_gb](#input\_server\_disk\_size\_gb) | Disk size for nomad server instances | `number` | `20` | no |
 | <a name="input_server_machine_type"></a> [server\_machine\_type](#input\_server\_machine\_type) | The instance type of the EC2 Nomad Servers. | `string` | `"t3a.medium"` | no |
 | <a name="input_server_public_ip"></a> [server\_public\_ip](#input\_server\_public\_ip) | Should the Nomad Server EC2 instances have a public IP? | `bool` | `false` | no |
-| <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes. Both clients and servers when deployed | `string` | `null` | no |
+| <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes. Both clients and servers when deployed. Mutually exclusive with ssh\_key\_name. | `string` | `null` | no |
+| <a name="input_ssh_key_name"></a> [ssh\_key\_name](#input\_ssh\_key\_name) | Name of a pre-existing AWS Key Pair to use for nomad nodes. Mutually exclusive with ssh\_key. | `string` | `null` | no |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet ID | `string` | `""` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Subnet IDs | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
 | <a name="input_use_podman"></a> [use\_podman](#input\_use\_podman) | Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2). | `bool` | `false` | no |

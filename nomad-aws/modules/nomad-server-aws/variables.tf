@@ -45,7 +45,13 @@ variable "launch_template_instance_type" {
 
 variable "ssh_key" {
   type        = string
-  description = "The SSH key you'd like to be on the Nomad Server instances."
+  description = "The SSH key you'd like to be on the Nomad Server instances. Mutually exclusive with ssh_key_name."
+  default     = null
+}
+
+variable "ssh_key_name" {
+  type        = string
+  description = "Name of a pre-existing AWS Key Pair to use for Nomad Server instances. Mutually exclusive with ssh_key."
   default     = null
 }
 

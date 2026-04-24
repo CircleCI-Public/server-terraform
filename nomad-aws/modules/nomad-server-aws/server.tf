@@ -25,7 +25,7 @@ resource "aws_launch_template" "nomad-servers" {
   tags                   = local.tags
   user_data              = data.cloudinit_config.nomad_server_user_data.rendered
   update_default_version = true
-  key_name               = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
+  key_name               = var.ssh_key_name != null ? var.ssh_key_name : (var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null)
   metadata_options {
     http_tokens = var.enable_imdsv2
   }

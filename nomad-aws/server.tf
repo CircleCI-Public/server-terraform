@@ -21,6 +21,7 @@ module "server" {
   launch_template_instance_type = var.server_machine_type
   tags                          = var.instance_tags
   ssh_key                       = var.ssh_key
+  ssh_key_name                  = var.ssh_key_name
   public_ip                     = var.server_public_ip
   random_string_suffix          = random_string.key_suffix.result
   launch_template_version       = var.launch_template_version

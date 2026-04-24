@@ -87,7 +87,13 @@ variable "instance_type" {
 
 variable "ssh_key" {
   type        = string
-  description = "SSH Public key to access nomad nodes. Both clients and servers when deployed"
+  description = "SSH Public key to access nomad nodes. Both clients and servers when deployed. Mutually exclusive with ssh_key_name."
+  default     = null
+}
+
+variable "ssh_key_name" {
+  type        = string
+  description = "Name of a pre-existing AWS Key Pair to use for nomad nodes. Mutually exclusive with ssh_key."
   default     = null
 }
 
