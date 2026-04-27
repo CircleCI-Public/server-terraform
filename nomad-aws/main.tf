@@ -92,7 +92,7 @@ resource "aws_launch_template" "nomad_clients" {
   name_prefix   = "${var.basename}-nomad-clients-"
   instance_type = var.instance_type
   image_id      = var.use_podman ? data.aws_ami.ubuntu_podman[0].id : data.aws_ami.ubuntu_focal.id
-  key_name      = var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null
+  key_name      = var.ssh_key_name != null ? var.ssh_key_name : (var.ssh_key != null ? aws_key_pair.ssh_key[0].id : null)
 
   network_interfaces {
     associate_public_ip_address = var.client_public_ip

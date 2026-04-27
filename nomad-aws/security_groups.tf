@@ -45,7 +45,7 @@ resource "aws_security_group_rule" "nomad_traffic_sg" {
 
 
 resource "aws_security_group_rule" "nomad_ssh_sg" {
-  count             = var.ssh_key != null ? 1 : 0
+  count             = (var.ssh_key != null || var.ssh_key_name != null) ? 1 : 0
   description       = "Allow CircleCI Server to SSH into nomad instances"
   security_group_id = aws_security_group.nomad_sg.id
   type              = "ingress"
