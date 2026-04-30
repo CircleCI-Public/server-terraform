@@ -29,6 +29,11 @@ system_update() {
 	apt-get update && apt-get -y upgrade
 }
 
+mitigate_cve_2026_31431() {
+  echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
+  rmmod algif_aead 2>/dev/null || true
+}
+
 install() {
 	package=$@
 	log "-----------------------------------------"
@@ -173,6 +178,7 @@ configure_nomad() {
 
 tune_io_scheduler
 system_update
+mitigate_cve_2026_31431
 install ntp
 install jq
 
