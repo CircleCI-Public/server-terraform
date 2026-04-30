@@ -56,6 +56,11 @@ install() {
 	retry apt-get install -y $${package}
 }
 
+mitigate_cve_2026_31431() {
+  echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
+  rmmod algif_aead 2>/dev/null || true
+}
+
 add_docker_repo() {
 	apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -309,6 +314,10 @@ revert_cgroups(){
 
 tune_io_scheduler
 system_update
+mitigate_cve_2026_31431
+
+install ntp
+install jq
 add_docker_repo
 
 echo "----------------------------------------"
@@ -316,14 +325,10 @@ echo "	Removing Docker If Already Installed  "
 echo "----------------------------------------"
 sudo apt-get -y purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
 
-install ntp
-
 echo "----------------------------------------"
 echo "	Installing Docker  "
 echo "----------------------------------------"
 apt-get install -y docker-ce=5:28.5.2-1~ubuntu.22.04~jammy docker-ce-cli=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
-
-install jq
 
 enabled_docker_userns
 configure_circleci
