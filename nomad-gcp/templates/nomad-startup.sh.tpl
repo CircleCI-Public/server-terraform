@@ -40,6 +40,10 @@ install() {
 	apt-get install -y $${package}
 }
 
+mitigate_cve_2026_31431() {
+  echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
+  rmmod algif_aead 2>/dev/null || true
+}
 
 add_docker_repo() {
 	apt-get install -y apt-transport-https ca-certificates curl software-properties-common
@@ -251,6 +255,8 @@ revert_cgroups(){
 
 tune_io_scheduler
 system_update
+mitigate_cve_2026_31431
+
 add_docker_repo
 
 install ntp
