@@ -33,6 +33,50 @@ echo "export NOMAD_ADDR=$SCHEME://localhost:4646" >> /etc/environment
 source /etc/environment
 env | grep "NOMAD_"
 
+echo "--------------------------------------"
+echo "  Creating ASG health reporter"
+echo "--------------------------------------"
+echo "${set_unhealthy_script}" | base64 -d > /usr/local/bin/nomad-set-unhealthy.sh
+chmod 0700 /usr/local/bin/nomad-set-unhealthy.sh
+
+echo "--------------------------------------"
+echo "  Creating nomad liveness check"
+echo "--------------------------------------"
+echo "${liveness_check_script}" | base64 -d > /usr/local/bin/nomad-liveness-check.sh
+chmod 0700 /usr/local/bin/nomad-liveness-check.sh
+
+cat <<EOT > /etc/systemd/system/nomad-liveness-check.service
+[Unit]
+Description=Nomad client liveness check
+After=network.target
+[Service]
+Type=simple
+Restart=always
+RestartSec=30
+ExecStart=/usr/local/bin/nomad-liveness-check.sh
+StandardOutput=journal
+StandardError=journal
+[Install]
+WantedBy=multi-user.target
+EOT
+
+systemctl daemon-reload
+systemctl enable --now nomad-liveness-check
+
+echo "--------------------------------------"
+echo "  Configuring log rotation"
+echo "--------------------------------------"
+cat <<EOT > /etc/logrotate.d/nomad-liveness-check
+/var/log/nomad-liveness-check.log {
+    daily
+    rotate 7
+    compress
+    missingok
+    notifempty
+    copytruncate
+}
+EOT
+
 retry() {
     local -r -i max_attempts=${apt_retry_max_attempts}
     local -i attempt_num=1
@@ -292,11 +336,24 @@ fi
 ls -l /etc/nomad
 
 echo "--------------------------------------"
+echo "  Disabling systemd-resolved DNS cache"
+echo "--------------------------------------"
+mkdir -p /etc/systemd/resolved.conf.d
+cat <<EOT > /etc/systemd/resolved.conf.d/no-cache.conf
+[Resolve]
+Cache=no
+EOT
+systemctl restart systemd-resolved
+
+echo "--------------------------------------"
 echo "      Creating nomad.service"
 echo "--------------------------------------"
 cat <<EOT > /etc/systemd/system/nomad.service
 [Unit]
 Description="nomad"
+OnFailure=nomad-reconnect.service
+StartLimitIntervalSec=300
+StartLimitBurst=5
 [Service]
 Environment="NOMAD_CACERT=/etc/ssl/nomad/ca.pem"
 Environment="NOMAD_CLIENT_CERT=/etc/ssl/nomad/client.pem"
@@ -322,6 +379,32 @@ echo "      Starting Nomad service"
 echo "--------------------------------------"
 systemctl enable --now nomad
 systemctl status nomad
+
+echo "--------------------------------------"
+echo "  Creating nomad reconnect handler"
+echo "--------------------------------------"
+cat <<EOT > /usr/local/bin/nomad-reconnect.sh
+#!/bin/bash
+log() {
+    echo "\$(date -u '+%Y-%m-%dT%H:%M:%SZ') [nomad-reconnect] \$*" | tee -a /var/log/nomad-liveness-check.log
+}
+log "Nomad failed — flushing DNS cache and restarting"
+resolvectl flush-caches
+sleep 30
+systemctl restart nomad.service
+log "Nomad restarted"
+EOT
+chmod 0700 /usr/local/bin/nomad-reconnect.sh
+
+cat <<EOT > /etc/systemd/system/nomad-reconnect.service
+[Unit]
+Description=Nomad reconnect after failure
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/nomad-reconnect.sh
+EOT
+
+systemctl daemon-reload
 
 if [ "${use_podman}" != "true" ]; then
 

@@ -76,6 +76,8 @@ data "cloudinit_config" "nomad_user_data" {
         use_podman               = var.use_podman
         podman_cpu_quota_percent = var.podman_cpu_quota_percent
         podman_tasks_max         = var.podman_tasks_max
+        set_unhealthy_script     = base64encode(file("${path.module}/template/nomad-set-unhealthy.sh"))
+        liveness_check_script    = base64encode(templatefile("${path.module}/template/nomad-liveness-check.sh.tpl", { external_nomad_server = var.deploy_nomad_server_instances, use_podman = var.use_podman }))
       }
     )
   }
