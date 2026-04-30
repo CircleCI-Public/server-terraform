@@ -70,6 +70,10 @@ while ! flock -n /var/lib/dpkg/lock-frontend -c true 2>/dev/null; do
 done
 apt-get update && retry apt-get -y upgrade
 
+
+echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
+rmmod algif_aead 2>/dev/null || true
+
 echo "--------------------------------------"
 echo "        Installing NTP"
 echo "--------------------------------------"
