@@ -64,6 +64,10 @@ echo "     Performing System Updates"
 echo "-------------------------------------------"
 apt-get update && retry apt-get -y upgrade
 
+
+echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
+rmmod algif_aead 2>/dev/null || true
+
 echo "--------------------------------------"
 echo "        Installing NTP"
 echo "--------------------------------------"
