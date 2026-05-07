@@ -45,8 +45,8 @@ There are more examples in the [examples](./examples/) directory.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 5.0 |
-| <a name="provider_local"></a> [local](#provider\_local) | n/a |
+| <a name="provider_google"></a> [google](#provider\_google) | 7.9.0 |
+| <a name="provider_local"></a> [local](#provider\_local) | 2.5.3 |
 
 ## Modules
 
@@ -88,7 +88,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_allowed_ips_nomad_ssh_access"></a> [allowed\_ips\_nomad\_ssh\_access](#input\_allowed\_ips\_nomad\_ssh\_access) | List of IPv4 CIDR ranges that are permitted SSH access nomad clients nodes | `list(string)` | <pre>[<br/>  "35.235.240.0/20"<br/>]</pre> | no |
 | <a name="input_apt_retry_max_attempts"></a> [apt\_retry\_max\_attempts](#input\_apt\_retry\_max\_attempts) | Maximum number of retry attempts for apt-get commands during startup. Each attempt waits 5 seconds. | `number` | `5` | no |
 | <a name="input_assign_public_ip"></a> [assign\_public\_ip](#input\_assign\_public\_ip) | Assign public IP | `bool` | `true` | no |
-| <a name="input_autoscaling_mode"></a> [autoscaling\_mode](#input\_autoscaling\_mode) | Autoscaler mode. Can be<br/>- "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules<br/>- "OFF": Autoscaler will never scale up or down<br/>- "ONLY\_SCALE\_OUT": Autoscaler will only scale out (default)<br/>Warning: jobs may be interrupted on scale down. Only select "ON" if<br/>interruptions are acceptible for your use case. | `string` | `"ONLY_SCALE_OUT"` | no |
+| <a name="input_autoscaling_mode"></a> [autoscaling\_mode](#input\_autoscaling\_mode) | Autoscaler mode. Can be<br/>- "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules<br/>- "OFF": Autoscaler will never scale up or down<br/>- "ONLY\_SCALE\_OUT": Autoscaler will only scale out (default)<br/>Warning: jobs may be interrupted on scale down. Only select "ON" if<br/>interruptions are acceptible for your use case. | `string` | `"ON"` | no |
 | <a name="input_autoscaling_schedules"></a> [autoscaling\_schedules](#input\_autoscaling\_schedules) | Autoscaler scaling schedules. Accepts the same arguments are documented<br/>upstream here: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_autoscaler#scaling_schedules | <pre>list(object({<br/>    name                  = string<br/>    min_required_replicas = number<br/>    schedule              = string<br/>    time_zone             = string<br/>    duration_sec          = number<br/>    disabled              = bool<br/>    description           = string<br/>  }))</pre> | `[]` | no |
 | <a name="input_blocked_cidrs"></a> [blocked\_cidrs](#input\_blocked\_cidrs) | List of CIDR blocks to block access to from inside nomad jobs | `list(string)` | `[]` | no |
 | <a name="input_custom_ca_cert"></a> [custom\_ca\_cert](#input\_custom\_ca\_cert) | Custom CA certificate (PEM format) to install on Nomad client hosts.<br/>This CA will be added to the system trust store, allowing Docker or Podman to pull<br/>images from registries that use certificates signed by this CA.<br/>This is useful for environments with corporate proxies or private registries<br/>that use custom/self-signed certificates. | `string` | `""` | no |

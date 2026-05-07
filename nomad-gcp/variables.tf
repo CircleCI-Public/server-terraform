@@ -89,7 +89,7 @@ variable "nomad_auto_scaler" {
 
 variable "autoscaling_mode" {
   type        = string
-  default     = "ONLY_SCALE_OUT"
+  default     = "ON"
   description = <<-EOF
     Autoscaler mode. Can be
     - "ON": Autoscaler will scale up and down to reach cpu target and react to cron schedules

@@ -115,6 +115,8 @@ resource "google_compute_instance_template" "nomad" {
       podman_cpu_quota_percent = var.podman_cpu_quota_percent
       podman_tasks_max         = var.podman_tasks_max
       custom_ca_cert           = var.custom_ca_cert
+      set_unhealthy_script     = base64encode(file("${path.module}/templates/nomad-set-unhealthy.sh"))
+      liveness_check_script    = base64encode(templatefile("${path.module}/templates/nomad-liveness-check.sh.tpl", { external_nomad_server = var.deploy_nomad_server_instances, use_podman = var.use_podman }))
     }
   )
 
@@ -150,7 +152,7 @@ resource "google_compute_instance_template" "nomad" {
   service_account {
     # https://developers.google.com/identity/protocols/googlescopes
     scopes = [
-      "https://www.googleapis.com/auth/compute.readonly",
+      "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/logging.write",
     ]
   }
