@@ -107,7 +107,7 @@ jobs:
           name: Check if docs need to be updated
           command: |
             set +eo pipefail
-            git diff --quiet nomad-aws/README.md nomad-gcp/README.md
+            git diff nomad-aws/README.md nomad-gcp/README.md
             if [ $? -ne 0 ]; then
               echo "There have been docs changes. Please run the 'make docs' command locally."
               exit 1
