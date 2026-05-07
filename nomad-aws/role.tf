@@ -3,6 +3,10 @@ data "aws_iam_policy_document" "ec2_policy" {
     actions   = ["ec2:DescribeInstances"]
     resources = ["*"]
   }
+  statement {
+    actions   = ["autoscaling:SetInstanceHealth"]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_policy" "describe_ec2_policy" {
