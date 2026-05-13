@@ -57,17 +57,15 @@ resource "tls_cert_request" "nomad_client" {
     organization = "nomad:client"
   }
 
-  dns_names = [
+  dns_names = concat([
     "client.global.nomad",
     "localhost",
     "nomad-server",
     "nomad-server-*.global",
-    "${var.nomad_server_hostname}"
-  ]
+    var.nomad_server_hostname,
+  ], var.additional_dns_sans)
 
-  ip_addresses = [
-    "127.0.0.1",
-  ]
+  ip_addresses = concat(["127.0.0.1"], var.additional_ip_sans)
 }
 
 resource "tls_locally_signed_cert" "nomad_client" {
@@ -100,17 +98,15 @@ resource "tls_cert_request" "nomad_server" {
   }
 
 
-  dns_names = [
+  dns_names = concat([
     "server.global.nomad",
     "localhost",
     "nomad-server",
     "nomad-server-*.global",
-    "${var.nomad_server_hostname}"
-  ]
+    var.nomad_server_hostname,
+  ], var.additional_dns_sans)
 
-  ip_addresses = [
-    "127.0.0.1",
-  ]
+  ip_addresses = concat(["127.0.0.1"], var.additional_ip_sans)
 }
 
 resource "tls_locally_signed_cert" "nomad_server" {
