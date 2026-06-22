@@ -113,12 +113,54 @@ configure_circleci() {
 	fi
 }
 
+setup_liveness_check() {
+	log "----------------------------------------------"
+	log "Setting up Nomad liveness check"
+	log "----------------------------------------------"
+	echo "${set_unhealthy_script}" | base64 -d > /usr/local/bin/nomad-set-unhealthy.sh
+	chmod 0700 /usr/local/bin/nomad-set-unhealthy.sh
+
+	echo "${liveness_check_script}" | base64 -d > /usr/local/bin/nomad-liveness-check.sh
+	chmod 0700 /usr/local/bin/nomad-liveness-check.sh
+
+	cat <<-EOT > /etc/systemd/system/nomad-liveness-check.service
+	[Unit]
+	Description=Nomad client liveness check
+	After=network.target
+	[Service]
+	Type=simple
+	Restart=always
+	RestartSec=30
+	StartLimitIntervalSec=3600
+	StartLimitBurst=3
+	ExecStart=/usr/local/bin/nomad-liveness-check.sh
+	StandardOutput=journal
+	StandardError=journal
+	[Install]
+	WantedBy=multi-user.target
+	EOT
+
+	cat <<-EOT > /etc/logrotate.d/nomad-liveness-check
+	/var/log/nomad-liveness-check.log {
+	    daily
+	    rotate 7
+	    compress
+	    missingok
+	    notifempty
+	    copytruncate
+	}
+	EOT
+
+	systemctl daemon-reload
+	systemctl enable --now nomad-liveness-check
+}
+
 install_nomad() {
 	log "----------------------------------------------"
 	log "Installing Nomad version ${nomad_version}"
 	log "----------------------------------------------"
 	sudo apt-get update && \
-	sudo apt-get install -y wget gpg coreutils
+	sudo apt-get install -y wget gpg coreutils jq
 	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 	sudo apt-get update && sudo apt-get install -y nomad=${nomad_version}
@@ -157,50 +199,6 @@ configure_nomad() {
 
 	source /etc/environment
 	env | grep "NOMAD_"
-
-	echo "--------------------------------------"
-	echo "  Creating MIG health reporter"
-	echo "--------------------------------------"
-	echo "${set_unhealthy_script}" | base64 -d > /usr/local/bin/nomad-set-unhealthy.sh
-	chmod 0700 /usr/local/bin/nomad-set-unhealthy.sh
-
-	echo "--------------------------------------"
-	echo "  Creating nomad liveness check"
-	echo "--------------------------------------"
-	echo "${liveness_check_script}" | base64 -d > /usr/local/bin/nomad-liveness-check.sh
-	chmod 0700 /usr/local/bin/nomad-liveness-check.sh
-
-	cat <<-EOT > /etc/systemd/system/nomad-liveness-check.service
-	[Unit]
-	Description=Nomad client liveness check
-	After=network.target
-	[Service]
-	Type=simple
-	Restart=always
-	RestartSec=30
-	ExecStart=/usr/local/bin/nomad-liveness-check.sh
-	StandardOutput=journal
-	StandardError=journal
-	[Install]
-	WantedBy=multi-user.target
-	EOT
-
-	systemctl daemon-reload
-	systemctl enable --now nomad-liveness-check
-
-	echo "--------------------------------------"
-	echo "  Configuring log rotation"
-	echo "--------------------------------------"
-	cat <<-EOT > /etc/logrotate.d/nomad-liveness-check
-	/var/log/nomad-liveness-check.log {
-	    daily
-	    rotate 7
-	    compress
-	    missingok
-	    notifempty
-	    copytruncate
-	}
-	EOT
 
 	log "Setting nomad configuration"
 	mkdir -p /etc/nomad
@@ -475,6 +473,7 @@ curl -o /tmp/info-stash --unix-socket /run/podman/podman.sock http://v1.41/info 
 %{ endif ~}
 
 configure_circleci
+setup_liveness_check
 install_nomad || (echo "=================\nFailed to install nomad\n==================\n" && exit 1)
 configure_nomad
 
@@ -507,6 +506,7 @@ systemctl restart docker
 %{ endif ~}
 
 configure_circleci
+setup_liveness_check
 install_nomad || (echo "=================\nFailed to install nomad\n==================\n" && exit 1)
 configure_nomad
 
