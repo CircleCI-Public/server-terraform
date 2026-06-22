@@ -84,13 +84,15 @@ data "cloudinit_config" "nomad_server_user_data" {
     content_type = "text/x-shellscript"
     content = templatefile("${path.module}/templates/nomad-server-startup.sh.tpl",
       {
-        tls_cert          = var.tls_cert
-        tls_key           = var.tls_key
-        tls_ca            = var.tls_ca
-        bootstrap_expect  = var.desired_capacity
-        server_retry_join = var.server_retry_join
-        nomad_version     = var.nomad_version
-        log_level         = var.log_level
+        tls_cert              = var.tls_cert
+        tls_key               = var.tls_key
+        tls_ca                = var.tls_ca
+        bootstrap_expect      = var.desired_capacity
+        server_retry_join     = var.server_retry_join
+        nomad_version         = var.nomad_version
+        log_level             = var.log_level
+        set_unhealthy_script  = base64encode(file("${path.module}/templates/nomad-set-unhealthy.sh"))
+        liveness_check_script = base64encode(file("${path.module}/templates/nomad-server-liveness-check.sh"))
       }
     )
   }

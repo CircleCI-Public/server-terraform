@@ -1,6 +1,6 @@
 resource "aws_iam_policy" "describe_ec2_policy" {
   name        = "${var.basename}-circleci-nomad-server-role-policy"
-  description = "Policy to allow ec2:DescribeInstances"
+  description = "Policy to allow ec2:DescribeInstances and autoscaling:SetInstanceHealth"
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -8,6 +8,11 @@ resource "aws_iam_policy" "describe_ec2_policy" {
       {
         Effect   = "Allow"
         Action   = "ec2:DescribeInstances"
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = "autoscaling:SetInstanceHealth"
         Resource = "*"
       }
     ]
