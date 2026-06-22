@@ -42,13 +42,56 @@ install() {
 	apt-get install -y $${package}
 }
 
+setup_liveness_check() {
+	log "-----------------------------------------"
+	log "Setting up Nomad liveness check"
+	log "-----------------------------------------"
+
+	echo "${set_unhealthy_script}" | base64 -d > /usr/local/bin/nomad-set-unhealthy.sh
+	chmod 0700 /usr/local/bin/nomad-set-unhealthy.sh
+
+	echo "${liveness_check_script}" | base64 -d > /usr/local/bin/nomad-liveness-check.sh
+	chmod 0700 /usr/local/bin/nomad-liveness-check.sh
+
+	cat <<-EOT > /etc/systemd/system/nomad-liveness-check.service
+	[Unit]
+	Description=Nomad server liveness check
+	After=network.target
+	[Service]
+	Type=simple
+	Restart=always
+	RestartSec=30
+	StartLimitIntervalSec=3600
+	StartLimitBurst=3
+	ExecStart=/usr/local/bin/nomad-liveness-check.sh
+	StandardOutput=journal
+	StandardError=journal
+	[Install]
+	WantedBy=multi-user.target
+	EOT
+
+	cat <<-EOT > /etc/logrotate.d/nomad-liveness-check
+	/var/log/nomad-liveness-check.log {
+	    daily
+	    rotate 7
+	    compress
+	    missingok
+	    notifempty
+	    copytruncate
+	}
+	EOT
+
+	systemctl daemon-reload
+	systemctl enable --now nomad-liveness-check
+}
+
 
 install_nomad() {
 	log "-----------------------------------------"
 	log "Installing Nomad Server"
 	log "-----------------------------------------"
 
-	install wget gpg coreutils zip
+	install wget gpg coreutils zip jq
 	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 	sudo apt-get update && sudo apt-get install -y nomad=${nomad_version}
@@ -158,6 +201,8 @@ configure_nomad() {
 	Environment="NOMAD_ADDR=https://localhost:4646"
 	Restart=always
 	RestartSec=30
+	StartLimitIntervalSec=300
+	StartLimitBurst=5
 	TimeoutStartSec=1m
 	ExecStart=/usr/bin/nomad agent -server -config /etc/nomad/server.hcl
 	[Install]
@@ -182,5 +227,6 @@ mitigate_cve_2026_31431
 install ntp
 install jq
 
+setup_liveness_check
 install_nomad || exit 1
 configure_nomad

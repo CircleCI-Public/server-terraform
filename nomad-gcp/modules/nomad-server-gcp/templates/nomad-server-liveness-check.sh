@@ -26,56 +26,47 @@ check_nomad_installed() {
 
 mark_unhealthy() {
     log "$1 — marking instance for recreation in MIG"
-    if /usr/local/bin/nomad-set-unhealthy.sh "$GCP_INSTANCE_NAME" 2>/dev/null; then
+    local exit_code
+    /usr/local/bin/nomad-set-unhealthy.sh "$GCP_INSTANCE_NAME" 2>/dev/null
+    exit_code=$?
+    if [ "$exit_code" -eq 0 ]; then
         log "Instance $GCP_INSTANCE_NAME marked for recreation in MIG"
+        sleep 600
     else
-        log "Failed to mark instance for recreation (no service account or not in a MIG)"
+        log "Failed to mark instance for recreation (exit $exit_code) — will retry sooner"
+        sleep 60
     fi
-    sleep 600
-}
-
-check_container_runtime() {
-%{ if use_podman ~}
-    [ -x /usr/bin/podman ] && systemctl is-active --quiet podman
-%{ else ~}
-    [ -x /usr/bin/docker ] && systemctl is-active --quiet docker
-%{ endif ~}
 }
 
 check_server_reachable() {
     local leader
-%{ if external_nomad_server ~}
     leader=$(curl -sf --max-time 10 \
         --cacert /etc/ssl/nomad/ca.pem \
-        --cert /etc/ssl/nomad/client.pem \
+        --cert /etc/ssl/nomad/server.pem \
         --key /etc/ssl/nomad/key.pem \
         "https://localhost:4646/v1/status/leader" 2>/dev/null | tr -d '"') || return 1
-%{ else ~}
-    leader=$(curl -sf --max-time 10 "http://localhost:4646/v1/status/leader" 2>/dev/null | tr -d '"') || return 1
-%{ endif ~}
     if [ -z "$leader" ]; then
         log "No leader elected — cluster may have lost quorum"
         return 2
     fi
     if [ "$leader" != "$LAST_LEADER" ]; then
-        log "Nomad server leader: $leader"
-        LAST_LEADER=$leader
+        log "Leader: $leader"
+        LAST_LEADER="$leader"
     fi
     return 0
 }
 
 check_cluster_membership() {
-    [ -z "$LOCAL_IP" ] && return 0
+    if [ -z "$LOCAL_IP" ]; then
+        log "WARNING: LOCAL_IP unavailable (metadata service unreachable) — skipping membership check"
+        return 0
+    fi
     local peers
-%{ if external_nomad_server ~}
     peers=$(curl -sf --max-time 10 \
         --cacert /etc/ssl/nomad/ca.pem \
-        --cert /etc/ssl/nomad/client.pem \
+        --cert /etc/ssl/nomad/server.pem \
         --key /etc/ssl/nomad/key.pem \
         "https://localhost:4646/v1/status/peers" 2>/dev/null) || return 0
-%{ else ~}
-    peers=$(curl -sf --max-time 10 "http://localhost:4646/v1/status/peers" 2>/dev/null) || return 0
-%{ endif ~}
     if ! echo "$peers" | grep -q "$LOCAL_IP"; then
         log "This server ($LOCAL_IP) is not in the Nomad peer list: $peers"
         return 1
@@ -83,15 +74,26 @@ check_cluster_membership() {
     return 0
 }
 
+check_disk_space() {
+    [ -d /opt/nomad ] || return 0
+    local used_pct
+    used_pct=$(df /opt/nomad | awk 'NR==2 {print $5}' | tr -d '%')
+    if [ "$used_pct" -ge 90 ]; then
+        log "Disk space critical: /opt/nomad is ${used_pct}% full"
+        return 1
+    fi
+    return 0
+}
+
 GCP_INSTANCE_NAME=$(get_instance_name)
 LOCAL_IP=$(get_local_ip)
-log "Starting nomad liveness check (interval: $CHECK_INTERVAL s, max failures: $MAX_FAILURES, instance: $GCP_INSTANCE_NAME, local_ip: $LOCAL_IP)"
+log "Starting liveness check for instance $GCP_INSTANCE_NAME ($LOCAL_IP)"
 
 log "Waiting for installation to complete..."
 until [ -x /usr/bin/nomad ] || [ "$SECONDS" -gt 900 ]; do
     sleep 30
 done
-log "Installation wait complete (elapsed: $${SECONDS}s)"
+log "Installation wait complete (elapsed: ${SECONDS}s)"
 
 if [ ! -x /usr/bin/nomad ]; then
     log "Nomad failed to install within 15 minutes"
@@ -101,14 +103,15 @@ fi
 
 while true; do
     if ! check_nomad_installed; then
-        mark_unhealthy "Nomad binary missing or service not active"
+        log "Nomad not installed or not active"
+        mark_unhealthy "Nomad not running"
         FAILURE_COUNT=0
         RESTART_COUNT=0
         continue
     fi
 
-    if ! check_container_runtime; then
-        mark_unhealthy "Container runtime missing or not active"
+    if ! check_disk_space; then
+        mark_unhealthy "Nomad data disk critically full"
         FAILURE_COUNT=0
         RESTART_COUNT=0
         continue
@@ -131,7 +134,7 @@ while true; do
         log "Server unreachable (failure $FAILURE_COUNT/$MAX_FAILURES)"
         if [ "$FAILURE_COUNT" -ge "$MAX_FAILURES" ]; then
             if [ "$RESTART_COUNT" -ge "$MAX_RESTARTS" ]; then
-                mark_unhealthy "Nomad failed after $RESTART_COUNT restarts"
+                mark_unhealthy "Nomad failed $RESTART_COUNT restarts"
                 FAILURE_COUNT=0
                 RESTART_COUNT=0
             else
