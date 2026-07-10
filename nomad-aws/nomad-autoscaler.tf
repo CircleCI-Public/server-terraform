@@ -7,6 +7,11 @@ locals {
     ? substr(local.OIDC_EKS_VARIABLE, 0, length(local.OIDC_EKS_VARIABLE) - length(":sub"))
     : local.OIDC_EKS_VARIABLE
   )
+
+  # StringEquals treats "*" as a literal character, not a wildcard, so a
+  # wildcard k8s_service_account (e.g. "system:serviceaccount:*:nomad-autoscaler")
+  # must be matched with StringLike instead.
+  K8S_SERVICE_ACCOUNT_IS_WILDCARD = length(regexall("\\*", lookup(var.enable_irsa, "k8s_service_account", ""))) > 0
 }
 
 resource "aws_iam_user" "nomad_asg_user" {
@@ -39,6 +44,7 @@ resource "aws_iam_role" "nomad_role" {
     OIDC_PRINCIPAL_ID   = lookup(var.enable_irsa, "oidc_principal_id", "")
     OIDC_EKS_VARIABLE   = local.OIDC_EKS_VARIABLE_STRIPPED
     K8S_SERVICE_ACCOUNT = lookup(var.enable_irsa, "k8s_service_account", "")
+    SUB_IS_WILDCARD     = local.K8S_SERVICE_ACCOUNT_IS_WILDCARD
   })
 
   inline_policy {
