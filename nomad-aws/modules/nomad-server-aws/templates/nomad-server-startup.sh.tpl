@@ -43,9 +43,12 @@ then
     update-grub
 fi
 
+${apt_helpers}
+
 echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
+prepare_apt
 apt-get update && apt-get -y upgrade
 
 
@@ -209,3 +212,5 @@ echo "--------------------------------------"
 systemctl daemon-reload
 systemctl enable --now nomad
 systemctl status nomad
+
+resume_apt_timers

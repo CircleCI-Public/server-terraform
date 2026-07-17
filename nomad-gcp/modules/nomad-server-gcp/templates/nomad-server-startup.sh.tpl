@@ -22,6 +22,8 @@ tune_io_scheduler() {
 	fi
 }
 
+${apt_helpers}
+
 system_update() {
 	log "-----------------------------------------"
 	log "Updating system"
@@ -222,6 +224,7 @@ configure_nomad() {
 
 
 tune_io_scheduler
+prepare_apt
 system_update
 mitigate_cve_2026_31431
 install ntp
@@ -230,3 +233,5 @@ install jq
 setup_liveness_check
 install_nomad || exit 1
 configure_nomad
+
+resume_apt_timers

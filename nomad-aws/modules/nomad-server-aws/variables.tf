@@ -200,3 +200,7 @@ variable "security_group_id" {
   type        = string
   default     = ""
 }
+variable "apt_helpers" {
+  description = "Shared bash helpers (prepare_apt/resume_apt_timers) injected into the server startup script."
+  type        = string
+}

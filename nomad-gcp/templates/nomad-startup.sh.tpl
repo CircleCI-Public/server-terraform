@@ -25,17 +25,14 @@ tune_io_scheduler() {
 	fi
 }
 
+${apt_helpers}
+
 system_update() {
 	log "--------------------------------------"
 	log "Updating system"
 	log "--------------------------------------"
-	# Stop unattended-upgrades and wait for dpkg lock to avoid conflicts on first boot
-	systemctl stop unattended-upgrades 2>/dev/null || true
-	while ! flock -n /var/lib/dpkg/lock-frontend -c true 2>/dev/null; do
-		echo "Waiting for dpkg lock to be released..."
-		sleep 10
-	done
-	apt-get update && apt-get -y upgrade
+	retry apt-get update
+	retry apt-get -y upgrade
 }
 
 retry() {
@@ -68,11 +65,11 @@ mitigate_cve_2026_31431() {
 }
 
 add_docker_repo() {
-	apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+	retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 	add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 	install "linux-image-$(uname -r)"
-	apt-get update
+	retry apt-get update
 }
 
 enabled_docker_userns() {
@@ -159,11 +156,12 @@ install_nomad() {
 	log "----------------------------------------------"
 	log "Installing Nomad version ${nomad_version}"
 	log "----------------------------------------------"
-	sudo apt-get update && \
-	sudo apt-get install -y wget gpg coreutils jq
+	retry sudo apt-get update
+	retry sudo apt-get install -y wget gpg coreutils jq
 	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-	sudo apt-get update && sudo apt-get install -y nomad=${nomad_version}
+	retry sudo apt-get update
+	retry sudo apt-get install -y nomad=${nomad_version}
 
 	nomad --version || ( echo "Nomad failed to install" && exit 1 )
 }
@@ -399,6 +397,7 @@ revert_cgroups(){
 }
 
 tune_io_scheduler
+prepare_apt
 system_update
 mitigate_cve_2026_31431
 
@@ -477,6 +476,8 @@ setup_liveness_check
 install_nomad || (echo "=================\nFailed to install nomad\n==================\n" && exit 1)
 configure_nomad
 
+resume_apt_timers
+
 else
 
 add_docker_repo
@@ -528,6 +529,8 @@ docker_chain="DOCKER-USER"
 /sbin/iptables --wait --insert $docker_chain 5 -i docker+ --destination "${cidr_block}" --jump DROP
 /sbin/iptables --wait --insert $docker_chain 5 -i br+ --destination "${cidr_block}" --jump DROP
 %{ endfor ~}
+
+resume_apt_timers
 
 echo "--------------------------------------"
 echo "	Reverting Cgroup v2"
