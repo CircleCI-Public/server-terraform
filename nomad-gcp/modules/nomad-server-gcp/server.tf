@@ -97,6 +97,7 @@ resource "google_compute_instance_template" "nomad" {
       max_replicas      = var.max_server_instances
       min_replicas      = var.min_server_instances
       server_retry_join = var.server_retry_join
+      apt_helpers       = var.apt_helpers
     }
   )
 
