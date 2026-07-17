@@ -4,6 +4,7 @@ locals {
   tags                           = ["${var.name}-circleci-nomad-clients"]
   subnet_or_network              = var.subnetwork != "" ? var.subnetwork : var.network
   is_subnet_a_self_link          = can(regex("^https://www\\.googleapis\\.com/compute/", local.subnet_or_network))
+  apt_helpers                    = file("${path.module}/../shared/scripts/apt-helpers.sh")
 }
 
 data "google_compute_subnetwork" "nomad" {
@@ -111,6 +112,7 @@ resource "google_compute_instance_template" "nomad" {
       log_level              = var.log_level
       external_nomad_server  = var.deploy_nomad_server_instances
       apt_retry_max_attempts = var.apt_retry_max_attempts
+      apt_helpers            = local.apt_helpers
     }
   )
 
