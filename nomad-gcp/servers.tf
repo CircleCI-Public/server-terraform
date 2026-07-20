@@ -61,4 +61,5 @@ module "server" {
   nomad_clients_tags               = local.tags
   gcp_cluster_ipv4_cidr            = data.google_container_cluster.k8s[0].cluster_ipv4_cidr
   gcp_cluster_network_cidr         = data.google_compute_subnetwork.k8s[0].ip_cidr_range
+  apt_helpers                      = local.apt_helpers
 }

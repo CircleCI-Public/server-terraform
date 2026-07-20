@@ -91,6 +91,7 @@ data "cloudinit_config" "nomad_server_user_data" {
         server_retry_join     = var.server_retry_join
         nomad_version         = var.nomad_version
         log_level             = var.log_level
+        apt_helpers           = var.apt_helpers
         set_unhealthy_script  = base64encode(file("${path.module}/templates/nomad-set-unhealthy.sh"))
         liveness_check_script = base64encode(file("${path.module}/templates/nomad-server-liveness-check.sh"))
       }
