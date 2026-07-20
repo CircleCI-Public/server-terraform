@@ -49,6 +49,8 @@ retry() {
     done
 }
 
+${apt_helpers}
+
 echo "----------------------------------------"
 echo "        Tuning kernel parameters"
 echo "----------------------------------------"
@@ -62,7 +64,9 @@ fi
 echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
-apt-get update && retry apt-get -y upgrade
+prepare_apt
+retry apt-get update
+retry apt-get -y upgrade
 
 
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
@@ -80,7 +84,7 @@ retry apt-get install -y apt-transport-https ca-certificates curl software-prope
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 retry apt-get install -y "linux-image-$UNAME"
-apt-get update
+retry apt-get update
 retry apt-get -y install docker-ce=5:28.1.1-1~ubuntu.22.04~jammy \
                    docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy \
                    jq
@@ -128,7 +132,8 @@ retry sudo apt-get install -y wget gpg coreutils
 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
-sudo apt-get update && retry sudo apt-get install -y nomad=${nomad_version}
+retry sudo apt-get update
+retry sudo apt-get install -y nomad=${nomad_version}
 sudo nomad version
 
 
@@ -314,3 +319,5 @@ docker_chain="DOCKER-USER"
 %{ endfor ~}
 /sbin/iptables --wait --insert $docker_chain 1 -i br+ --destination "${dns_server}" -p tcp --dport 53 --jump RETURN
 /sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination "${dns_server}" -p udp --dport 53 --jump RETURN
+
+resume_apt_timers

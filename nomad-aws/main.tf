@@ -12,6 +12,8 @@ locals {
   nomad_client_instance_role = var.role_name != null ? var.role_name : (var.deploy_nomad_server_instances ? aws_iam_role.nomad_instance_role[0].name : null)
 
   instance_tags = merge(var.instance_tags, { "type" = "circleci-nomad-client" })
+
+  apt_helpers = file("${path.module}/../shared/scripts/apt-helpers.sh")
 }
 
 resource "aws_key_pair" "ssh_key" {
@@ -61,6 +63,7 @@ data "cloudinit_config" "nomad_user_data" {
         log_level              = var.log_level
         external_nomad_server  = var.deploy_nomad_server_instances
         apt_retry_max_attempts = var.apt_retry_max_attempts
+        apt_helpers            = local.apt_helpers
       }
     )
   }
