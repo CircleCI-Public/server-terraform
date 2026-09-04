@@ -49,7 +49,6 @@ echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
 prepare_apt
-apt-get update && apt-get -y upgrade
 
 
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
@@ -59,6 +58,19 @@ echo "--------------------------------------"
 echo "        Installing NTP"
 echo "--------------------------------------"
 apt-get install -y ntp
+
+echo "--------------------------------------"
+echo "  Adding HashiCorp apt repository"
+echo "--------------------------------------"
+apt-get install -y wget gpg coreutils jq
+wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+echo "-------------------------------------------"
+echo "     Updating and Upgrading System Packages"
+echo "-------------------------------------------"
+apt-get update
+apt-get -y upgrade
 
 echo "--------------------------------------"
 echo "  Creating ASG health reporter"
@@ -109,11 +121,7 @@ EOT
 echo "--------------------------------------"
 echo "Installing Nomad"
 echo "--------------------------------------"
-apt-get update && apt-get install -y wget gpg coreutils jq
-wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt-get update
-sudo apt-get install nomad=${nomad_version} -y
+apt-get install nomad=${nomad_version} -y
 nomad version
 
 echo "--------------------------------------"

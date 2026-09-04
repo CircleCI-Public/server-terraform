@@ -93,10 +93,7 @@ install_nomad() {
 	log "Installing Nomad Server"
 	log "-----------------------------------------"
 
-	install wget gpg coreutils zip jq
-	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-	sudo apt-get update && sudo apt-get install -y nomad=${nomad_version}
+	sudo apt-get install -y nomad=${nomad_version}
 
 	nomad --version || ( echo "Nomad failed to install" && exit 1 )
 }
@@ -225,10 +222,17 @@ configure_nomad() {
 
 tune_io_scheduler
 prepare_apt
-system_update
 mitigate_cve_2026_31431
 install ntp
-install jq
+
+echo "-----------------------------------------"
+echo "  Adding HashiCorp apt repository"
+echo "-----------------------------------------"
+install wget gpg coreutils zip jq
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+system_update
 
 setup_liveness_check
 install_nomad || exit 1

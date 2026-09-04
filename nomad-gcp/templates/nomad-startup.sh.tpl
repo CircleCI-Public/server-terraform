@@ -67,7 +67,7 @@ mitigate_cve_2026_31431() {
 add_docker_repo() {
 	retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-	add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	retry add-apt-repository -y --no-update "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 	install "linux-image-$(uname -r)"
 	retry apt-get update
 }
@@ -156,12 +156,7 @@ install_nomad() {
 	log "----------------------------------------------"
 	log "Installing Nomad version ${nomad_version}"
 	log "----------------------------------------------"
-	retry sudo apt-get update
-	retry sudo apt-get install -y wget gpg coreutils jq
-	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-	retry sudo apt-get update
-	retry sudo apt-get install -y nomad=${nomad_version}
+	retry apt-get install -y nomad=${nomad_version}
 
 	nomad --version || ( echo "Nomad failed to install" && exit 1 )
 }
@@ -398,11 +393,17 @@ revert_cgroups(){
 
 tune_io_scheduler
 prepare_apt
-system_update
 mitigate_cve_2026_31431
 
-install ntp
-install jq
+install ntp wget gpg coreutils jq
+
+echo "--------------------------------------"
+echo "  Adding HashiCorp apt repository"
+echo "--------------------------------------"
+wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+
+system_update
 
 if [ "${use_podman}" == "true" ]; then
 
