@@ -116,7 +116,7 @@ rmmod algif_aead 2>/dev/null || true
 echo "--------------------------------------"
 echo "        Installing common packages"
 echo "--------------------------------------"
-retry apt-get install -y ntp wget gpg coreutils
+retry apt-get install -y ntp wget gpg coreutils jq
 
 echo "--------------------------------------"
 echo "  Adding HashiCorp apt repository"
@@ -135,7 +135,7 @@ if [ "${use_podman}" == "true" ]; then
 echo "--------------------------------------"
 echo "        Installing Podman"
 echo "--------------------------------------"
-retry apt-get install -y podman jq
+retry apt-get install -y podman
 
 echo "--------------------------------------"
 echo "    Configuring cgroupv2 tuning"
@@ -202,8 +202,7 @@ retry add-apt-repository -y --no-update "deb [arch=amd64] https://download.docke
 retry apt-get install -y "linux-image-$UNAME"
 retry apt-get update
 retry apt-get -y install docker-ce=5:28.1.1-1~ubuntu.22.04~jammy \
-                   docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy \
-                   jq
+                   docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy
 
 # force docker to use userns-remap to mitigate CVE 2019-5736
 mkdir -p /etc/docker

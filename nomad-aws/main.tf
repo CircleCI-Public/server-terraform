@@ -9,7 +9,7 @@ locals {
   tag_key_for_discover       = "identifier"
   tag_value_for_discover     = "${var.basename}-circleci-nomad-server-instances-${random_string.key_suffix.result}"
   server_retry_join          = "provider=aws tag_key=${local.tag_key_for_discover} tag_value=${local.tag_value_for_discover} addr_type=${var.addr_type} region=${var.aws_region}"
-  nomad_client_instance_role = var.role_name != null ? var.role_name : (var.deploy_nomad_server_instances ? aws_iam_role.nomad_instance_role[0].name : null)
+  nomad_client_instance_role = var.role_name != null ? var.role_name : aws_iam_role.nomad_instance_role[0].name
 
   instance_tags = merge(var.instance_tags, { "type" = "circleci-nomad-client" })
 
