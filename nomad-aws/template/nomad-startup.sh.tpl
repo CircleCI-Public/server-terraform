@@ -109,24 +109,33 @@ echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
 prepare_apt
-retry apt-get update
-retry apt-get -y upgrade
-
 
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
 rmmod algif_aead 2>/dev/null || true
 
 echo "--------------------------------------"
-echo "        Installing NTP"
+echo "        Installing common packages"
 echo "--------------------------------------"
-retry apt-get install -y ntp
+retry apt-get install -y ntp wget gpg coreutils jq
+
+echo "--------------------------------------"
+echo "  Adding HashiCorp apt repository"
+echo "--------------------------------------"
+wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+
+echo "-------------------------------------------"
+echo "     Updating and Upgrading System Packages"
+echo "-------------------------------------------"
+retry apt-get update
+retry apt-get -y upgrade
 
 if [ "${use_podman}" == "true" ]; then
 
 echo "--------------------------------------"
 echo "        Installing Podman"
 echo "--------------------------------------"
-retry apt-get install -y podman jq
+retry apt-get install -y podman
 
 echo "--------------------------------------"
 echo "    Configuring cgroupv2 tuning"
@@ -189,12 +198,11 @@ echo "        Installing Docker"
 echo "--------------------------------------"
 retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+retry add-apt-repository -y --no-update "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 retry apt-get install -y "linux-image-$UNAME"
 retry apt-get update
 retry apt-get -y install docker-ce=5:28.1.1-1~ubuntu.22.04~jammy \
-                   docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy \
-                   jq
+                   docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy
 
 # force docker to use userns-remap to mitigate CVE 2019-5736
 mkdir -p /etc/docker
@@ -254,14 +262,8 @@ fi
 echo "--------------------------------------"
 echo "         Installing nomad"
 echo "--------------------------------------"
-retry sudo apt-get update && \
-retry sudo apt-get install -y wget gpg coreutils
-wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-
-retry sudo apt-get update
-retry sudo apt-get install -y nomad=${nomad_version}
-sudo nomad version
+retry apt-get install -y nomad=${nomad_version}
+nomad version
 
 
 echo "--------------------------------------"
