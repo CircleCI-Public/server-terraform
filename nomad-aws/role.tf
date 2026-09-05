@@ -1,11 +1,17 @@
+data "aws_caller_identity" "current" {}
+
+data "aws_partition" "current" {}
+
 data "aws_iam_policy_document" "ec2_policy" {
   statement {
     actions   = ["ec2:DescribeInstances"]
     resources = ["*"]
   }
   statement {
-    actions   = ["autoscaling:SetInstanceHealth"]
-    resources = ["*"]
+    actions = ["autoscaling:SetInstanceHealth"]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:autoscaling:${var.aws_region}:${data.aws_caller_identity.current.account_id}:autoScalingGroup:*:autoScalingGroupName/${var.basename}-circleci-nomad-clients-asg"
+    ]
   }
 }
 
