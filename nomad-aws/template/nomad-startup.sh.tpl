@@ -4,6 +4,24 @@ export DEBIAN_FRONTEND=noninteractive
 UNAME="$(uname -r)"
 export UNAME
 
+retry() {
+    local -r -i max_attempts=${apt_retry_max_attempts}
+    local -i attempt_num=1
+
+    until "$@"; do
+        if (( attempt_num == max_attempts )); then
+            echo "Attempt $attempt_num failed and there are no more attempts left!"
+            exit 1
+        else
+            echo "Attempt $attempt_num failed! Trying again in 5s... ($attempt_num/$max_attempts)"
+            ((attempt_num++))
+            sleep 5
+        fi
+    done
+}
+
+${apt_helpers}
+
 export aws_instance_metadata_url="http://169.254.169.254"
 export TOKEN="$(curl -X PUT "$aws_instance_metadata_url/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 180")"
 export PUBLIC_IP="$(curl -H "X-aws-ec2-metadata-token: $TOKEN" $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
@@ -32,6 +50,13 @@ echo "export NOMAD_ADDR=$SCHEME://localhost:4646" >> /etc/environment
 
 source /etc/environment
 env | grep "NOMAD_"
+
+echo "--------------------------------------"
+echo "        Installing jq"
+echo "--------------------------------------"
+prepare_apt
+retry apt-get update
+retry apt-get install -y jq
 
 echo "--------------------------------------"
 echo "  Creating ASG health reporter"
@@ -77,24 +102,6 @@ cat <<EOT > /etc/logrotate.d/nomad-liveness-check
 }
 EOT
 
-retry() {
-    local -r -i max_attempts=${apt_retry_max_attempts}
-    local -i attempt_num=1
-
-    until "$@"; do
-        if (( attempt_num == max_attempts )); then
-            echo "Attempt $attempt_num failed and there are no more attempts left!"
-            exit 1
-        else
-            echo "Attempt $attempt_num failed! Trying again in 5s... ($attempt_num/$max_attempts)"
-            ((attempt_num++))
-            sleep 5
-        fi
-    done
-}
-
-${apt_helpers}
-
 echo "----------------------------------------"
 echo "        Tuning kernel parameters"
 echo "----------------------------------------"
@@ -108,7 +115,6 @@ fi
 echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
-prepare_apt
 
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
 rmmod algif_aead 2>/dev/null || true
@@ -116,13 +122,22 @@ rmmod algif_aead 2>/dev/null || true
 echo "--------------------------------------"
 echo "        Installing common packages"
 echo "--------------------------------------"
-retry apt-get install -y ntp wget gpg coreutils jq
+retry apt-get install -y ntp wget gpg coreutils
 
 echo "--------------------------------------"
 echo "  Adding HashiCorp apt repository"
 echo "--------------------------------------"
 wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+
+if [ "${use_podman}" != "true" ]; then
+echo "--------------------------------------"
+echo "  Adding Docker apt repository"
+echo "--------------------------------------"
+retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+retry add-apt-repository -y --no-update "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+fi
 
 echo "-------------------------------------------"
 echo "     Updating and Upgrading System Packages"
@@ -196,11 +211,7 @@ else
 echo "--------------------------------------"
 echo "        Installing Docker"
 echo "--------------------------------------"
-retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-retry add-apt-repository -y --no-update "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 retry apt-get install -y "linux-image-$UNAME"
-retry apt-get update
 retry apt-get -y install docker-ce=5:28.1.1-1~ubuntu.22.04~jammy \
                    docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy
 

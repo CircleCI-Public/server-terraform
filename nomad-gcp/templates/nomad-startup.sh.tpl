@@ -68,8 +68,6 @@ add_docker_repo() {
 	retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 	retry add-apt-repository -y --no-update "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-	install "linux-image-$(uname -r)"
-	retry apt-get update
 }
 
 enabled_docker_userns() {
@@ -395,6 +393,7 @@ tune_io_scheduler
 prepare_apt
 mitigate_cve_2026_31431
 
+retry apt-get update
 install ntp wget gpg coreutils jq
 
 echo "--------------------------------------"
@@ -402,6 +401,13 @@ echo "  Adding HashiCorp apt repository"
 echo "--------------------------------------"
 wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+
+if [ "${use_podman}" != "true" ]; then
+echo "--------------------------------------"
+echo "  Adding Docker apt repository"
+echo "--------------------------------------"
+add_docker_repo
+fi
 
 system_update
 
@@ -481,7 +487,7 @@ resume_apt_timers
 
 else
 
-add_docker_repo
+install "linux-image-$(uname -r)"
 
 echo "----------------------------------------"
 echo "	Removing Docker If Already Installed  "

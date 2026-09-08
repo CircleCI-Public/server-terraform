@@ -7,6 +7,24 @@ export DEBIAN_FRONTEND=noninteractive
 UNAME="$(uname -r)"
 export UNAME
 
+retry() {
+    local -r -i max_attempts=${apt_retry_max_attempts}
+    local -i attempt_num=1
+
+    until "$@"; do
+        if (( attempt_num == max_attempts )); then
+            echo "Attempt $attempt_num failed and there are no more attempts left!"
+            exit 1
+        else
+            echo "Attempt $attempt_num failed! Trying again in 5s... ($attempt_num/$max_attempts)"
+            ((attempt_num++))
+            sleep 5
+        fi
+    done
+}
+
+${apt_helpers}
+
 export aws_instance_metadata_url="http://169.254.169.254"
 export TOKEN="$(curl -X PUT "$aws_instance_metadata_url/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 180")"
 export PUBLIC_IP="$(curl -H "X-aws-ec2-metadata-token: $TOKEN" $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
@@ -43,34 +61,31 @@ then
     update-grub
 fi
 
-${apt_helpers}
-
 echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
 prepare_apt
 
-
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
 rmmod algif_aead 2>/dev/null || true
 
 echo "--------------------------------------"
-echo "        Installing NTP"
+echo "        Installing common packages"
 echo "--------------------------------------"
-apt-get install -y ntp
+retry apt-get update
+retry apt-get install -y ntp wget gpg coreutils jq
 
 echo "--------------------------------------"
 echo "  Adding HashiCorp apt repository"
 echo "--------------------------------------"
-apt-get install -y wget gpg coreutils jq
 wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
 echo "-------------------------------------------"
 echo "     Updating and Upgrading System Packages"
 echo "-------------------------------------------"
-apt-get update
-apt-get -y upgrade
+retry apt-get update
+retry apt-get -y upgrade
 
 echo "--------------------------------------"
 echo "  Creating ASG health reporter"
@@ -121,7 +136,7 @@ EOT
 echo "--------------------------------------"
 echo "Installing Nomad"
 echo "--------------------------------------"
-apt-get install nomad=${nomad_version} -y
+retry apt-get install -y nomad=${nomad_version}
 nomad version
 
 echo "--------------------------------------"

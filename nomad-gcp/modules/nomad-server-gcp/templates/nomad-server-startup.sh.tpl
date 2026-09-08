@@ -24,11 +24,28 @@ tune_io_scheduler() {
 
 ${apt_helpers}
 
+retry() {
+    local -r -i max_attempts=${apt_retry_max_attempts}
+    local -i attempt_num=1
+
+    until "$@"; do
+        if (( attempt_num == max_attempts )); then
+            echo "Attempt $attempt_num failed and there are no more attempts left!"
+            exit 1
+        else
+            echo "Attempt $attempt_num failed! Trying again in 5s... ($attempt_num/$max_attempts)"
+            ((attempt_num++))
+            sleep 5
+        fi
+    done
+}
+
 system_update() {
 	log "-----------------------------------------"
 	log "Updating system"
 	log "-----------------------------------------"
-	apt-get update && apt-get -y upgrade
+	retry apt-get update
+	retry apt-get -y upgrade
 }
 
 mitigate_cve_2026_31431() {
@@ -41,7 +58,7 @@ install() {
 	log "-----------------------------------------"
 	log "Installing $${package}"
 	log "-----------------------------------------"
-	apt-get install -y $${package}
+	retry apt-get install -y $${package}
 }
 
 setup_liveness_check() {
@@ -93,7 +110,7 @@ install_nomad() {
 	log "Installing Nomad Server"
 	log "-----------------------------------------"
 
-	sudo apt-get install -y nomad=${nomad_version}
+	retry apt-get install -y nomad=${nomad_version}
 
 	nomad --version || ( echo "Nomad failed to install" && exit 1 )
 }
@@ -223,12 +240,13 @@ configure_nomad() {
 tune_io_scheduler
 prepare_apt
 mitigate_cve_2026_31431
-install ntp
+
+retry apt-get update
+install ntp wget gpg coreutils zip jq
 
 echo "-----------------------------------------"
 echo "  Adding HashiCorp apt repository"
 echo "-----------------------------------------"
-install wget gpg coreutils zip jq
 wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
