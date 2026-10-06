@@ -163,4 +163,10 @@ resource "aws_autoscaling_group" "clients_asg" {
       propagate_at_launch = true
     }
   }
+
+  # Nomad Autoscaler adds transient nomad_autoscaler_lifecycle_phase_* tags
+  # to the ASG during scale-in. Ignore tag drift so plans stay clean.
+  lifecycle {
+    ignore_changes = [tag]
+  }
 }
