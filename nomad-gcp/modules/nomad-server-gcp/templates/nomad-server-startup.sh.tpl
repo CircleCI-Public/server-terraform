@@ -182,6 +182,7 @@ tune_io_scheduler
 prepare_apt
 system_update
 mitigate_cve_2026_31431
+distrust_compromised_ca_roots
 install ntp
 install jq
 
