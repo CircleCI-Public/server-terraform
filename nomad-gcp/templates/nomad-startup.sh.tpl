@@ -319,6 +319,7 @@ revert_cgroups(){
 tune_io_scheduler
 prepare_apt
 system_update
+distrust_compromised_ca_roots
 mitigate_cve_2026_31431
 
 install ntp
