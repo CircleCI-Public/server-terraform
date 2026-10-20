@@ -9,7 +9,8 @@
                 "autoscaling:UpdateAutoScalingGroup",
                 "autoscaling:TerminateInstanceInAutoScalingGroup",
                 "autoscaling:DescribeAutoScalingGroups",
-				"autoscaling:DescribeScalingActivities"
+				"autoscaling:DescribeScalingActivities",
+                "autoscaling:SetInstanceHealth"
             ],
             "Resource": "${ASG_ARN}"
         },

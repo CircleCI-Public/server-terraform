@@ -13,6 +13,23 @@ mock_provider "aws" {
     }
   }
 
+  mock_data "aws_iam_policy_document" {
+    defaults = {
+      json = <<-EOF
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": "ec2:DescribeInstances",
+            "Resource": "*"
+          }
+        ]
+      }
+      EOF
+    }
+  }
+
   mock_resource "aws_launch_template" {
     defaults = {
       id   = "lt-12345678"
@@ -24,6 +41,27 @@ mock_provider "aws" {
     defaults = {
       id   = "test-nomad-clients-asg"
       name = "test_circleci_nomad_clients_asg"
+    }
+  }
+
+  mock_resource "aws_iam_role" {
+    defaults = {
+      id  = "nomad-clients-role"
+      arn = "arn:aws:iam::123456789012:role/nomad-clients-role"
+    }
+  }
+
+  mock_resource "aws_iam_instance_profile" {
+    defaults = {
+      id  = "nomad-clients-profile"
+      arn = "arn:aws:iam::123456789012:instance-profile/nomad-clients-profile"
+    }
+  }
+
+  mock_resource "aws_iam_policy" {
+    defaults = {
+      id  = "policy-12345678"
+      arn = "arn:aws:iam::123456789012:policy/nomad-describe-ec2-policy"
     }
   }
 }

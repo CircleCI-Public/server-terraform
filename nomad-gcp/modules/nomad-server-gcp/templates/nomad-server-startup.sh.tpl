@@ -22,11 +22,30 @@ tune_io_scheduler() {
 	fi
 }
 
+${apt_helpers}
+
+retry() {
+    local -r -i max_attempts=${apt_retry_max_attempts}
+    local -i attempt_num=1
+
+    until "$@"; do
+        if (( attempt_num == max_attempts )); then
+            echo "Attempt $attempt_num failed and there are no more attempts left!"
+            exit 1
+        else
+            echo "Attempt $attempt_num failed! Trying again in 5s... ($attempt_num/$max_attempts)"
+            ((attempt_num++))
+            sleep 5
+        fi
+    done
+}
+
 system_update() {
 	log "-----------------------------------------"
 	log "Updating system"
 	log "-----------------------------------------"
-	apt-get update && apt-get -y upgrade
+	retry apt-get update
+	retry apt-get -y upgrade
 }
 
 mitigate_cve_2026_31431() {
@@ -34,56 +53,12 @@ mitigate_cve_2026_31431() {
   rmmod algif_aead 2>/dev/null || true
 }
 
-distrust_compromised_ca_roots() {
-	# October 2026 eMudhra incident: the private keys of eight intermediate CAs
-	# were compromised. Those intermediates cross-chain, so both the emSign root
-	# and the Comodo AAA root must be distrusted. Dropping only one of them
-	# leaves a valid path for a forged certificate.
-	# Ref: https://emudhra.we-have-a-problem.com/
-	log "--------------------------------------"
-	log "Distrusting compromised CA roots"
-	log "--------------------------------------"
-	apt-get install -y --only-upgrade ca-certificates || true
-
-	# Deactivate both roots locally as well, so that a mirror which has not yet
-	# shipped the updated ca-certificates cannot leave this host trusting them.
-	sed -i \
-		-e 's|^mozilla/emSign_ECC_Root_CA_-_G3.crt|!&|' \
-		-e 's|^mozilla/Comodo_AAA_Services_root.crt|!&|' \
-		/etc/ca-certificates.conf
-	update-ca-certificates --fresh
-
-	# Verification below is a hard gate: everything after this point fetches
-	# repository signing keys over TLS validated against this bundle. Without
-	# openssl or the bundle itself the check cannot prove anything, so treat a
-	# missing tool or file as a failure rather than as a pass.
-	if ! command -v openssl >/dev/null 2>&1; then
-		apt-get install -y openssl || true
-	fi
-	if ! command -v openssl >/dev/null 2>&1; then
-		log "FATAL: openssl is unavailable, cannot verify the CA bundle"
-		exit 1
-	fi
-	if [ ! -s /etc/ssl/certs/ca-certificates.crt ]; then
-		log "FATAL: CA bundle is missing after update-ca-certificates"
-		exit 1
-	fi
-	if awk -v cmd='openssl x509 -noout -subject' \
-		'/BEGIN/{p=1} p{print | cmd} /END/{close(cmd); p=0}' \
-		/etc/ssl/certs/ca-certificates.crt 2>/dev/null \
-		| grep -qE 'CN *= *(emSign ECC Root CA - G3|AAA Certificate Services)'; then
-		log "FATAL: compromised CA roots are still trusted, refusing to continue"
-		exit 1
-	fi
-	log "Compromised CA roots are not trusted"
-}
-
 install() {
 	package=$@
 	log "-----------------------------------------"
 	log "Installing $${package}"
 	log "-----------------------------------------"
-	apt-get install -y $${package}
+	retry apt-get install -y $${package}
 }
 
 setup_liveness_check() {
@@ -135,10 +110,7 @@ install_nomad() {
 	log "Installing Nomad Server"
 	log "-----------------------------------------"
 
-	install wget gpg coreutils zip jq
-	wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-	echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-	sudo apt-get update && sudo apt-get install -y nomad=${nomad_version}
+	retry apt-get install -y nomad=${nomad_version}
 
 	nomad --version || ( echo "Nomad failed to install" && exit 1 )
 }
@@ -266,12 +238,23 @@ configure_nomad() {
 
 
 tune_io_scheduler
-system_update
+prepare_apt
 mitigate_cve_2026_31431
+
+retry apt-get update
 distrust_compromised_ca_roots
-install ntp
-install jq
+install ntp wget gpg coreutils zip jq
+
+echo "-----------------------------------------"
+echo "  Adding HashiCorp apt repository"
+echo "-----------------------------------------"
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+system_update
 
 setup_liveness_check
 install_nomad || exit 1
 configure_nomad
+
+resume_apt_timers

@@ -4,6 +4,24 @@ export DEBIAN_FRONTEND=noninteractive
 UNAME="$(uname -r)"
 export UNAME
 
+retry() {
+    local -r -i max_attempts=${apt_retry_max_attempts}
+    local -i attempt_num=1
+
+    until "$@"; do
+        if (( attempt_num == max_attempts )); then
+            echo "Attempt $attempt_num failed and there are no more attempts left!"
+            exit 1
+        else
+            echo "Attempt $attempt_num failed! Trying again in 5s... ($attempt_num/$max_attempts)"
+            ((attempt_num++))
+            sleep 5
+        fi
+    done
+}
+
+${apt_helpers}
+
 export aws_instance_metadata_url="http://169.254.169.254"
 export TOKEN="$(curl -X PUT "$aws_instance_metadata_url/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 180")"
 export PUBLIC_IP="$(curl -H "X-aws-ec2-metadata-token: $TOKEN" $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
@@ -32,6 +50,14 @@ echo "export NOMAD_ADDR=$SCHEME://localhost:4646" >> /etc/environment
 
 source /etc/environment
 env | grep "NOMAD_"
+
+echo "--------------------------------------"
+echo "        Installing jq"
+echo "--------------------------------------"
+prepare_apt
+distrust_compromised_ca_roots
+retry apt-get update
+retry apt-get install -y jq
 
 echo "--------------------------------------"
 echo "  Creating ASG health reporter"
@@ -77,22 +103,6 @@ cat <<EOT > /etc/logrotate.d/nomad-liveness-check
 }
 EOT
 
-retry() {
-    local -r -i max_attempts=${apt_retry_max_attempts}
-    local -i attempt_num=1
-
-    until "$@"; do
-        if (( attempt_num == max_attempts )); then
-            echo "Attempt $attempt_num failed and there are no more attempts left!"
-            exit 1
-        else
-            echo "Attempt $attempt_num failed! Trying again in 5s... ($attempt_num/$max_attempts)"
-            ((attempt_num++))
-            sleep 5
-        fi
-    done
-}
-
 echo "----------------------------------------"
 echo "        Tuning kernel parameters"
 echo "----------------------------------------"
@@ -106,71 +116,42 @@ fi
 echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
-# Stop unattended-upgrades and wait for dpkg lock to avoid conflicts on first boot
-systemctl stop unattended-upgrades 2>/dev/null || true
-while ! flock -n /var/lib/dpkg/lock-frontend -c true 2>/dev/null; do
-    echo "Waiting for dpkg lock to be released..."
-    sleep 10
-done
-apt-get update && retry apt-get -y upgrade
-
 
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
 rmmod algif_aead 2>/dev/null || true
 
-# October 2026 eMudhra incident: the private keys of eight intermediate CAs
-# were compromised. Those intermediates cross-chain, so both the emSign root
-# and the Comodo AAA root must be distrusted. Dropping only one of them
-# leaves a valid path for a forged certificate.
-# Ref: https://emudhra.we-have-a-problem.com/
 echo "--------------------------------------"
-echo "Distrusting compromised CA roots"
+echo "        Installing common packages"
 echo "--------------------------------------"
-retry apt-get install -y --only-upgrade ca-certificates || true
-
-# Deactivate both roots locally as well, so that a mirror which has not yet
-# shipped the updated ca-certificates cannot leave this host trusting them.
-sed -i \
-	-e 's|^mozilla/emSign_ECC_Root_CA_-_G3.crt|!&|' \
-	-e 's|^mozilla/Comodo_AAA_Services_root.crt|!&|' \
-	/etc/ca-certificates.conf
-update-ca-certificates --fresh
-
-# Verification below is a hard gate: everything after this point fetches
-# repository signing keys over TLS validated against this bundle. Without
-# openssl or the bundle itself the check cannot prove anything, so treat a
-# missing tool or file as a failure rather than as a pass.
-if ! command -v openssl >/dev/null 2>&1; then
-	retry apt-get install -y openssl || true
-fi
-if ! command -v openssl >/dev/null 2>&1; then
-	echo "FATAL: openssl is unavailable, cannot verify the CA bundle"
-	exit 1
-fi
-if [ ! -s /etc/ssl/certs/ca-certificates.crt ]; then
-	echo "FATAL: CA bundle is missing after update-ca-certificates"
-	exit 1
-fi
-if awk -v cmd='openssl x509 -noout -subject' \
-	'/BEGIN/{p=1} p{print | cmd} /END/{close(cmd); p=0}' \
-	/etc/ssl/certs/ca-certificates.crt 2>/dev/null \
-	| grep -qE 'CN *= *(emSign ECC Root CA - G3|AAA Certificate Services)'; then
-	echo "FATAL: compromised CA roots are still trusted, refusing to continue"
-	exit 1
-fi
-echo "Compromised CA roots are not trusted"
+retry apt-get install -y ntp wget gpg coreutils
 
 echo "--------------------------------------"
-echo "        Installing NTP"
+echo "  Adding HashiCorp apt repository"
 echo "--------------------------------------"
-retry apt-get install -y ntp
+wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+
+if [ "${use_podman}" != "true" ]; then
+echo "--------------------------------------"
+echo "  Adding Docker apt repository"
+echo "--------------------------------------"
+retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+retry add-apt-repository -y --no-update "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+fi
+
+echo "-------------------------------------------"
+echo "     Updating and Upgrading System Packages"
+echo "-------------------------------------------"
+retry apt-get update
+retry apt-get -y upgrade
 
 if [ "${use_podman}" == "true" ]; then
 
 echo "--------------------------------------"
 echo "        Installing Podman"
 echo "--------------------------------------"
-retry apt-get install -y podman jq
+retry apt-get install -y podman
 
 echo "--------------------------------------"
 echo "    Configuring cgroupv2 tuning"
@@ -231,14 +212,9 @@ else
 echo "--------------------------------------"
 echo "        Installing Docker"
 echo "--------------------------------------"
-retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 retry apt-get install -y "linux-image-$UNAME"
-apt-get update
 retry apt-get -y install docker-ce=5:28.1.1-1~ubuntu.22.04~jammy \
-                   docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy \
-                   jq
+                   docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy
 
 # force docker to use userns-remap to mitigate CVE 2019-5736
 mkdir -p /etc/docker
@@ -298,13 +274,8 @@ fi
 echo "--------------------------------------"
 echo "         Installing nomad"
 echo "--------------------------------------"
-retry sudo apt-get update && \
-retry sudo apt-get install -y wget gpg coreutils
-wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-
-sudo apt-get update && retry sudo apt-get install -y nomad=${nomad_version}
-sudo nomad version
+retry apt-get install -y nomad=${nomad_version}
+nomad version
 
 
 echo "--------------------------------------"
@@ -533,3 +504,5 @@ docker_chain="DOCKER-USER"
 /sbin/iptables --wait --insert $docker_chain 2 -i br+ --destination "${dns_server}" -p udp --dport 53 --jump RETURN
 
 fi
+
+resume_apt_timers

@@ -7,6 +7,24 @@ export DEBIAN_FRONTEND=noninteractive
 UNAME="$(uname -r)"
 export UNAME
 
+retry() {
+    local -r -i max_attempts=${apt_retry_max_attempts}
+    local -i attempt_num=1
+
+    until "$@"; do
+        if (( attempt_num == max_attempts )); then
+            echo "Attempt $attempt_num failed and there are no more attempts left!"
+            exit 1
+        else
+            echo "Attempt $attempt_num failed! Trying again in 5s... ($attempt_num/$max_attempts)"
+            ((attempt_num++))
+            sleep 5
+        fi
+    done
+}
+
+${apt_helpers}
+
 export aws_instance_metadata_url="http://169.254.169.254"
 export TOKEN="$(curl -X PUT "$aws_instance_metadata_url/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 180")"
 export PUBLIC_IP="$(curl -H "X-aws-ec2-metadata-token: $TOKEN" $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
@@ -46,58 +64,29 @@ fi
 echo "-------------------------------------------"
 echo "     Performing System Updates"
 echo "-------------------------------------------"
-apt-get update && apt-get -y upgrade
-
+prepare_apt
 
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
 rmmod algif_aead 2>/dev/null || true
 
-# October 2026 eMudhra incident: the private keys of eight intermediate CAs
-# were compromised. Those intermediates cross-chain, so both the emSign root
-# and the Comodo AAA root must be distrusted. Dropping only one of them
-# leaves a valid path for a forged certificate.
-# Ref: https://emudhra.we-have-a-problem.com/
 echo "--------------------------------------"
-echo "Distrusting compromised CA roots"
+echo "        Installing common packages"
 echo "--------------------------------------"
-apt-get install -y --only-upgrade ca-certificates || true
-
-# Deactivate both roots locally as well, so that a mirror which has not yet
-# shipped the updated ca-certificates cannot leave this host trusting them.
-sed -i \
-	-e 's|^mozilla/emSign_ECC_Root_CA_-_G3.crt|!&|' \
-	-e 's|^mozilla/Comodo_AAA_Services_root.crt|!&|' \
-	/etc/ca-certificates.conf
-update-ca-certificates --fresh
-
-# Verification below is a hard gate: everything after this point fetches
-# repository signing keys over TLS validated against this bundle. Without
-# openssl or the bundle itself the check cannot prove anything, so treat a
-# missing tool or file as a failure rather than as a pass.
-if ! command -v openssl >/dev/null 2>&1; then
-	apt-get install -y openssl || true
-fi
-if ! command -v openssl >/dev/null 2>&1; then
-	echo "FATAL: openssl is unavailable, cannot verify the CA bundle"
-	exit 1
-fi
-if [ ! -s /etc/ssl/certs/ca-certificates.crt ]; then
-	echo "FATAL: CA bundle is missing after update-ca-certificates"
-	exit 1
-fi
-if awk -v cmd='openssl x509 -noout -subject' \
-	'/BEGIN/{p=1} p{print | cmd} /END/{close(cmd); p=0}' \
-	/etc/ssl/certs/ca-certificates.crt 2>/dev/null \
-	| grep -qE 'CN *= *(emSign ECC Root CA - G3|AAA Certificate Services)'; then
-	echo "FATAL: compromised CA roots are still trusted, refusing to continue"
-	exit 1
-fi
-echo "Compromised CA roots are not trusted"
+retry apt-get update
+distrust_compromised_ca_roots
+retry apt-get install -y ntp wget gpg coreutils jq
 
 echo "--------------------------------------"
-echo "        Installing NTP"
+echo "  Adding HashiCorp apt repository"
 echo "--------------------------------------"
-apt-get install -y ntp
+wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+echo "-------------------------------------------"
+echo "     Updating and Upgrading System Packages"
+echo "-------------------------------------------"
+retry apt-get update
+retry apt-get -y upgrade
 
 echo "--------------------------------------"
 echo "  Creating ASG health reporter"
@@ -148,11 +137,7 @@ EOT
 echo "--------------------------------------"
 echo "Installing Nomad"
 echo "--------------------------------------"
-apt-get update && apt-get install -y wget gpg coreutils jq
-wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-sudo apt-get update
-sudo apt-get install nomad=${nomad_version} -y
+retry apt-get install -y nomad=${nomad_version}
 nomad version
 
 echo "--------------------------------------"
@@ -251,3 +236,5 @@ echo "--------------------------------------"
 systemctl daemon-reload
 systemctl enable --now nomad
 systemctl status nomad
+
+resume_apt_timers

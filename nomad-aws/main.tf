@@ -9,9 +9,11 @@ locals {
   tag_key_for_discover       = "identifier"
   tag_value_for_discover     = "${var.basename}-circleci-nomad-server-instances-${random_string.key_suffix.result}"
   server_retry_join          = "provider=aws tag_key=${local.tag_key_for_discover} tag_value=${local.tag_value_for_discover} addr_type=${var.addr_type} region=${var.aws_region}"
-  nomad_client_instance_role = var.role_name != null ? var.role_name : (var.deploy_nomad_server_instances ? aws_iam_role.nomad_instance_role[0].name : null)
+  nomad_client_instance_role = var.role_name != null ? var.role_name : aws_iam_role.nomad_instance_role[0].name
 
   instance_tags = merge(var.instance_tags, { "type" = "circleci-nomad-client" })
+
+  apt_helpers = file("${path.module}/../shared/scripts/apt-helpers.sh")
 }
 
 resource "aws_key_pair" "ssh_key" {
@@ -73,6 +75,7 @@ data "cloudinit_config" "nomad_user_data" {
         log_level                = var.log_level
         external_nomad_server    = var.deploy_nomad_server_instances
         apt_retry_max_attempts   = var.apt_retry_max_attempts
+        apt_helpers              = local.apt_helpers
         use_podman               = var.use_podman
         podman_cpu_quota_percent = var.podman_cpu_quota_percent
         podman_tasks_max         = var.podman_tasks_max
@@ -159,5 +162,11 @@ resource "aws_autoscaling_group" "clients_asg" {
       value               = tag.value
       propagate_at_launch = true
     }
+  }
+
+  # Nomad Autoscaler adds transient nomad_autoscaler_lifecycle_phase_* tags
+  # to the ASG during scale-in. Ignore tag drift so plans stay clean.
+  lifecycle {
+    ignore_changes = [tag]
   }
 }
