@@ -74,7 +74,12 @@ distrust_compromised_ca_roots() {
 
     # The verification below is a hard gate. Without openssl, or without the
     # bundle itself, the check cannot prove anything, so treat a missing tool
-    # or file as a failure rather than as a pass.
+    # or file as a failure rather than as a pass. A broken openssl or an
+    # unparsable bundle is the same problem one step further in: it prints no
+    # subject lines at all, which reads exactly like "the roots are gone". So
+    # count the subjects that were parsed and require that count to match the
+    # certificates in the bundle, and the check fails closed whenever it cannot
+    # prove anything.
     if ! command -v openssl >/dev/null 2>&1; then
         _apt_retry apt-get install -y openssl || true
     fi
@@ -86,12 +91,20 @@ distrust_compromised_ca_roots() {
         echo "FATAL: CA bundle is missing after update-ca-certificates"
         exit 1
     fi
-    if awk -v cmd='openssl x509 -noout -subject' \
-        '/BEGIN/{p=1} p{print | cmd} /END/{close(cmd); p=0}' \
-        /etc/ssl/certs/ca-certificates.crt 2>/dev/null \
+    local bundle_certs bundle_subjects parsed_certs
+    bundle_certs=$(grep -c 'BEGIN CERTIFICATE' /etc/ssl/certs/ca-certificates.crt)
+    bundle_subjects=$(openssl crl2pkcs7 -nocrl -certfile /etc/ssl/certs/ca-certificates.crt 2>/dev/null \
+        | openssl pkcs7 -print_certs -noout 2>/dev/null \
+        | grep '^subject=')
+    parsed_certs=$(printf '%s\n' "$bundle_subjects" | grep -c '^subject=')
+    if [ "$parsed_certs" -lt 1 ] || [ "$parsed_certs" -ne "$bundle_certs" ]; then
+        echo "FATAL: parsed $parsed_certs of $bundle_certs certificates in the CA bundle, cannot verify it"
+        exit 1
+    fi
+    if printf '%s\n' "$bundle_subjects" \
         | grep -qE 'CN *= *(emSign ECC Root CA - G3|AAA Certificate Services)'; then
         echo "FATAL: compromised CA roots are still trusted, refusing to continue"
         exit 1
     fi
-    echo "Compromised CA roots are not trusted"
+    echo "Compromised CA roots are not trusted ($parsed_certs roots checked)"
 }
