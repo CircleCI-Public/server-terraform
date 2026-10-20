@@ -67,6 +67,7 @@ echo "-------------------------------------------"
 prepare_apt
 retry apt-get update
 retry apt-get -y upgrade
+distrust_compromised_ca_roots
 
 
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
