@@ -242,6 +242,7 @@ prepare_apt
 mitigate_cve_2026_31431
 
 retry apt-get update
+distrust_compromised_ca_roots
 install ntp wget gpg coreutils zip jq
 
 echo "-----------------------------------------"

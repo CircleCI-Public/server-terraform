@@ -73,6 +73,7 @@ echo "--------------------------------------"
 echo "        Installing common packages"
 echo "--------------------------------------"
 retry apt-get update
+distrust_compromised_ca_roots
 retry apt-get install -y ntp wget gpg coreutils jq
 
 echo "--------------------------------------"

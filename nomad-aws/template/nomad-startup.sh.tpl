@@ -55,6 +55,7 @@ echo "--------------------------------------"
 echo "        Installing jq"
 echo "--------------------------------------"
 prepare_apt
+distrust_compromised_ca_roots
 retry apt-get update
 retry apt-get install -y jq
 
