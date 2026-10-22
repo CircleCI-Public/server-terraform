@@ -124,8 +124,27 @@ run "test_autoscaling_group_configuration" {
   }
 
   assert {
+    condition     = length(aws_autoscaling_group.clients_asg.suspended_processes) == 0
+    error_message = "ASG should not suspend any process by default"
+  }
+}
+
+run "test_suspend_az_rebalance" {
+  variables {
+    nomad_server_hostname = "example.com"
+    blocked_cidrs         = ["192.168.1.0/24"]
+    dns_server            = "192.168.0.2"
+    nodes                 = 3
+    max_nodes             = 10
+    vpc_id                = "vpc-12345678"
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
+    suspend_az_rebalance  = true
+  }
+
+  assert {
     condition     = contains(aws_autoscaling_group.clients_asg.suspended_processes, "AZRebalance")
-    error_message = "ASG should have AZ rebalancing suspended"
+    error_message = "ASG should have AZ rebalancing suspended when suspend_az_rebalance is true"
   }
 }
 
