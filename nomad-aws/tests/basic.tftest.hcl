@@ -122,6 +122,11 @@ run "test_autoscaling_group_configuration" {
     condition     = aws_autoscaling_group.clients_asg.min_size == 1
     error_message = "ASG min size should be 1 when nomad_auto_scaler is enabled"
   }
+
+  assert {
+    condition     = contains(aws_autoscaling_group.clients_asg.suspended_processes, "AZRebalance")
+    error_message = "ASG should have AZ rebalancing suspended"
+  }
 }
 
 run "test_security_group_configuration" {
