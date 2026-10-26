@@ -75,6 +75,10 @@ There are more examples in the [examples](./examples/) directory.
 - [IRSA example](./examples/irsa/main.tf)
 - [External Nomad Server example](./examples/nomad-server/main.tf)
 
+## Availability zone rebalancing
+
+By default, AWS rebalances the Nomad clients Auto Scaling group across availability zones. AWS terminates a client of its choice without notifying Nomad, so the jobs on that client are lost. Set `suspend_az_rebalance = true` to suspend this process, especially when `nomad_auto_scaler` is `true`. Scale-out and scale-in still spread clients across zones. The zones can stay uneven after a zone recovers from a capacity shortage.
+
 ---
 
 <!-- BEGIN_TF_DOCS -->
@@ -185,6 +189,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_ssh_key_name"></a> [ssh\_key\_name](#input\_ssh\_key\_name) | Name of a pre-existing AWS Key Pair to use for nomad nodes. Mutually exclusive with ssh\_key. | `string` | `null` | no |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet ID | `string` | `""` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Subnet IDs | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
+| <a name="input_suspend_az_rebalance"></a> [suspend\_az\_rebalance](#input\_suspend\_az\_rebalance) | If true, suspend AZRebalance on the Nomad clients Auto Scaling group. AWS AZ rebalancing terminates clients without draining them in Nomad, which loses running jobs. While suspended, zones can stay uneven after a zone recovers from a capacity shortage. | `bool` | `false` | no |
 | <a name="input_use_podman"></a> [use\_podman](#input\_use\_podman) | Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2). | `bool` | `false` | no |
 | <a name="input_volume_type"></a> [volume\_type](#input\_volume\_type) | The EBS volume type of the node. If gp3 is not available in your desired region, switch to gp2 | `string` | `"gp3"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |

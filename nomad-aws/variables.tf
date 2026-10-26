@@ -320,3 +320,9 @@ variable "custom_ca_cert" {
     that use custom/self-signed certificates.
     EOF
 }
+
+variable "suspend_az_rebalance" {
+  type        = bool
+  default     = false
+  description = "If true, suspend AZRebalance on the Nomad clients Auto Scaling group. AWS AZ rebalancing terminates clients without draining them in Nomad, which loses running jobs. While suspended, zones can stay uneven after a zone recovers from a capacity shortage."
+}

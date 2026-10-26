@@ -147,7 +147,7 @@ resource "aws_autoscaling_group" "clients_asg" {
   # AZ rebalancing terminates clients that AWS picks, without draining them in
   # Nomad first, so the jobs running on them are lost. Scale-out and scale-in
   # still spread instances across the availability zones while it is suspended.
-  suspended_processes = ["AZRebalance"]
+  suspended_processes = var.suspend_az_rebalance ? ["AZRebalance"] : []
 
   launch_template {
     id      = aws_launch_template.nomad_clients.id
