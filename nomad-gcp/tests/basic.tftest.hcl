@@ -154,6 +154,20 @@ run "test_health_check_configuration" {
   }
 }
 
+run "test_failure_handlers_do_not_exit_in_a_subshell" {
+  variables {
+    region                = "us-east1"
+    zone                  = "us-east1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+  }
+
+  assert {
+    condition     = length(regexall("\\|\\|\\s*\\([^)]*\\bexit\\b", google_compute_instance_template.nomad.metadata_startup_script)) == 0
+    error_message = "A failure handler runs exit inside ( ). That exit stops only the subshell, so the startup script continues. Use a brace group { ...; } instead."
+  }
+}
+
 run "test_mtls_configuration" {
   variables {
     region                = "canada-east1"
