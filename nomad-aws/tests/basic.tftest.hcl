@@ -113,12 +113,20 @@ run "test_ca_distrust_order" {
 
   assert {
     condition     = length(regexall("(?m)^[^#\\n]*\\b(?:curl|wget)\\b[^\\n]*https://", split("\ndistrust_compromised_ca_roots\n", data.cloudinit_config.nomad_user_data.part[0].content)[0])) == 0
-    error_message = "Nothing should fetch over HTTPS before distrust_compromised_ca_roots runs"
+    error_message = "No curl or wget command should fetch an https:// URL before distrust_compromised_ca_roots runs"
   }
 
   assert {
-    condition     = strcontains(data.cloudinit_config.nomad_user_data.part[0].content, "\ndistrust_compromised_ca_roots() {")
-    error_message = "The startup script calls distrust_compromised_ca_roots, so it must also define it"
+    condition = alltrue([
+      for url in ["apt.releases.hashicorp.com/gpg", "download.docker.com/linux/ubuntu/gpg"] :
+      !strcontains(split("\ndistrust_compromised_ca_roots\n", data.cloudinit_config.nomad_user_data.part[0].content)[0], url)
+    ])
+    error_message = "The HashiCorp and Docker signing keys should be fetched after distrust_compromised_ca_roots runs"
+  }
+
+  assert {
+    condition     = strcontains(split("\ndistrust_compromised_ca_roots\n", data.cloudinit_config.nomad_user_data.part[0].content)[0], "\ndistrust_compromised_ca_roots() {")
+    error_message = "The startup script must define distrust_compromised_ca_roots before it calls it"
   }
 }
 

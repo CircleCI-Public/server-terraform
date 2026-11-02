@@ -164,7 +164,12 @@ run "test_failure_handlers_do_not_exit_in_a_subshell" {
 
   assert {
     condition     = length(regexall("\\|\\|\\s*\\([^)]*\\bexit\\b", google_compute_instance_template.nomad.metadata_startup_script)) == 0
-    error_message = "A failure handler runs exit inside ( ). That exit stops only the subshell, so the startup script continues. Use a brace group { ...; } instead."
+    error_message = "A failure handler in the client script runs exit inside ( ). That exit stops only the subshell, so the script can continue. Use a brace group { ...; } instead."
+  }
+
+  assert {
+    condition     = length(regexall("\\|\\|\\s*\\([^)]*\\bexit\\b", file("${path.module}/modules/nomad-server-gcp/templates/nomad-server-startup.sh.tpl"))) == 0
+    error_message = "A failure handler in the server template runs exit inside ( ). That exit stops only the subshell, so the script can continue. Use a brace group { ...; } instead."
   }
 }
 
