@@ -208,3 +208,12 @@ variable "apt_retry_max_attempts" {
   description = "Max attempts for the retry() apt wrapper in the server startup script."
   type        = number
 }
+variable "cve_2026_98432_helpers" {
+  description = "CVE-2026-98432 mitigation helper injected into the server startup script."
+  type        = string
+}
+variable "enable_cve_2026_98432_mitigation" {
+  description = "If true, the server startup script applies the CVE-2026-98432 mitigation."
+  type        = bool
+  nullable    = false
+}

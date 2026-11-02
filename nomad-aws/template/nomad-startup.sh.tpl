@@ -22,6 +22,10 @@ retry() {
 
 ${apt_helpers}
 
+%{ if cve_2026_98432_enabled ~}
+${cve_2026_98432_helpers}
+%{ endif ~}
+
 export aws_instance_metadata_url="http://169.254.169.254"
 export TOKEN="$(curl -X PUT "$aws_instance_metadata_url/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 180")"
 export PUBLIC_IP="$(curl -H "X-aws-ec2-metadata-token: $TOKEN" $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
@@ -62,19 +66,23 @@ retry apt-get install -y jq
 echo "--------------------------------------"
 echo "  Creating ASG health reporter"
 echo "--------------------------------------"
-echo "${set_unhealthy_script}" | base64 -d > /usr/local/bin/nomad-set-unhealthy.sh
+cat <<'NOMAD_SET_UNHEALTHY_EOF' > /usr/local/bin/nomad-set-unhealthy.sh
+${set_unhealthy_script}
+NOMAD_SET_UNHEALTHY_EOF
 chmod 0700 /usr/local/bin/nomad-set-unhealthy.sh
 
 echo "--------------------------------------"
 echo "  Creating nomad liveness check"
 echo "--------------------------------------"
-echo "${liveness_check_script}" | base64 -d > /usr/local/bin/nomad-liveness-check.sh
+cat <<'NOMAD_LIVENESS_CHECK_EOF' > /usr/local/bin/nomad-liveness-check.sh
+${liveness_check_script}
+NOMAD_LIVENESS_CHECK_EOF
 chmod 0700 /usr/local/bin/nomad-liveness-check.sh
 
 cat <<EOT > /etc/systemd/system/nomad-liveness-check.service
 [Unit]
 Description=Nomad client liveness check
-After=network.target
+After=network.target nomad.service
 [Service]
 Type=simple
 Restart=always
@@ -119,6 +127,10 @@ echo "-------------------------------------------"
 
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
 rmmod algif_aead 2>/dev/null || true
+
+%{ if cve_2026_98432_enabled ~}
+mitigate_cve_2026_98432
+%{ endif ~}
 
 echo "--------------------------------------"
 echo "        Installing common packages"

@@ -326,3 +326,10 @@ variable "suspend_az_rebalance" {
   default     = false
   description = "If true, suspend AZRebalance on the Nomad clients Auto Scaling group. AWS AZ rebalancing terminates clients without draining them in Nomad, which loses running jobs. While suspended, zones can stay uneven after a zone recovers from a capacity shortage."
 }
+
+variable "enable_cve_2026_98432_mitigation" {
+  type        = bool
+  default     = true
+  nullable    = false
+  description = "If true, the Nomad client and server startup scripts apply a mitigation for CVE-2026-98432. They disable MPTCP and keep net.ipv4.tcp_migrate_req at 0 in the host network namespace. They also drop inbound IPv4 TCP packets that carry IP options. A job can still trigger the bug inside its own network namespace. Only a kernel with the fix removes that risk. The scripts do not check the kernel version. For the fixed kernels, see https://ubuntu.com/security/CVE-2026-98432. If the mitigation is not in place, Nomad does not start, and the Auto Scaling group replaces the node. Running nodes keep their setup until the Auto Scaling group replaces them, also when you change this variable. The mitigation adds about 1.2 KB to the gzipped user data. If the user data goes over the EC2 limit of 16 KB, for example with a long custom_ca_cert, Terraform stops with an error."
+}

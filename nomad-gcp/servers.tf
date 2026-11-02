@@ -63,4 +63,6 @@ module "server" {
   gcp_cluster_network_cidr         = data.google_compute_subnetwork.k8s[0].ip_cidr_range
   apt_helpers                      = local.apt_helpers
   apt_retry_max_attempts           = var.apt_retry_max_attempts
+  cve_2026_98432_helpers           = local.cve_2026_98432_helpers
+  enable_cve_2026_98432_mitigation = var.enable_cve_2026_98432_mitigation
 }

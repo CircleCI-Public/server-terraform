@@ -99,6 +99,8 @@ resource "google_compute_instance_template" "nomad" {
       server_retry_join      = var.server_retry_join
       apt_helpers            = var.apt_helpers
       apt_retry_max_attempts = var.apt_retry_max_attempts
+      cve_2026_98432_helpers = var.cve_2026_98432_helpers
+      cve_2026_98432_enabled = var.enable_cve_2026_98432_mitigation
       liveness_check_script  = base64encode(file("${path.module}/templates/nomad-server-liveness-check.sh"))
       set_unhealthy_script   = base64encode(file("${path.module}/templates/nomad-set-unhealthy.sh"))
     }

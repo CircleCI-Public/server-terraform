@@ -5,6 +5,7 @@ locals {
   subnet_or_network              = var.subnetwork != "" ? var.subnetwork : var.network
   is_subnet_a_self_link          = can(regex("^https://www\\.googleapis\\.com/compute/", local.subnet_or_network))
   apt_helpers                    = file("${path.module}/../shared/scripts/apt-helpers.sh")
+  cve_2026_98432_helpers         = file("${path.module}/../shared/scripts/cve-2026-98432.sh")
 }
 
 data "google_compute_subnetwork" "nomad" {
@@ -113,6 +114,8 @@ resource "google_compute_instance_template" "nomad" {
       external_nomad_server    = var.deploy_nomad_server_instances
       apt_retry_max_attempts   = var.apt_retry_max_attempts
       apt_helpers              = local.apt_helpers
+      cve_2026_98432_helpers   = local.cve_2026_98432_helpers
+      cve_2026_98432_enabled   = var.enable_cve_2026_98432_mitigation
       use_podman               = var.use_podman
       podman_cpu_quota_percent = var.podman_cpu_quota_percent
       podman_tasks_max         = var.podman_tasks_max

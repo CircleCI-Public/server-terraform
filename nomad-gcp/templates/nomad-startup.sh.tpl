@@ -27,6 +27,10 @@ tune_io_scheduler() {
 
 ${apt_helpers}
 
+%{ if cve_2026_98432_enabled ~}
+${cve_2026_98432_helpers}
+%{ endif ~}
+
 system_update() {
 	log "--------------------------------------"
 	log "Updating system"
@@ -121,7 +125,7 @@ setup_liveness_check() {
 	cat <<-EOT > /etc/systemd/system/nomad-liveness-check.service
 	[Unit]
 	Description=Nomad client liveness check
-	After=network.target
+	After=network.target nomad.service
 	[Service]
 	Type=simple
 	Restart=always
@@ -396,6 +400,9 @@ mitigate_cve_2026_31431
 retry apt-get update
 distrust_compromised_ca_roots
 install ntp wget gpg coreutils jq
+%{ if cve_2026_98432_enabled ~}
+mitigate_cve_2026_98432
+%{ endif ~}
 
 echo "--------------------------------------"
 echo "  Adding HashiCorp apt repository"

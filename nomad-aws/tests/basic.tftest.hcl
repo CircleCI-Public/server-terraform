@@ -242,3 +242,162 @@ run "test_mtls_configuration" {
     error_message = "Nomad CA should not be empty"
   }
 }
+
+run "test_cve_2026_98432_mitigation_enabled_by_default" {
+  variables {
+    nomad_server_hostname = "example.com"
+    blocked_cidrs         = ["192.168.1.0/24"]
+    dns_server            = "192.168.0.2"
+    nodes                 = 2
+    vpc_id                = "vpc-12345678"
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
+  }
+
+  assert {
+    condition     = can(regex("(?m)^mitigate_cve_2026_98432$", data.cloudinit_config.nomad_user_data.part[0].content))
+    error_message = "Startup script should call the CVE-2026-98432 mitigation by default"
+  }
+
+  assert {
+    condition     = strcontains(data.cloudinit_config.nomad_user_data.part[0].content, "mitigate_cve_2026_98432() {")
+    error_message = "Startup script should define the CVE-2026-98432 mitigation it calls"
+  }
+
+  assert {
+    condition = can(regex(
+      "(?ms)^retry apt-get update$.*^mitigate_cve_2026_98432$",
+      regex("(?s)^(.*?)\nif \\[ \"(?:true|false)\" [!=]= \"true\" \\]; then\n", data.cloudinit_config.nomad_user_data.part[0].content)[0]
+    ))
+    error_message = "Startup script should call the CVE-2026-98432 mitigation after apt-get update and before the first Docker or Podman branch, so both runtime paths run it"
+  }
+}
+
+run "test_embedded_scripts_ship_verbatim" {
+  variables {
+    nomad_server_hostname = "example.com"
+    blocked_cidrs         = ["192.168.1.0/24"]
+    dns_server            = "192.168.0.2"
+    nodes                 = 2
+    vpc_id                = "vpc-12345678"
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
+  }
+
+  assert {
+    condition     = strcontains(data.cloudinit_config.nomad_user_data.part[0].content, "cat <<'NOMAD_SET_UNHEALTHY_EOF' > /usr/local/bin/nomad-set-unhealthy.sh\n${file("template/nomad-set-unhealthy.sh")}\nNOMAD_SET_UNHEALTHY_EOF\n")
+    error_message = "Startup script should write nomad-set-unhealthy.sh verbatim from a quoted heredoc"
+  }
+
+  assert {
+    condition     = strcontains(data.cloudinit_config.nomad_user_data.part[0].content, "cat <<'NOMAD_LIVENESS_CHECK_EOF' > /usr/local/bin/nomad-liveness-check.sh\n${templatefile("template/nomad-liveness-check.sh.tpl", { external_nomad_server = false, use_podman = false })}\nNOMAD_LIVENESS_CHECK_EOF\n")
+    error_message = "Startup script should write nomad-liveness-check.sh verbatim from a quoted heredoc"
+  }
+
+  assert {
+    condition = alltrue([
+      for delimiter in ["NOMAD_SET_UNHEALTHY_EOF", "NOMAD_LIVENESS_CHECK_EOF"] :
+      !can(regex("[^\\x00-\\x7F]", regex("(?s)<<'${delimiter}' [^\n]*\n(.*?)\n${delimiter}\n", data.cloudinit_config.nomad_user_data.part[0].content)[0]))
+    ])
+    error_message = "The scripts that the startup script embeds should be ASCII only, because cloud-init rewrites other characters in user data"
+  }
+}
+
+run "test_helpers_ship_without_comment_lines" {
+  variables {
+    nomad_server_hostname = "example.com"
+    blocked_cidrs         = ["192.168.1.0/24"]
+    dns_server            = "192.168.0.2"
+    nodes                 = 2
+    vpc_id                = "vpc-12345678"
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
+  }
+
+  assert {
+    condition     = !can(regex("(?m)^[[:space:]]*# (CVE-2026-98432 mitigation for the Nomad|Shared apt/dpkg helpers)", data.cloudinit_config.nomad_user_data.part[0].content))
+    error_message = "The shell helpers should ship without their comment lines, to fit in EC2 user data"
+  }
+
+  assert {
+    condition = alltrue([
+      for line in [
+        "ip protocol tcp ip hdrlength != 5 counter drop",
+        "ExecStartPre=/bin/sh -c '/usr/sbin/nft list table ip circleci_cve_2026_98432",
+        "ExecStartPost=/usr/sbin/nft -f /etc/circleci/cve-2026-98432.nft",
+        "WantedBy=sysinit.target",
+      ] : strcontains(data.cloudinit_config.nomad_user_data.part[0].content, line)
+    ])
+    error_message = "Comment stripping should keep the heredoc bodies of the CVE-2026-98432 helper"
+  }
+}
+
+run "test_cve_2026_98432_mitigation_disabled" {
+  variables {
+    nomad_server_hostname            = "example.com"
+    blocked_cidrs                    = ["192.168.1.0/24"]
+    dns_server                       = "192.168.0.2"
+    nodes                            = 2
+    vpc_id                           = "vpc-12345678"
+    aws_region                       = "us-east-1"
+    basename                         = "cci-nomad"
+    enable_cve_2026_98432_mitigation = false
+  }
+
+  assert {
+    condition     = !can(regex("(?m)^mitigate_cve_2026_98432$", data.cloudinit_config.nomad_user_data.part[0].content))
+    error_message = "Startup script should not call the CVE-2026-98432 mitigation when enable_cve_2026_98432_mitigation is false"
+  }
+
+  assert {
+    condition     = !strcontains(data.cloudinit_config.nomad_user_data.part[0].content, "mitigate_cve_2026_98432() {")
+    error_message = "Startup script should not include the CVE-2026-98432 helper when enable_cve_2026_98432_mitigation is false"
+  }
+}
+
+run "test_user_data_size_limit" {
+  variables {
+    nomad_server_hostname = "example.com"
+    blocked_cidrs         = ["192.168.1.0/24"]
+    dns_server            = "192.168.0.2"
+    nodes                 = 2
+    vpc_id                = "vpc-12345678"
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
+  }
+
+  assert {
+    condition     = length(data.cloudinit_config.nomad_user_data.rendered) <= 20480
+    error_message = "Base64 user data should stay at or under 20480 characters (15 KB decoded) with these small inputs. EC2 rejects user data over 16 KB. Real inputs are larger, and each RSA-4096 certificate in custom_ca_cert adds about 1.5 KB."
+  }
+}
+
+run "test_user_data_over_ec2_limit_fails" {
+  command = plan
+
+  # Fixed TLS values make the user data known at plan time.
+  override_module {
+    target = module.nomad_tls
+    outputs = {
+      nomad_server_cert = "CERT"
+      nomad_server_key  = "KEY"
+      nomad_client_cert = "CERT"
+      nomad_client_key  = "KEY"
+      nomad_tls_ca      = "CA"
+    }
+  }
+
+  variables {
+    nomad_server_hostname = "example.com"
+    blocked_cidrs         = ["192.168.1.0/24"]
+    dns_server            = "192.168.0.2"
+    nodes                 = 2
+    vpc_id                = "vpc-12345678"
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
+    # Hex digests compress poorly, so this adds about 10 KB after gzip.
+    custom_ca_cert = join("\n", [for i in range(160) : sha512("custom-ca-${i}")])
+  }
+
+  expect_failures = [aws_launch_template.nomad_clients]
+}

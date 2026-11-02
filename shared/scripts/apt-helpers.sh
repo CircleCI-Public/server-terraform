@@ -3,6 +3,10 @@
 # `apt_helpers` templatefile variable. Kept provider-agnostic (uses `echo`, not
 # the GCP-only `log` helper) so a single copy works for AWS and GCP, client and
 # server. Edit here only — the startup templates interpolate this verbatim.
+# On AWS, the module first removes each line whose first non-blank characters
+# are `# `, and each line that is only `#`, because EC2 user data is limited
+# to 16 KB. Do not start a line that way inside a heredoc or a multi-line
+# string, because the AWS copy loses it.
 prepare_apt() {
     echo "-------------------------------------------"
     echo "     Preparing apt"

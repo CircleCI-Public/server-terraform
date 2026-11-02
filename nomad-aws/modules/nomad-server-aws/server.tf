@@ -44,6 +44,12 @@ resource "aws_launch_template" "nomad-servers" {
   }
   lifecycle {
     create_before_destroy = true
+
+    # 21844 base64 characters decode to at most 16383 bytes.
+    precondition {
+      condition     = length(data.cloudinit_config.nomad_server_user_data.rendered) <= 21844
+      error_message = "The Nomad server user data is over the EC2 limit of 16 KB after gzip. Set enable_cve_2026_98432_mitigation = false to make it smaller."
+    }
   }
 }
 
@@ -93,6 +99,8 @@ data "cloudinit_config" "nomad_server_user_data" {
         log_level              = var.log_level
         apt_helpers            = var.apt_helpers
         apt_retry_max_attempts = var.apt_retry_max_attempts
+        cve_2026_98432_helpers = var.cve_2026_98432_helpers
+        cve_2026_98432_enabled = var.enable_cve_2026_98432_mitigation
         set_unhealthy_script   = base64encode(file("${path.module}/templates/nomad-set-unhealthy.sh"))
         liveness_check_script  = base64encode(file("${path.module}/templates/nomad-server-liveness-check.sh"))
       }

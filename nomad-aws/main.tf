@@ -13,7 +13,18 @@ locals {
 
   instance_tags = merge(var.instance_tags, { "type" = "circleci-nomad-client" })
 
-  apt_helpers = file("${path.module}/../shared/scripts/apt-helpers.sh")
+  # The shell helpers ship in EC2 user data, which is limited to 16 KB. To save
+  # space, drop each line whose first non-blank characters are "# ", and each
+  # line that is only "#". A line such as "#!/bin/sh" stays. Each helper file
+  # states the rule that follows from this.
+  apt_helpers = join("\n", [
+    for line in split("\n", file("${path.module}/../shared/scripts/apt-helpers.sh")) : line
+    if !(startswith(trimspace(line), "# ") || trimspace(line) == "#")
+  ])
+  cve_2026_98432_helpers = join("\n", [
+    for line in split("\n", file("${path.module}/../shared/scripts/cve-2026-98432.sh")) : line
+    if !(startswith(trimspace(line), "# ") || trimspace(line) == "#")
+  ])
 }
 
 resource "aws_key_pair" "ssh_key" {
@@ -55,6 +66,11 @@ module "nomad_tls" {
   nomad_server_port     = var.nomad_server_port
 }
 
+# EC2 rejects user data that is over 16 KB after gzip and before base64. The
+# template embeds nomad-set-unhealthy.sh and the liveness check as plain text,
+# because gzip compresses base64 text much less than plain text. The launch
+# template stops a run that goes over the limit, and tests/basic.tftest.hcl
+# keeps the default inputs under 15 KB.
 data "cloudinit_config" "nomad_user_data" {
   gzip          = true
   base64_encode = true
@@ -76,11 +92,13 @@ data "cloudinit_config" "nomad_user_data" {
         external_nomad_server    = var.deploy_nomad_server_instances
         apt_retry_max_attempts   = var.apt_retry_max_attempts
         apt_helpers              = local.apt_helpers
+        cve_2026_98432_helpers   = local.cve_2026_98432_helpers
+        cve_2026_98432_enabled   = var.enable_cve_2026_98432_mitigation
         use_podman               = var.use_podman
         podman_cpu_quota_percent = var.podman_cpu_quota_percent
         podman_tasks_max         = var.podman_tasks_max
-        set_unhealthy_script     = base64encode(file("${path.module}/template/nomad-set-unhealthy.sh"))
-        liveness_check_script    = base64encode(templatefile("${path.module}/template/nomad-liveness-check.sh.tpl", { external_nomad_server = var.deploy_nomad_server_instances, use_podman = var.use_podman }))
+        set_unhealthy_script     = file("${path.module}/template/nomad-set-unhealthy.sh")
+        liveness_check_script    = templatefile("${path.module}/template/nomad-liveness-check.sh.tpl", { external_nomad_server = var.deploy_nomad_server_instances, use_podman = var.use_podman })
         custom_ca_cert           = var.custom_ca_cert
       }
     )
@@ -132,6 +150,14 @@ resource "aws_launch_template" "nomad_clients" {
     content {
       resource_type = tag_specifications.value
       tags          = local.instance_tags
+    }
+  }
+
+  lifecycle {
+    # 21844 base64 characters decode to at most 16383 bytes.
+    precondition {
+      condition     = length(data.cloudinit_config.nomad_user_data.rendered) <= 21844
+      error_message = "The Nomad client user data is over the EC2 limit of 16 KB after gzip. Shorten custom_ca_cert, or set enable_cve_2026_98432_mitigation = false."
     }
   }
 }

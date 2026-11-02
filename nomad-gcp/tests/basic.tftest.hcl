@@ -180,3 +180,50 @@ run "test_mtls_configuration" {
     error_message = "Nomad CA should not be empty"
   }
 }
+
+run "test_cve_2026_98432_mitigation_enabled_by_default" {
+  variables {
+    region                = "us-east1"
+    zone                  = "us-east1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+  }
+
+  assert {
+    condition     = can(regex("(?m)^mitigate_cve_2026_98432$", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "Startup script should call the CVE-2026-98432 mitigation by default"
+  }
+
+  assert {
+    condition     = strcontains(google_compute_instance_template.nomad.metadata_startup_script, "mitigate_cve_2026_98432() {")
+    error_message = "Startup script should define the CVE-2026-98432 mitigation it calls"
+  }
+
+  assert {
+    condition = can(regex(
+      "(?ms)^retry apt-get update$.*^mitigate_cve_2026_98432$",
+      regex("(?s)^(.*?)\nif \\[ \"(?:true|false)\" [!=]= \"true\" \\]; then\n", google_compute_instance_template.nomad.metadata_startup_script)[0]
+    ))
+    error_message = "Startup script should call the CVE-2026-98432 mitigation after apt-get update and before the first Docker or Podman branch, so both runtime paths run it"
+  }
+}
+
+run "test_cve_2026_98432_mitigation_disabled" {
+  variables {
+    region                           = "us-east1"
+    zone                             = "us-east1-a"
+    nomad_server_hostname            = "example.com"
+    name                             = "test-nomad"
+    enable_cve_2026_98432_mitigation = false
+  }
+
+  assert {
+    condition     = !can(regex("(?m)^mitigate_cve_2026_98432$", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "Startup script should not call the CVE-2026-98432 mitigation when enable_cve_2026_98432_mitigation is false"
+  }
+
+  assert {
+    condition     = !strcontains(google_compute_instance_template.nomad.metadata_startup_script, "mitigate_cve_2026_98432() {")
+    error_message = "Startup script should not include the CVE-2026-98432 helper when enable_cve_2026_98432_mitigation is false"
+  }
+}

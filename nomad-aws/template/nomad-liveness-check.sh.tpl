@@ -23,7 +23,7 @@ check_nomad_installed() {
 }
 
 mark_unhealthy() {
-    log "$1 — marking instance unhealthy in ASG"
+    log "$1: marking instance unhealthy in ASG"
     if /usr/local/bin/nomad-set-unhealthy.sh "$EC2_INSTANCE_ID" 2>/dev/null; then
         log "Instance $EC2_INSTANCE_ID marked unhealthy in ASG"
     else

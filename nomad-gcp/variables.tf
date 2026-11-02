@@ -385,3 +385,10 @@ variable "custom_ca_cert" {
     that use custom/self-signed certificates.
     EOF
 }
+
+variable "enable_cve_2026_98432_mitigation" {
+  type        = bool
+  default     = true
+  nullable    = false
+  description = "If true, the Nomad client and server startup scripts apply a mitigation for CVE-2026-98432. They disable MPTCP and keep net.ipv4.tcp_migrate_req at 0 in the host network namespace. They also drop inbound IPv4 TCP packets that carry IP options. A job can still trigger the bug inside its own network namespace. Only a kernel with the fix removes that risk. The scripts do not check the kernel version. For the fixed kernels, see https://ubuntu.com/security/CVE-2026-98432. If the mitigation is not in place, Nomad does not start, and the managed instance group replaces the node. Running nodes keep their setup until the managed instance group replaces them, also when you change this variable."
+}

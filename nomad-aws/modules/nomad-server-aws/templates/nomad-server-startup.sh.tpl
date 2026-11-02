@@ -25,6 +25,10 @@ retry() {
 
 ${apt_helpers}
 
+%{ if cve_2026_98432_enabled ~}
+${cve_2026_98432_helpers}
+%{ endif ~}
+
 export aws_instance_metadata_url="http://169.254.169.254"
 export TOKEN="$(curl -X PUT "$aws_instance_metadata_url/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 180")"
 export PUBLIC_IP="$(curl -H "X-aws-ec2-metadata-token: $TOKEN" $aws_instance_metadata_url/latest/meta-data/public-ipv4)"
@@ -75,6 +79,9 @@ echo "--------------------------------------"
 retry apt-get update
 distrust_compromised_ca_roots
 retry apt-get install -y ntp wget gpg coreutils jq
+%{ if cve_2026_98432_enabled ~}
+mitigate_cve_2026_98432
+%{ endif ~}
 
 echo "--------------------------------------"
 echo "  Adding HashiCorp apt repository"
@@ -103,7 +110,7 @@ chmod 0700 /usr/local/bin/nomad-liveness-check.sh
 cat <<EOT > /etc/systemd/system/nomad-liveness-check.service
 [Unit]
 Description=Nomad server liveness check
-After=network.target
+After=network.target nomad.service
 [Service]
 Type=simple
 Restart=always

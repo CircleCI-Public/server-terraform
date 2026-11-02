@@ -178,3 +178,85 @@ run "test_load_balancer_configuration" {
     error_message = "Target group should be configured for port 4648"
   }
 }
+
+run "test_server_cve_2026_98432_mitigation_enabled" {
+  module {
+    source = "./modules/nomad-server-aws"
+  }
+
+  variables {
+    aws_region                       = "us-east-1"
+    vpc_id                           = "vpc-12345678"
+    basename                         = "test"
+    nomad_server_hostname            = "example.com"
+    random_string_suffix             = "abcd1234"
+    server_nlb_arn                   = "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/net/test/0123456789abcdef"
+    apt_helpers                      = file("../shared/scripts/apt-helpers.sh")
+    apt_retry_max_attempts           = 5
+    cve_2026_98432_helpers           = file("../shared/scripts/cve-2026-98432.sh")
+    enable_cve_2026_98432_mitigation = true
+  }
+
+  assert {
+    condition     = can(regex("(?m)^mitigate_cve_2026_98432$", data.cloudinit_config.nomad_server_user_data.part[0].content))
+    error_message = "Server startup script should call the CVE-2026-98432 mitigation when enable_cve_2026_98432_mitigation is true"
+  }
+
+  assert {
+    condition     = strcontains(data.cloudinit_config.nomad_server_user_data.part[0].content, "mitigate_cve_2026_98432() {")
+    error_message = "Server startup script should define the CVE-2026-98432 mitigation it calls"
+  }
+
+  assert {
+    condition     = can(regex("(?ms)^retry apt-get update$.*^mitigate_cve_2026_98432$", data.cloudinit_config.nomad_server_user_data.part[0].content)) && !can(regex("(?ms)apt-get install -y nomad=.*^mitigate_cve_2026_98432$", data.cloudinit_config.nomad_server_user_data.part[0].content))
+    error_message = "Server startup script should call the CVE-2026-98432 mitigation after apt-get update and before it installs Nomad"
+  }
+}
+
+run "test_server_cve_2026_98432_mitigation_disabled" {
+  module {
+    source = "./modules/nomad-server-aws"
+  }
+
+  variables {
+    aws_region                       = "us-east-1"
+    vpc_id                           = "vpc-12345678"
+    basename                         = "test"
+    nomad_server_hostname            = "example.com"
+    random_string_suffix             = "abcd1234"
+    server_nlb_arn                   = "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/net/test/0123456789abcdef"
+    apt_helpers                      = file("../shared/scripts/apt-helpers.sh")
+    apt_retry_max_attempts           = 5
+    cve_2026_98432_helpers           = file("../shared/scripts/cve-2026-98432.sh")
+    enable_cve_2026_98432_mitigation = false
+  }
+
+  assert {
+    condition     = !can(regex("(?m)^mitigate_cve_2026_98432$", data.cloudinit_config.nomad_server_user_data.part[0].content))
+    error_message = "Server startup script should not call the CVE-2026-98432 mitigation when enable_cve_2026_98432_mitigation is false"
+  }
+
+  assert {
+    condition     = !strcontains(data.cloudinit_config.nomad_server_user_data.part[0].content, "mitigate_cve_2026_98432() {")
+    error_message = "Server startup script should not include the CVE-2026-98432 helper when enable_cve_2026_98432_mitigation is false"
+  }
+}
+
+run "test_server_user_data_size_limit" {
+  variables {
+    basename                      = "test"
+    nomad_server_hostname         = "example.com"
+    blocked_cidrs                 = ["192.168.1.0/24"]
+    dns_server                    = "192.168.0.2"
+    nodes                         = 2
+    vpc_id                        = "vpc-12345678"
+    subnets                       = ["subnet-12345678"]
+    deploy_nomad_server_instances = true
+    aws_region                    = "us-east-1"
+  }
+
+  assert {
+    condition     = length(module.server[0].launch_template.user_data) <= 20480
+    error_message = "Base64 server user data should stay at or under 20480 characters (15 KB decoded). EC2 rejects user data over 16 KB."
+  }
+}
