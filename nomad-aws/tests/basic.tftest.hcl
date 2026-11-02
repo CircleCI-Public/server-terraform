@@ -271,6 +271,32 @@ run "test_cve_2026_98432_mitigation_enabled_by_default" {
     ))
     error_message = "Startup script should call the CVE-2026-98432 mitigation after apt-get update and before the first Docker or Podman branch, so both runtime paths run it"
   }
+
+  # No server is deployed in this run, so check the module call in server.tf.
+  assert {
+    condition = alltrue([
+      can(regex("(?m)^\\s*cve_2026_98432_helpers\\s*=\\s*local\\.cve_2026_98432_helpers\\s*$", file("server.tf"))),
+      can(regex("(?m)^\\s*enable_cve_2026_98432_mitigation\\s*=\\s*var\\.enable_cve_2026_98432_mitigation\\s*$", file("server.tf"))),
+    ]) && var.enable_cve_2026_98432_mitigation
+    error_message = "The root module should pass the stripped CVE-2026-98432 helper and the flag to the server module unchanged"
+  }
+}
+
+run "test_liveness_check_starts_after_nomad" {
+  variables {
+    nomad_server_hostname = "example.com"
+    blocked_cidrs         = ["192.168.1.0/24"]
+    dns_server            = "192.168.0.2"
+    nodes                 = 2
+    vpc_id                = "vpc-12345678"
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
+  }
+
+  assert {
+    condition     = strcontains(data.cloudinit_config.nomad_user_data.part[0].content, "Description=Nomad client liveness check\nAfter=network.target nomad.service\n")
+    error_message = "The client liveness unit should start after nomad.service, so that a check at boot does not find Nomad still starting"
+  }
 }
 
 run "test_embedded_scripts_ship_verbatim" {
@@ -297,7 +323,7 @@ run "test_embedded_scripts_ship_verbatim" {
   assert {
     condition = alltrue([
       for delimiter in ["NOMAD_SET_UNHEALTHY_EOF", "NOMAD_LIVENESS_CHECK_EOF"] :
-      !can(regex("[^\\x00-\\x7F]", regex("(?s)<<'${delimiter}' [^\n]*\n(.*?)\n${delimiter}\n", data.cloudinit_config.nomad_user_data.part[0].content)[0]))
+      length(regexall("[^\\x00-\\x7F]", regex("(?s)<<'${delimiter}' [^\n]*\n(.*?)\n${delimiter}\n", data.cloudinit_config.nomad_user_data.part[0].content)[0])) == 0
     ])
     error_message = "The scripts that the startup script embeds should be ASCII only, because cloud-init rewrites other characters in user data"
   }
@@ -320,10 +346,15 @@ run "test_helpers_ship_without_comment_lines" {
   }
 
   assert {
+    condition     = length(regexall("(?m)^[[:space:]]*#( |$)", local.apt_helpers)) == 0 && length(regexall("(?m)^[[:space:]]*#( |$)", local.cve_2026_98432_helpers)) == 0
+    error_message = "The stripped shell helpers should have no comment lines left"
+  }
+
+  assert {
     condition = alltrue([
       for line in [
         "ip protocol tcp ip hdrlength != 5 counter drop",
-        "ExecStartPre=/bin/sh -c '/usr/sbin/nft list table ip circleci_cve_2026_98432",
+        "ExecStartPre=/bin/sh -c '/usr/sbin/nft -f /etc/circleci/cve-2026-98432.nft || ",
         "ExecStartPost=/usr/sbin/nft -f /etc/circleci/cve-2026-98432.nft",
         "WantedBy=sysinit.target",
       ] : strcontains(data.cloudinit_config.nomad_user_data.part[0].content, line)

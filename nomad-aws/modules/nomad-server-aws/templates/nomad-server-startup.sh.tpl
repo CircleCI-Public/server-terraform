@@ -79,9 +79,6 @@ echo "--------------------------------------"
 retry apt-get update
 distrust_compromised_ca_roots
 retry apt-get install -y ntp wget gpg coreutils jq
-%{ if cve_2026_98432_enabled ~}
-mitigate_cve_2026_98432
-%{ endif ~}
 
 echo "--------------------------------------"
 echo "  Adding HashiCorp apt repository"
@@ -110,7 +107,7 @@ chmod 0700 /usr/local/bin/nomad-liveness-check.sh
 cat <<EOT > /etc/systemd/system/nomad-liveness-check.service
 [Unit]
 Description=Nomad server liveness check
-After=network.target nomad.service
+After=network.target
 [Service]
 Type=simple
 Restart=always
@@ -126,6 +123,9 @@ EOT
 
 systemctl daemon-reload
 systemctl enable --now nomad-liveness-check
+%{ if cve_2026_98432_enabled ~}
+mitigate_cve_2026_98432
+%{ endif ~}
 
 echo "--------------------------------------"
 echo "  Configuring log rotation"

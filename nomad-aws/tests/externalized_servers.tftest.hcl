@@ -208,8 +208,18 @@ run "test_server_cve_2026_98432_mitigation_enabled" {
   }
 
   assert {
-    condition     = can(regex("(?ms)^retry apt-get update$.*^mitigate_cve_2026_98432$", data.cloudinit_config.nomad_server_user_data.part[0].content)) && !can(regex("(?ms)apt-get install -y nomad=.*^mitigate_cve_2026_98432$", data.cloudinit_config.nomad_server_user_data.part[0].content))
+    condition     = can(regex("(?ms)^retry apt-get update$.*^mitigate_cve_2026_98432$.*^retry apt-get install -y nomad=", data.cloudinit_config.nomad_server_user_data.part[0].content))
     error_message = "Server startup script should call the CVE-2026-98432 mitigation after apt-get update and before it installs Nomad"
+  }
+
+  assert {
+    condition     = can(regex("(?ms)^systemctl enable --now nomad-liveness-check$.*^mitigate_cve_2026_98432$", data.cloudinit_config.nomad_server_user_data.part[0].content))
+    error_message = "Server startup script should start the liveness check before the CVE-2026-98432 mitigation. The ASG uses EC2 health checks, so only the liveness check can replace a server whose mitigation fails."
+  }
+
+  assert {
+    condition     = strcontains(data.cloudinit_config.nomad_server_user_data.part[0].content, "Description=Nomad server liveness check\nAfter=network.target\n")
+    error_message = "The server liveness unit should not start after nomad.service. On systemd 249, a Nomad start that keeps failing never ends its start job, so the liveness check would never start."
   }
 }
 
@@ -259,4 +269,29 @@ run "test_server_user_data_size_limit" {
     condition     = length(module.server[0].launch_template.user_data) <= 20480
     error_message = "Base64 server user data should stay at or under 20480 characters (15 KB decoded). EC2 rejects user data over 16 KB."
   }
+}
+
+run "test_server_user_data_over_ec2_limit_fails" {
+  command = plan
+
+  module {
+    source = "./modules/nomad-server-aws"
+  }
+
+  variables {
+    aws_region                       = "us-east-1"
+    vpc_id                           = "vpc-12345678"
+    basename                         = "test"
+    nomad_server_hostname            = "example.com"
+    random_string_suffix             = "abcd1234"
+    server_nlb_arn                   = "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/net/test/0123456789abcdef"
+    apt_helpers                      = file("../shared/scripts/apt-helpers.sh")
+    apt_retry_max_attempts           = 5
+    cve_2026_98432_helpers           = file("../shared/scripts/cve-2026-98432.sh")
+    enable_cve_2026_98432_mitigation = true
+    # Hex digests compress poorly, so this adds about 10 KB after gzip.
+    tls_cert = join("\n", [for i in range(160) : sha512("server-cert-${i}")])
+  }
+
+  expect_failures = [aws_launch_template.nomad-servers]
 }

@@ -227,3 +227,88 @@ run "test_cve_2026_98432_mitigation_disabled" {
     error_message = "Startup script should not include the CVE-2026-98432 helper when enable_cve_2026_98432_mitigation is false"
   }
 }
+run "test_liveness_check_starts_after_nomad" {
+  variables {
+    region                = "us-east1"
+    zone                  = "us-east1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+  }
+
+  assert {
+    condition     = strcontains(google_compute_instance_template.nomad.metadata_startup_script, "Description=Nomad client liveness check\n\tAfter=network.target nomad.service\n")
+    error_message = "The client liveness unit should start after nomad.service, so that a check at boot does not find Nomad still starting"
+  }
+}
+
+# The server module uses the hashicorp/google provider, which this file does
+# not mock. This run thus renders the server template directly, and it checks
+# the module calls in the .tf files.
+run "test_server_cve_2026_98432_mitigation" {
+  command = plan
+
+  variables {
+    region                = "us-east1"
+    zone                  = "us-east1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+  }
+
+  assert {
+    condition = can(regex(
+      "(?ms)^mitigate_cve_2026_98432\\(\\) \\{$.*^retry apt-get update$.*^mitigate_cve_2026_98432$.*^setup_liveness_check$.*^install_nomad ",
+      templatefile("modules/nomad-server-gcp/templates/nomad-server-startup.sh.tpl", {
+        nomad_version          = "1.11.3-1"
+        blocked_cidrs          = []
+        tls_cert               = "CERT"
+        tls_key                = "KEY"
+        tls_ca                 = "CA"
+        max_replicas           = 3
+        min_replicas           = 3
+        server_retry_join      = "nomad.example.com"
+        apt_helpers            = local.apt_helpers
+        apt_retry_max_attempts = var.apt_retry_max_attempts
+        cve_2026_98432_helpers = local.cve_2026_98432_helpers
+        cve_2026_98432_enabled = true
+        liveness_check_script  = ""
+        set_unhealthy_script   = ""
+      })
+    ))
+    error_message = "With the mitigation on, the server startup script should define the CVE-2026-98432 mitigation, and call it after apt-get update and before the liveness check and the Nomad install"
+  }
+
+  assert {
+    condition = !strcontains(templatefile("modules/nomad-server-gcp/templates/nomad-server-startup.sh.tpl", {
+      nomad_version          = "1.11.3-1"
+      blocked_cidrs          = []
+      tls_cert               = "CERT"
+      tls_key                = "KEY"
+      tls_ca                 = "CA"
+      max_replicas           = 3
+      min_replicas           = 3
+      server_retry_join      = "nomad.example.com"
+      apt_helpers            = local.apt_helpers
+      apt_retry_max_attempts = var.apt_retry_max_attempts
+      cve_2026_98432_helpers = local.cve_2026_98432_helpers
+      cve_2026_98432_enabled = false
+      liveness_check_script  = ""
+      set_unhealthy_script   = ""
+    }), "mitigate_cve_2026_98432")
+    error_message = "With the mitigation off, the server startup script should not include or call the CVE-2026-98432 mitigation"
+  }
+
+  assert {
+    condition = alltrue([
+      can(regex("(?m)^\\s*cve_2026_98432_helpers\\s*=\\s*local\\.cve_2026_98432_helpers\\s*$", file("servers.tf"))),
+      can(regex("(?m)^\\s*enable_cve_2026_98432_mitigation\\s*=\\s*var\\.enable_cve_2026_98432_mitigation\\s*$", file("servers.tf"))),
+      can(regex("(?m)^\\s*cve_2026_98432_helpers\\s*=\\s*var\\.cve_2026_98432_helpers\\s*$", file("modules/nomad-server-gcp/server.tf"))),
+      can(regex("(?m)^\\s*cve_2026_98432_enabled\\s*=\\s*var\\.enable_cve_2026_98432_mitigation\\s*$", file("modules/nomad-server-gcp/server.tf"))),
+    ]) && var.enable_cve_2026_98432_mitigation
+    error_message = "The root module and the server module should pass the CVE-2026-98432 helper and the flag to the server template unchanged"
+  }
+
+  assert {
+    condition     = strcontains(file("modules/nomad-server-gcp/templates/nomad-server-startup.sh.tpl"), "Description=Nomad server liveness check\n\tAfter=network.target nomad.service\n") && var.enable_cve_2026_98432_mitigation
+    error_message = "The server liveness unit should start after nomad.service, so that a check at boot does not find Nomad still starting"
+  }
+}
