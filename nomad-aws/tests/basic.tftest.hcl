@@ -95,6 +95,33 @@ run "test_launch_template_configuration" {
   }
 }
 
+run "test_ca_distrust_order" {
+  variables {
+    nomad_server_hostname = "example.com"
+    blocked_cidrs         = ["192.168.1.0/24"]
+    dns_server            = "192.168.0.2"
+    nodes                 = 2
+    vpc_id                = "vpc-12345678"
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
+  }
+
+  assert {
+    condition     = can(regex("(?ms)^retry apt-get update$.*^distrust_compromised_ca_roots$", data.cloudinit_config.nomad_user_data.part[0].content))
+    error_message = "distrust_compromised_ca_roots should run after apt-get update"
+  }
+
+  assert {
+    condition     = length(regexall("(?m)^[^#\\n]*\\b(?:curl|wget)\\b[^\\n]*https://", split("\ndistrust_compromised_ca_roots\n", data.cloudinit_config.nomad_user_data.part[0].content)[0])) == 0
+    error_message = "Nothing should fetch over HTTPS before distrust_compromised_ca_roots runs"
+  }
+
+  assert {
+    condition     = strcontains(data.cloudinit_config.nomad_user_data.part[0].content, "\ndistrust_compromised_ca_roots() {")
+    error_message = "The startup script calls distrust_compromised_ca_roots, so it must also define it"
+  }
+}
+
 run "test_autoscaling_group_configuration" {
   variables {
     nomad_server_hostname = "example.com"
