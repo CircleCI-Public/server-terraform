@@ -116,7 +116,7 @@ install_nomad() {
 
 	retry apt-get install -y nomad=${nomad_version}
 
-	nomad --version || ( echo "Nomad failed to install" && exit 1 )
+	nomad --version || { echo "Nomad failed to install"; return 1; }
 }
 
 configure_nomad() {

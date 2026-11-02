@@ -160,7 +160,7 @@ install_nomad() {
 	log "----------------------------------------------"
 	retry apt-get install -y nomad=${nomad_version}
 
-	nomad --version || ( echo "Nomad failed to install" && exit 1 )
+	nomad --version || { echo "Nomad failed to install"; return 1; }
 }
 
 configure_nomad() {
@@ -488,7 +488,7 @@ curl -o /tmp/info-stash --unix-socket /run/podman/podman.sock http://v1.41/info 
 
 configure_circleci
 setup_liveness_check
-install_nomad || (echo "=================\nFailed to install nomad\n==================\n" && exit 1)
+install_nomad || { echo "=================\nFailed to install nomad\n==================\n"; exit 1; }
 configure_nomad
 
 resume_apt_timers
@@ -505,7 +505,7 @@ sudo apt-get -y purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin
 echo "----------------------------------------"
 echo "	Installing Docker  "
 echo "----------------------------------------"
-apt-get install -y docker-ce=5:28.5.2-1~ubuntu.22.04~jammy docker-ce-cli=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
+apt-get install -y docker-ce=5:28.5.2-1~ubuntu.22.04~jammy docker-ce-cli=5:28.5.2-1~ubuntu.22.04~jammy || { echo "=================\nFailed to install docker-ce\n==================\n"; exit 1; }
 
 enabled_docker_userns
 
@@ -523,7 +523,7 @@ systemctl restart docker
 
 configure_circleci
 setup_liveness_check
-install_nomad || (echo "=================\nFailed to install nomad\n==================\n" && exit 1)
+install_nomad || { echo "=================\nFailed to install nomad\n==================\n"; exit 1; }
 configure_nomad
 
 create_ci_network
