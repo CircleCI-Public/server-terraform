@@ -2,8 +2,13 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
-# if tmpfs is found then cgroups v1 has been configured to be used and the system does not need to be re-initialized
-sudo stat -fc %T /sys/fs/cgroup/ | grep "tmpfs" && exit 0 || echo "Cgroups V2 detected, running system initialization"
+# if tmpfs is found and nomad is installed then the system has been initialized and does not need to be re-initialized
+# an image that already boots cgroups v1 (for example Ubuntu 24.04) still runs the initialization on its first boot
+if stat -fc %T /sys/fs/cgroup/ | grep -q tmpfs && command -v nomad >/dev/null 2>&1; then
+	echo "cgroup v1 is active and Nomad is installed, skipping system initialization"
+	exit 0
+fi
+echo "Running system initialization"
 
 log() {
 	msg=$1
@@ -498,7 +503,13 @@ sudo apt-get -y purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin
 echo "----------------------------------------"
 echo "	Installing Docker  "
 echo "----------------------------------------"
-apt-get install -y docker-ce=5:28.5.2-1~ubuntu.22.04~jammy docker-ce-cli=5:28.5.2-1~ubuntu.22.04~jammy || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
+# Docker publishes one package per Ubuntu release. 22.04 and any other release keep the jammy package.
+case "$(lsb_release -cs)" in
+	noble) DOCKER_VERSION="5:28.5.2-1~ubuntu.24.04~noble" ;;
+	*)     DOCKER_VERSION="5:28.5.2-1~ubuntu.22.04~jammy" ;;
+esac
+echo "Installing docker-ce $DOCKER_VERSION"
+apt-get install -y docker-ce="$DOCKER_VERSION" docker-ce-cli="$DOCKER_VERSION" || (echo "=================\nFailed to install docker-ce\n==================\n" && exit 1)
 
 enabled_docker_userns
 
@@ -543,7 +554,11 @@ resume_apt_timers
 echo "--------------------------------------"
 echo "	Reverting Cgroup v2"
 echo "--------------------------------------"
-revert_cgroups
-reboot
+if stat -fc %T /sys/fs/cgroup/ | grep -q tmpfs; then
+	echo "cgroup v1 is already active, no reboot needed"
+else
+	revert_cgroups
+	reboot
+fi
 
 fi
