@@ -180,3 +180,43 @@ run "test_mtls_configuration" {
     error_message = "Nomad CA should not be empty"
   }
 }
+
+run "test_startup_script_ubuntu_release" {
+  variables {
+    region                = "us-west1"
+    zone                  = "us-west1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+  }
+
+  assert {
+    condition = alltrue([
+      can(regex("(?m)^if stat -fc %T /sys/fs/cgroup/ \\| grep -q tmpfs && command -v nomad >/dev/null 2>&1; then$", google_compute_instance_template.nomad.metadata_startup_script)),
+      !strcontains(google_compute_instance_template.nomad.metadata_startup_script, "grep \"tmpfs\" && exit 0"),
+    ])
+    error_message = "The startup script should skip initialization only when cgroup v1 is active and nomad is installed"
+  }
+
+  assert {
+    condition     = can(regex("(?m)^\\s*noble\\) DOCKER_VERSION=\"5:28\\.5\\.2-1~ubuntu\\.24\\.04~noble\" ;;$", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "Ubuntu 24.04 clients should install the noble docker-ce package"
+  }
+
+  assert {
+    condition     = can(regex("(?m)^\\s*\\*\\)\\s+DOCKER_VERSION=\"5:28\\.5\\.2-1~ubuntu\\.22\\.04~jammy\" ;;$", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "Ubuntu 22.04 and other releases should keep the jammy docker-ce package"
+  }
+
+  assert {
+    condition = alltrue([
+      strcontains(google_compute_instance_template.nomad.metadata_startup_script, "docker-ce=\"$DOCKER_VERSION\""),
+      strcontains(google_compute_instance_template.nomad.metadata_startup_script, "docker-ce-cli=\"$DOCKER_VERSION\""),
+    ])
+    error_message = "docker-ce and docker-ce-cli should install the version selected for the Ubuntu release"
+  }
+
+  assert {
+    condition     = can(regex("(?m)^if stat -fc %T /sys/fs/cgroup/ \\| grep -q tmpfs; then\\n\\s*echo \"cgroup v1 is already active, no reboot needed\"\\nelse\\n\\s*revert_cgroups\\n\\s*reboot\\nfi$", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "The startup script should revert cgroups and reboot only when cgroup v2 is active"
+  }
+}
