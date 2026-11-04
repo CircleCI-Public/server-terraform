@@ -148,6 +148,36 @@ run "test_suspend_az_rebalance" {
   }
 }
 
+run "test_docker_version_by_ubuntu_release" {
+  variables {
+    nomad_server_hostname = "example.com"
+    blocked_cidrs         = ["192.168.1.0/24"]
+    dns_server            = "192.168.0.2"
+    nodes                 = 3
+    vpc_id                = "vpc-12345678"
+    aws_region            = "us-east-1"
+    basename              = "cci-nomad"
+  }
+
+  assert {
+    condition     = can(regex("(?m)^\\s*noble\\) DOCKER_VERSION=\"5:28\\.1\\.1-1~ubuntu\\.24\\.04~noble\" ;;$", data.cloudinit_config.nomad_user_data.part[0].content))
+    error_message = "Ubuntu 24.04 clients should install the noble docker-ce package"
+  }
+
+  assert {
+    condition     = can(regex("(?m)^\\s*\\*\\)\\s+DOCKER_VERSION=\"5:28\\.1\\.1-1~ubuntu\\.22\\.04~jammy\" ;;$", data.cloudinit_config.nomad_user_data.part[0].content))
+    error_message = "Ubuntu 22.04 and other releases should keep the jammy docker-ce package"
+  }
+
+  assert {
+    condition = alltrue([
+      strcontains(data.cloudinit_config.nomad_user_data.part[0].content, "docker-ce=\"$DOCKER_VERSION\""),
+      strcontains(data.cloudinit_config.nomad_user_data.part[0].content, "docker-ce-cli=\"$DOCKER_VERSION\""),
+    ])
+    error_message = "docker-ce and docker-ce-cli should install the version selected for the Ubuntu release"
+  }
+}
+
 run "test_security_group_configuration" {
   variables {
     nomad_server_hostname = "example.com"
