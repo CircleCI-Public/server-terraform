@@ -86,8 +86,14 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 retry apt-get install -y "linux-image-$UNAME"
 retry apt-get update
-retry apt-get -y install docker-ce=5:28.1.1-1~ubuntu.22.04~jammy \
-                   docker-ce-cli=5:28.1.1-1~ubuntu.22.04~jammy \
+# Docker publishes one package per Ubuntu release. 22.04 and any other release keep the jammy package.
+case "$(lsb_release -cs)" in
+    noble) DOCKER_VERSION="5:28.1.1-1~ubuntu.24.04~noble" ;;
+    *)     DOCKER_VERSION="5:28.1.1-1~ubuntu.22.04~jammy" ;;
+esac
+echo "Installing docker-ce $DOCKER_VERSION"
+retry apt-get -y install docker-ce="$DOCKER_VERSION" \
+                   docker-ce-cli="$DOCKER_VERSION" \
                    jq
 
 # force docker to use userns-remap to mitigate CVE 2019-5736
