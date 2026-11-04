@@ -220,3 +220,24 @@ run "test_startup_script_ubuntu_release" {
     error_message = "The startup script should revert cgroups and reboot only when cgroup v2 is active"
   }
 }
+
+run "test_default_client_image" {
+  command = plan
+
+  variables {
+    region                = "us-east1"
+    zone                  = "us-east1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+  }
+
+  assert {
+    condition     = data.google_compute_image.machine_image.project == "circleci-images"
+    error_message = "Clients should use the CircleCI Server Nomad image project by default"
+  }
+
+  assert {
+    condition     = data.google_compute_image.machine_image.family == "circleci-server-nomad-image-2404"
+    error_message = "Clients should use the Ubuntu 24.04 CircleCI Server Nomad image family by default"
+  }
+}
