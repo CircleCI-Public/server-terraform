@@ -61,7 +61,9 @@ To stay on Canonical Ubuntu 22.04, set:
 
 The default image boots cgroup v1, which the Docker clients use. Podman needs
 cgroup v2. When `use_podman = true`, the startup script enables cgroup v2 on the
-first boot of a client and reboots it once.
+first boot of a client and reboots it once, before it installs Nomad. If the
+switch fails, the script stops before Nomad starts, and the managed instance
+group replaces the client when its health check fails.
 
 These inputs do not change the Nomad servers that the module creates when
 `deploy_nomad_server_instances = true`. The servers use
