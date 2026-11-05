@@ -203,7 +203,7 @@ variable "nomad_server_version" {
 
 variable "use_podman" {
   type        = bool
-  description = "Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2)."
+  description = "Use podman as the container runtime instead of Docker. Podman needs cgroup v2. If the image boots cgroup v1 (for example the default image), the startup script enables cgroup v2 and reboots the client once on its first boot."
   default     = false
 }
 

@@ -59,6 +59,10 @@ To stay on Canonical Ubuntu 22.04, set:
   machine_image_family  = "ubuntu-2204-lts"
 ```
 
+The default image boots cgroup v1, which the Docker clients use. Podman needs
+cgroup v2. When `use_podman = true`, the startup script enables cgroup v2 on the
+first boot of a client and reboots it once.
+
 These inputs do not change the Nomad servers that the module creates when
 `deploy_nomad_server_instances = true`. The servers use
 `server_machine_image_family` from the `ubuntu-os-cloud` project.
@@ -166,7 +170,7 @@ These inputs do not change the Nomad servers that the module creates when
 | <a name="input_server_target_cpu_utilization"></a> [server\_target\_cpu\_utilization](#input\_server\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling for nomad server cluster | `number` | `0.8` | no |
 | <a name="input_subnetwork"></a> [subnetwork](#input\_subnetwork) | Subnetwork to deploy nomad clients into. NB. This is required if using custom subnets | `string` | `""` | no |
 | <a name="input_target_cpu_utilization"></a> [target\_cpu\_utilization](#input\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling | `number` | `0.5` | no |
-| <a name="input_use_podman"></a> [use\_podman](#input\_use\_podman) | Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2). | `bool` | `false` | no |
+| <a name="input_use_podman"></a> [use\_podman](#input\_use\_podman) | Use podman as the container runtime instead of Docker. Podman needs cgroup v2. If the image boots cgroup v1 (for example the default image), the startup script enables cgroup v2 and reboots the client once on its first boot. | `bool` | `false` | no |
 | <a name="input_zone"></a> [zone](#input\_zone) | GCP compute zone to deploy nomad clients into (e.g us-east1-a) | `string` | n/a | yes |
 
 ## Outputs

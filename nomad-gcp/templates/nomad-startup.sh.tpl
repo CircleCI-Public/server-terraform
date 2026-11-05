@@ -321,6 +321,13 @@ revert_cgroups(){
       sudo update-grub
 }
 
+enable_cgroups_v2(){
+      for f in /etc/default/grub /etc/default/grub.d/*.cfg; do
+            [ -f "$f" ] && sudo sed -i '/^GRUB_CMDLINE_LINUX/ s/ systemd.unified_cgroup_hierarchy=0//g' "$f"
+      done
+      sudo update-grub
+}
+
 tune_io_scheduler
 prepare_apt
 system_update
@@ -389,6 +396,20 @@ install_nomad || (echo "=================\nFailed to install nomad\n============
 configure_nomad
 
 resume_apt_timers
+
+echo "--------------------------------------"
+echo "	Enabling Cgroup v2"
+echo "--------------------------------------"
+if stat -fc %T /sys/fs/cgroup/ | grep -q tmpfs; then
+	enable_cgroups_v2
+	if grep -q 'systemd.unified_cgroup_hierarchy=0' /boot/grub/grub.cfg; then
+		echo "Could not remove systemd.unified_cgroup_hierarchy=0 from the kernel command line, staying on cgroup v1"
+	else
+		reboot
+	fi
+else
+	echo "cgroup v2 is already active, no reboot needed"
+fi
 
 else
 
