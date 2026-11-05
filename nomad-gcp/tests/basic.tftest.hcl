@@ -241,3 +241,26 @@ run "test_default_client_image" {
     error_message = "Clients should use the Ubuntu 24.04 CircleCI Server Nomad image family by default"
   }
 }
+
+run "test_podman_switches_to_cgroup_v2" {
+  command = plan
+  variables {
+    region                = "us-east1"
+    zone                  = "us-east1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+    use_podman            = true
+  }
+  assert {
+    condition     = can(regex("(?m)^\\s*\\[ -f \"\\$f\" \\] && sudo sed -i '/\\^GRUB_CMDLINE_LINUX/ s/ systemd\\.unified_cgroup_hierarchy=0//g' \"\\$f\"$", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "enable_cgroups_v2 should remove systemd.unified_cgroup_hierarchy=0 from the GRUB kernel command line"
+  }
+  assert {
+    condition     = can(regex("(?m)^if \\[ \"true\" == \"true\" \\]; then$", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "use_podman = true should select the Podman branch of the startup script"
+  }
+  assert {
+    condition     = can(regex("(?s)resume_apt_timers\\s+echo \"-+\"\\s+echo \"\\tEnabling Cgroup v2\".*?if stat -fc %T /sys/fs/cgroup/ \\| grep -q tmpfs; then\\s+enable_cgroups_v2\\s+if grep -q 'systemd\\.unified_cgroup_hierarchy=0' /boot/grub/grub\\.cfg; then.*?else\\s+reboot\\s+fi", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "Podman clients on a cgroup v1 host should enable cgroup v2 and reboot"
+  }
+}
