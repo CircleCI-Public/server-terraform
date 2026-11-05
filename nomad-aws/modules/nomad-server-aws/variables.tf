@@ -77,7 +77,7 @@ variable "machine_image_owners" {
 variable "machine_image_names" {
   type        = list(string)
   description = "Strings to filter image names for nomad virtual machine images."
-  default     = ["CircleCIServerNomad*"]
+  default     = ["ServerNomadV2-*"]
 }
 
 #
