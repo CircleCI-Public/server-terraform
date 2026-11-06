@@ -180,13 +180,13 @@ variable "k8s_namespace" {
 variable "machine_image_project" {
   type        = string
   description = "The project value used to retrieve the virtual machine image."
-  default     = "ubuntu-os-cloud"
+  default     = "circleci-images"
 }
 
 variable "machine_image_family" {
   type        = string
-  description = "The family value used to retrieve the virtual machine image."
-  default     = "ubuntu-2204-lts"
+  description = "The family value used to retrieve the virtual machine image. The default family stores the CircleCI Server Nomad client image in the `us` multi-region. The `circleci-images` project also has regional families with the same image: `circleci-server-nomad-image-2404-us-central1` and `circleci-server-nomad-image-2404-us-east1`."
+  default     = "circleci-server-nomad-image-2404"
 }
 
 variable "nomad_client_version" {
@@ -203,7 +203,7 @@ variable "nomad_server_version" {
 
 variable "use_podman" {
   type        = bool
-  description = "Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2)."
+  description = "Use podman as the container runtime instead of Docker. Podman needs cgroup v2. If the image boots cgroup v1 (for example the default image), the startup script enables cgroup v2 and reboots the client once on its first boot."
   default     = false
 }
 

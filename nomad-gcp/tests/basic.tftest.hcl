@@ -191,7 +191,7 @@ run "test_startup_script_ubuntu_release" {
 
   assert {
     condition = alltrue([
-      can(regex("(?m)^if stat -fc %T /sys/fs/cgroup/ \\| grep -q tmpfs && command -v nomad >/dev/null 2>&1; then$", google_compute_instance_template.nomad.metadata_startup_script)),
+      can(regex("(?m)^elif stat -fc %T /sys/fs/cgroup/ \\| grep -q tmpfs && command -v nomad >/dev/null 2>&1; then$", google_compute_instance_template.nomad.metadata_startup_script)),
       !strcontains(google_compute_instance_template.nomad.metadata_startup_script, "grep \"tmpfs\" && exit 0"),
     ])
     error_message = "The startup script should skip initialization only when cgroup v1 is active and nomad is installed"
@@ -218,5 +218,67 @@ run "test_startup_script_ubuntu_release" {
   assert {
     condition     = can(regex("(?m)^if stat -fc %T /sys/fs/cgroup/ \\| grep -q tmpfs; then\\n\\s*echo \"cgroup v1 is already active, no reboot needed\"\\nelse\\n\\s*revert_cgroups\\n\\s*reboot\\nfi$", google_compute_instance_template.nomad.metadata_startup_script))
     error_message = "The startup script should revert cgroups and reboot only when cgroup v2 is active"
+  }
+}
+
+run "test_default_client_image" {
+  command = plan
+
+  variables {
+    region                = "us-east1"
+    zone                  = "us-east1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+  }
+
+  assert {
+    condition     = data.google_compute_image.machine_image.project == "circleci-images"
+    error_message = "Clients should use the CircleCI Server Nomad image project by default"
+  }
+
+  assert {
+    condition     = data.google_compute_image.machine_image.family == "circleci-server-nomad-image-2404"
+    error_message = "Clients should use the Ubuntu 24.04 CircleCI Server Nomad image family by default"
+  }
+}
+
+run "test_podman_switches_to_cgroup_v2" {
+  command = plan
+  variables {
+    region                = "us-east1"
+    zone                  = "us-east1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+    use_podman            = true
+  }
+  assert {
+    condition     = can(regex("(?m)^if \\[ \"true\" == \"true\" \\]; then\n\\s*if stat -fc %T /sys/fs/cgroup/ \\| grep -q cgroup2fs && command -v nomad >/dev/null 2>&1; then\n\\s*echo \"cgroup v2 is active and Nomad is installed, skipping system initialization\"\n\\s*exit 0$", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "Podman clients should skip initialization only when cgroup v2 is active and nomad is installed"
+  }
+  assert {
+    condition     = can(regex("enable_cgroups_v2\\(\\)\\s*\\{[^}]*for f in /etc/default/grub /etc/default/grub\\.d/\\*\\.cfg; do[^}]*s/ systemd\\.unified_cgroup_hierarchy=0//g' \"\\$f\" \\|\\| rc=1[^}]*update-grub \\|\\| rc=1\\s+return \\$rc", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "enable_cgroups_v2 should remove systemd.unified_cgroup_hierarchy=0 from /etc/default/grub and /etc/default/grub.d/*.cfg, run update-grub and return an error if a step fails"
+  }
+  assert {
+    condition     = length(regexall("enable_cgroups_v2", google_compute_instance_template.nomad.metadata_startup_script)) == 2
+    error_message = "The startup script should define enable_cgroups_v2 and call it once"
+  }
+  assert {
+    condition     = can(regex("(?s)\nif \\[ \"true\" == \"true\" \\] && stat -fc %T /sys/fs/cgroup/ \\| grep -q tmpfs; then\n.*?\n\\s*cgroup_v2_marker=/var/lib/circleci/cgroup-v2-reboot\n\\s*if \\[ -e \"\\$cgroup_v2_marker\" \\]; then\n[^\n]*\n\\s*exit 1\n\\s*fi\n\\s*if ! enable_cgroups_v2 \\|\\| grep -q 'systemd\\.unified_cgroup_hierarchy=0' /boot/grub/grub\\.cfg; then\n[^\n]*\n\\s*exit 1\n\\s*fi\n\\s*mkdir -p /var/lib/circleci\n\\s*touch \"\\$cgroup_v2_marker\"\n[^\n]*\n\\s*reboot\n\\s*exit 0\n\\s*fi\n\\s*tune_io_scheduler\n", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "Podman clients on a cgroup v1 host should enable cgroup v2 and reboot once before the initialization starts, and stop if the switch fails"
+  }
+}
+
+run "test_docker_does_not_switch_to_cgroup_v2" {
+  command = plan
+  variables {
+    region                = "us-east1"
+    zone                  = "us-east1-a"
+    nomad_server_hostname = "example.com"
+    name                  = "test-nomad"
+  }
+  assert {
+    condition     = can(regex("(?m)^if \\[ \"false\" == \"true\" \\] && stat -fc %T /sys/fs/cgroup/ \\| grep -q tmpfs; then$", google_compute_instance_template.nomad.metadata_startup_script))
+    error_message = "Docker clients should not run the cgroup v2 switch"
   }
 }
