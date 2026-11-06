@@ -1,0 +1,4 @@
+review:
+  pr:
+    review_request_on:
+      - pull_request.opened
