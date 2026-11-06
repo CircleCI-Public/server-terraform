@@ -32,6 +32,43 @@ output "module" {
 
 There are more examples in the [examples](./examples/) directory.
 
+## Nomad client image
+
+By default, the Nomad clients boot the CircleCI Server Nomad client image
+(Ubuntu 24.04 with cgroup v1). The module finds the image by family in the
+`circleci-images` project:
+
+| Family | Storage location |
+|---|---|
+| `circleci-server-nomad-image-2404` (default) | `us` multi-region |
+| `circleci-server-nomad-image-2404-us-central1` | `us-central1` |
+| `circleci-server-nomad-image-2404-us-east1` | `us-east1` |
+
+The three families have the same image. A regional family stores the image in
+one region only. If your clients run in `us-central1` or `us-east1`, you can set
+`machine_image_family` to the family of that region. Then GCP creates the boot
+disks from an image in the same region.
+
+If your organization uses the `compute.trustedImageProjects` policy, allow
+`projects/circleci-images`.
+
+To stay on Canonical Ubuntu 22.04, set:
+
+```Terraform
+  machine_image_project = "ubuntu-os-cloud"
+  machine_image_family  = "ubuntu-2204-lts"
+```
+
+The default image boots cgroup v1, which the Docker clients use. Podman needs
+cgroup v2. When `use_podman = true`, the startup script enables cgroup v2 on the
+first boot of a client and reboots it once, before it installs Nomad. If the
+switch fails, the script stops before Nomad starts, and the managed instance
+group replaces the client when its health check fails.
+
+These inputs do not change the Nomad servers that the module creates when
+`deploy_nomad_server_instances = true`. The servers use
+`server_machine_image_family` from the `ubuntu-os-cloud` project.
+
 ---
 
 <!-- BEGIN_TF_DOCS -->
@@ -106,8 +143,8 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_k8s_cluster_name"></a> [k8s\_cluster\_name](#input\_k8s\_cluster\_name) | Kubernetes Cluster Name | `string` | `""` | no |
 | <a name="input_k8s_namespace"></a> [k8s\_namespace](#input\_k8s\_namespace) | If enable\_workload\_identity is true, provide application k8s namespace | `string` | `"circleci-server"` | no |
 | <a name="input_log_level"></a> [log\_level](#input\_log\_level) | Nomad Server and Client Log level | `string` | `"INFO"` | no |
-| <a name="input_machine_image_family"></a> [machine\_image\_family](#input\_machine\_image\_family) | The family value used to retrieve the virtual machine image. | `string` | `"ubuntu-2204-lts"` | no |
-| <a name="input_machine_image_project"></a> [machine\_image\_project](#input\_machine\_image\_project) | The project value used to retrieve the virtual machine image. | `string` | `"ubuntu-os-cloud"` | no |
+| <a name="input_machine_image_family"></a> [machine\_image\_family](#input\_machine\_image\_family) | The family value used to retrieve the virtual machine image. The default family stores the CircleCI Server Nomad client image in the `us` multi-region. The `circleci-images` project also has regional families with the same image: `circleci-server-nomad-image-2404-us-central1` and `circleci-server-nomad-image-2404-us-east1`. | `string` | `"circleci-server-nomad-image-2404"` | no |
+| <a name="input_machine_image_project"></a> [machine\_image\_project](#input\_machine\_image\_project) | The project value used to retrieve the virtual machine image. | `string` | `"circleci-images"` | no |
 | <a name="input_machine_type"></a> [machine\_type](#input\_machine\_type) | Instance type for nomad clients | `string` | `"n2-standard-8"` | no |
 | <a name="input_max_replicas"></a> [max\_replicas](#input\_max\_replicas) | Max number of nomad clients when scaled up | `number` | `4` | no |
 | <a name="input_max_server_instances"></a> [max\_server\_instances](#input\_max\_server\_instances) | Maximum number of nomad server instances. This should be an odd number so that a leader can be elected. Hashicorp recommends either 3, 5 or 7 instances. | `number` | `7` | no |
@@ -136,7 +173,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_server_target_cpu_utilization"></a> [server\_target\_cpu\_utilization](#input\_server\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling for nomad server cluster | `number` | `0.8` | no |
 | <a name="input_subnetwork"></a> [subnetwork](#input\_subnetwork) | Subnetwork to deploy nomad clients into. NB. This is required if using custom subnets | `string` | `""` | no |
 | <a name="input_target_cpu_utilization"></a> [target\_cpu\_utilization](#input\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling | `number` | `0.5` | no |
-| <a name="input_use_podman"></a> [use\_podman](#input\_use\_podman) | Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2). | `bool` | `false` | no |
+| <a name="input_use_podman"></a> [use\_podman](#input\_use\_podman) | Use podman as the container runtime instead of Docker. Podman needs cgroup v2. If the image boots cgroup v1 (for example the default image), the startup script enables cgroup v2 and reboots the client once on its first boot. | `bool` | `false` | no |
 | <a name="input_zone"></a> [zone](#input\_zone) | GCP compute zone to deploy nomad clients into (e.g us-east1-a) | `string` | n/a | yes |
 
 ## Outputs

@@ -2,9 +2,14 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
-# if tmpfs is found and nomad is installed then the system has been initialized and does not need to be re-initialized
-# an image that already boots cgroups v1 (for example Ubuntu 24.04) still runs the initialization on its first boot
-if stat -fc %T /sys/fs/cgroup/ | grep -q tmpfs && command -v nomad >/dev/null 2>&1; then
+# if the host is on the cgroup version of its runtime (v2 for podman, v1 for docker) and nomad is installed then the system has been initialized and does not need to be re-initialized
+# an image that already boots the right cgroup version (for example Ubuntu 24.04 with cgroups v1) still runs the initialization on its first boot
+if [ "${use_podman}" == "true" ]; then
+	if stat -fc %T /sys/fs/cgroup/ | grep -q cgroup2fs && command -v nomad >/dev/null 2>&1; then
+		echo "cgroup v2 is active and Nomad is installed, skipping system initialization"
+		exit 0
+	fi
+elif stat -fc %T /sys/fs/cgroup/ | grep -q tmpfs && command -v nomad >/dev/null 2>&1; then
 	echo "cgroup v1 is active and Nomad is installed, skipping system initialization"
 	exit 0
 fi
@@ -393,6 +398,36 @@ revert_cgroups(){
       sudo sed -i '/^GRUB_CMDLINE_LINUX/ s/"$/ systemd.unified_cgroup_hierarchy=0"/' /etc/default/grub
       sudo update-grub
 }
+
+enable_cgroups_v2(){
+      local f rc=0
+      for f in /etc/default/grub /etc/default/grub.d/*.cfg; do
+            [ -f "$f" ] || continue
+            sudo sed -i '/^GRUB_CMDLINE_LINUX/ s/ systemd.unified_cgroup_hierarchy=0//g' "$f" || rc=1
+      done
+      sudo update-grub || rc=1
+      return $rc
+}
+
+if [ "${use_podman}" == "true" ] && stat -fc %T /sys/fs/cgroup/ | grep -q tmpfs; then
+	echo "--------------------------------------"
+	echo "	Enabling Cgroup v2 for Podman"
+	echo "--------------------------------------"
+	cgroup_v2_marker=/var/lib/circleci/cgroup-v2-reboot
+	if [ -e "$cgroup_v2_marker" ]; then
+		echo "ERROR: cgroup v1 is still active after the reboot to enable cgroup v2, stopping. Kernel command line: $(cat /proc/cmdline)"
+		exit 1
+	fi
+	if ! enable_cgroups_v2 || grep -q 'systemd.unified_cgroup_hierarchy=0' /boot/grub/grub.cfg; then
+		echo "ERROR: could not remove systemd.unified_cgroup_hierarchy=0 from the kernel command line, stopping"
+		exit 1
+	fi
+	mkdir -p /var/lib/circleci
+	touch "$cgroup_v2_marker"
+	echo "Rebooting once to enable cgroup v2"
+	reboot
+	exit 0
+fi
 
 tune_io_scheduler
 prepare_apt
