@@ -57,11 +57,6 @@ echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
 rmmod algif_aead 2>/dev/null || true
 
 echo "--------------------------------------"
-echo "        Installing NTP"
-echo "--------------------------------------"
-apt-get install -y ntp
-
-echo "--------------------------------------"
 echo "Installing Nomad"
 echo "--------------------------------------"
 apt-get update && apt-get install -y wget gpg coreutils

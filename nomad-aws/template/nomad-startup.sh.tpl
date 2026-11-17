@@ -74,11 +74,6 @@ echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
 rmmod algif_aead 2>/dev/null || true
 
 echo "--------------------------------------"
-echo "        Installing NTP"
-echo "--------------------------------------"
-retry apt-get install -y ntp
-
-echo "--------------------------------------"
 echo "        Installing Docker"
 echo "--------------------------------------"
 retry apt-get install -y apt-transport-https ca-certificates curl software-properties-common
