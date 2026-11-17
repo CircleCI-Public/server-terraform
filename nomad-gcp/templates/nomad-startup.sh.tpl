@@ -327,7 +327,6 @@ system_update
 distrust_compromised_ca_roots
 mitigate_cve_2026_31431
 
-install ntp
 install jq
 add_docker_repo
 
