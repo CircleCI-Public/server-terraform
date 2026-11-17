@@ -73,11 +73,6 @@ distrust_compromised_ca_roots
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
 rmmod algif_aead 2>/dev/null || true
 
-echo "--------------------------------------"
-echo "        Installing NTP"
-echo "--------------------------------------"
-retry apt-get install -y ntp
-
 if [ "${use_podman}" == "true" ]; then
 
 echo "--------------------------------------"
