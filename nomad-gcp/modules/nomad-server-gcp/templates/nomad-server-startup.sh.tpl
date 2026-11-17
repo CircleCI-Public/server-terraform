@@ -183,7 +183,6 @@ prepare_apt
 system_update
 mitigate_cve_2026_31431
 distrust_compromised_ca_roots
-install ntp
 install jq
 
 install_nomad || exit 1
