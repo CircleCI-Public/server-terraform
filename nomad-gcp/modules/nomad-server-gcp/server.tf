@@ -89,15 +89,16 @@ resource "google_compute_instance_template" "nomad" {
   metadata_startup_script = templatefile(
     "${path.module}/templates/nomad-server-startup.sh.tpl",
     {
-      nomad_version     = var.nomad_version
-      blocked_cidrs     = var.blocked_cidrs
-      tls_cert          = var.tls_cert
-      tls_key           = var.tls_key
-      tls_ca            = var.tls_ca
-      max_replicas      = var.max_server_instances
-      min_replicas      = var.min_server_instances
-      server_retry_join = var.server_retry_join
-      apt_helpers       = var.apt_helpers
+      nomad_version       = var.nomad_version
+      blocked_cidrs       = var.blocked_cidrs
+      tls_cert            = var.tls_cert
+      tls_key             = var.tls_key
+      tls_ca              = var.tls_ca
+      max_replicas        = var.max_server_instances
+      min_replicas        = var.min_server_instances
+      server_retry_join   = var.server_retry_join
+      apt_helpers         = var.apt_helpers
+      use_image_time_sync = var.use_image_time_sync
     }
   )
 

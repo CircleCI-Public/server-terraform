@@ -31,6 +31,7 @@ module "server" {
   security_group_id             = aws_security_group.nomad_server_sg[0].id
   nomad_version                 = var.nomad_server_version
   apt_helpers                   = local.apt_helpers
+  use_image_time_sync           = var.use_image_time_sync
 }
 
 
