@@ -183,7 +183,7 @@ prepare_apt
 system_update
 mitigate_cve_2026_31431
 distrust_compromised_ca_roots
-if [ "${use_image_time_sync}" != "true" ]; then
+if [ "${use_ntp}" == "true" ]; then
   install ntp
 fi
 install jq

@@ -113,7 +113,7 @@ resource "google_compute_instance_template" "nomad" {
       external_nomad_server  = var.deploy_nomad_server_instances
       apt_retry_max_attempts = var.apt_retry_max_attempts
       apt_helpers            = local.apt_helpers
-      use_image_time_sync    = var.use_image_time_sync
+      use_ntp                = var.use_ntp
     }
   )
 

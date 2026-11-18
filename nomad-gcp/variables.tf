@@ -201,10 +201,10 @@ variable "apt_retry_max_attempts" {
   default     = 5
 }
 
-variable "use_image_time_sync" {
+variable "use_ntp" {
   type        = bool
-  description = "Use the time sync that ships in the machine image (chrony, set to the cloud time service) instead of installing ntp. Set to true to skip the ntp install. The default (false) keeps the current behaviour."
-  default     = false
+  description = "Install ntp on the instance. Set to false to skip the install and keep the chrony that ships in the machine image (Amazon Time Sync on AWS, the metadata server on GCP). The default (true) keeps the current behaviour."
+  default     = true
 }
 
 variable "health_check_timeout_sec" {

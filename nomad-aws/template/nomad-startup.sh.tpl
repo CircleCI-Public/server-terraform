@@ -73,7 +73,7 @@ distrust_compromised_ca_roots
 echo "install algif_aead /bin/false" > /etc/modprobe.d/disable-algif.conf
 rmmod algif_aead 2>/dev/null || true
 
-if [ "${use_image_time_sync}" != "true" ]; then
+if [ "${use_ntp}" == "true" ]; then
 echo "--------------------------------------"
 echo "        Installing NTP"
 echo "--------------------------------------"
