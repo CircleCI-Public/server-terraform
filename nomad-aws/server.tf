@@ -30,6 +30,7 @@ module "server" {
   log_level                     = var.log_level
   security_group_id             = aws_security_group.nomad_server_sg[0].id
   apt_helpers                   = local.apt_helpers
+  use_ntp                       = var.use_ntp
 }
 
 

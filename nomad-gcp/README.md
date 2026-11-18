@@ -163,6 +163,7 @@ These inputs do not change the Nomad servers that the module creates when
 | <a name="input_server_target_cpu_utilization"></a> [server\_target\_cpu\_utilization](#input\_server\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling for nomad server cluster | `number` | `0.8` | no |
 | <a name="input_subnetwork"></a> [subnetwork](#input\_subnetwork) | Subnetwork to deploy nomad clients into. NB. This is required if using custom subnets | `string` | `""` | no |
 | <a name="input_target_cpu_utilization"></a> [target\_cpu\_utilization](#input\_target\_cpu\_utilization) | Target CPU utilization to trigger autoscaling | `number` | `0.5` | no |
+| <a name="input_use_ntp"></a> [use\_ntp](#input\_use\_ntp) | Install ntp on the instance. Set to false to skip the install and keep the chrony that ships in the machine image (Amazon Time Sync on AWS, the metadata server on GCP). The default (true) keeps the current behaviour. | `bool` | `true` | no |
 | <a name="input_zone"></a> [zone](#input\_zone) | GCP compute zone to deploy nomad clients into (e.g us-east1-a) | `string` | n/a | yes |
 
 ## Outputs

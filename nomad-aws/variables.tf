@@ -189,6 +189,12 @@ variable "apt_retry_max_attempts" {
   default     = 5
 }
 
+variable "use_ntp" {
+  type        = bool
+  description = "Install ntp on the instance. Set to false to skip the install and keep the chrony that ships in the machine image (Amazon Time Sync on AWS, the metadata server on GCP). The default (true) keeps the current behaviour."
+  default     = true
+}
+
 variable "allowed_ips_retry_ssh" {
   type        = list(string)
   description = "List of IPv4 ranges that are permitted to access nomad nodes for the retry-with-ssh feature"
