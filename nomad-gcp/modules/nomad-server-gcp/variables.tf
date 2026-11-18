@@ -246,3 +246,8 @@ variable "apt_helpers" {
   description = "Shared bash helpers (prepare_apt/resume_apt_timers) injected into the server startup script."
   type        = string
 }
+variable "use_ntp" {
+  type        = bool
+  description = "Install ntp on the instance. Set to false to skip the install and keep the chrony that ships in the machine image (Amazon Time Sync on AWS, the metadata server on GCP). The default (true) keeps the current behaviour."
+  default     = true
+}

@@ -195,6 +195,12 @@ variable "apt_retry_max_attempts" {
   default     = 5
 }
 
+variable "use_ntp" {
+  type        = bool
+  description = "Install ntp on the instance. Set to false to skip the install and keep the chrony that ships in the machine image (Amazon Time Sync on AWS, the metadata server on GCP). The default (true) keeps the current behaviour."
+  default     = true
+}
+
 variable "use_podman" {
   type        = bool
   description = "Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2)."

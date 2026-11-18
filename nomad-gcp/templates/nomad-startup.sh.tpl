@@ -362,7 +362,9 @@ system_update
 distrust_compromised_ca_roots
 mitigate_cve_2026_31431
 
-install ntp
+if [ "${use_ntp}" == "true" ]; then
+  install ntp
+fi
 install jq
 
 if [ "${use_podman}" == "true" ]; then

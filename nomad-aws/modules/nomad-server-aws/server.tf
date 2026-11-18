@@ -92,6 +92,7 @@ data "cloudinit_config" "nomad_server_user_data" {
         nomad_version     = var.nomad_version
         log_level         = var.log_level
         apt_helpers       = var.apt_helpers
+        use_ntp           = var.use_ntp
       }
     )
   }

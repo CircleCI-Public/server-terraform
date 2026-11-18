@@ -173,6 +173,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes. Both clients and servers when deployed | `string` | `null` | no |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet ID | `string` | `""` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Subnet IDs | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
+| <a name="input_use_ntp"></a> [use\_ntp](#input\_use\_ntp) | Install ntp on the instance. Set to false to skip the install and keep the chrony that ships in the machine image (Amazon Time Sync on AWS, the metadata server on GCP). The default (true) keeps the current behaviour. | `bool` | `true` | no |
 | <a name="input_use_podman"></a> [use\_podman](#input\_use\_podman) | Use podman as the container runtime instead of Docker. Requires a podman-compatible AMI (cgroupv2). | `bool` | `false` | no |
 | <a name="input_volume_type"></a> [volume\_type](#input\_volume\_type) | The EBS volume type of the node. If gp3 is not available in your desired region, switch to gp2 | `string` | `"gp3"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |
