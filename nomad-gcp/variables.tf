@@ -201,6 +201,12 @@ variable "apt_retry_max_attempts" {
   default     = 5
 }
 
+variable "use_image_time_sync" {
+  type        = bool
+  description = "Use the time sync that ships in the machine image (chrony, set to the cloud time service) instead of installing ntp. Set to true to skip the ntp install. The default (false) keeps the current behaviour."
+  default     = false
+}
+
 variable "health_check_timeout_sec" {
   description = "Nomad Server Heath Check Timeout in seconds"
   type        = number

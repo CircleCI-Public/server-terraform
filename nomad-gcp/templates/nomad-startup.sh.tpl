@@ -327,6 +327,9 @@ system_update
 distrust_compromised_ca_roots
 mitigate_cve_2026_31431
 
+if [ "${use_image_time_sync}" != "true" ]; then
+  install ntp
+fi
 install jq
 add_docker_repo
 

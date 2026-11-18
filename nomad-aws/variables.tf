@@ -189,6 +189,12 @@ variable "apt_retry_max_attempts" {
   default     = 5
 }
 
+variable "use_image_time_sync" {
+  type        = bool
+  description = "Use the time sync that ships in the machine image (chrony, set to the cloud time service) instead of installing ntp. Set to true to skip the ntp install. The default (false) keeps the current behaviour."
+  default     = false
+}
+
 variable "allowed_ips_retry_ssh" {
   type        = list(string)
   description = "List of IPv4 ranges that are permitted to access nomad nodes for the retry-with-ssh feature"

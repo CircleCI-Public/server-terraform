@@ -198,3 +198,8 @@ variable "apt_helpers" {
   description = "Shared bash helpers (prepare_apt/resume_apt_timers) injected into the server startup script."
   type        = string
 }
+variable "use_image_time_sync" {
+  type        = bool
+  description = "Use the time sync that ships in the machine image (chrony, set to the cloud time service) instead of installing ntp. Set to true to skip the ntp install. The default (false) keeps the current behaviour."
+  default     = false
+}

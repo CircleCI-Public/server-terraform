@@ -168,6 +168,7 @@ There are more examples in the [examples](./examples/) directory.
 | <a name="input_ssh_key"></a> [ssh\_key](#input\_ssh\_key) | SSH Public key to access nomad nodes. Both clients and servers when deployed | `string` | `null` | no |
 | <a name="input_subnet"></a> [subnet](#input\_subnet) | Subnet ID | `string` | `""` | no |
 | <a name="input_subnets"></a> [subnets](#input\_subnets) | Subnet IDs | `list(string)` | <pre>[<br/>  ""<br/>]</pre> | no |
+| <a name="input_use_image_time_sync"></a> [use\_image\_time\_sync](#input\_use\_image\_time\_sync) | Use the time sync that ships in the machine image (chrony, set to the cloud time service) instead of installing ntp. Set to true to skip the ntp install. The default (false) keeps the current behaviour. | `bool` | `false` | no |
 | <a name="input_volume_type"></a> [volume\_type](#input\_volume\_type) | The EBS volume type of the node. If gp3 is not available in your desired region, switch to gp2 | `string` | `"gp3"` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID of VPC used for Nomad resources | `string` | n/a | yes |
 
