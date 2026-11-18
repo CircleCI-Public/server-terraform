@@ -123,7 +123,7 @@ rmmod algif_aead 2>/dev/null || true
 echo "--------------------------------------"
 echo "        Installing common packages"
 echo "--------------------------------------"
-retry apt-get install -y ntp wget gpg coreutils
+retry apt-get install -y wget gpg coreutils
 
 echo "--------------------------------------"
 echo "  Adding HashiCorp apt repository"
